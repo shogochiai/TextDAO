@@ -1,10 +1,27 @@
 # ERC-7546 UCS TDD Example
 
 ## Overview
-- This is a Foundry project
-- DoubleOp and ProposeUp are tested
-- To remove all proxy thingies, ops-related-state is being stored under the test contract itself. (No UCS proxy creation, just focus on functions and unit testing.)
-- You can [fuzz state](https://mirror.xyz/shogochiai.eth/qw8PutYbxhm3g8FaW9g4NjKq14giC8jVtq_aMFOvkSU) hence scenario testing can be removed. This is for making unit test simpler and faster.
+- This project was born for solving unconfortable UUPS-based testing/devops experience.  
+- The downside of UUPS testing are
+  - You must be proxy-concerned.
+  - One-implementation, one proxy.
+  - Hardhat.
+  - "BigNumber"
+  - Slow.
+  - State preparation via complex scenario.
+- The virtue of UCS testing are
+  - Just unit test functions.
+  - No proxies within your sight.
+  - Foundry.
+  - Just simply write Solidity.
+  - Fast.
+  - Made up your state and run [fuzz testing](https://mirror.xyz/shogochiai.eth/qw8PutYbxhm3g8FaW9g4NjKq14giC8jVtq_aMFOvkSU).
+
+## Status
+- DoubleOp and ProposeOp test cases are demonstrated.
+
+## Roadmap
+- More example like "ve", "DAO", and "AA"
 
 ## Screenshots
 
