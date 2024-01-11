@@ -1,15 +1,17 @@
 # ERC-7546 UCS TDD Example
 
 ## Overview
-- This project was born for solving unconfortable UUPS-based testing/devops experience.  
-- The downside of UUPS testing are
+This project was born for solving unconfortable UUPS-based testing/devops experience.  
+
+**The downside of UUPS testing are**
   - You must be proxy-concerned.
   - One-implementation, one proxy.
   - Hardhat.
   - "BigNumber"
   - Slow.
   - State preparation via complex scenario.
-- The virtue of UCS testing are
+
+**The virtue of UCS testing are**
   - Just unit test functions.
   - No proxies within your sight.
   - Foundry.
