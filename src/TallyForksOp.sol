@@ -7,7 +7,7 @@ import { SortLib } from "./SortLib.sol";
 contract TallyForksOp {
     function tallyForks(uint pid) external returns (bool) {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.Proposal storage $p = $.proposals[pid];
         StorageLib.HeaderFork[] storage $hfs = $p.headerForks;
         StorageLib.BodyFork[] storage $bfs = $p.bodyForks;
 
