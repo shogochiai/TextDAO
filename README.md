@@ -23,6 +23,7 @@ This project was born for solving unconfortable UUPS-based testing/devops experi
 - DoubleOp and ProposeOp test cases are demonstrated.
 
 ## Roadmap
+- Cross-op state mutation.
 - More example like "ve", "DAO", and "AA"
 
 ## Screenshots
