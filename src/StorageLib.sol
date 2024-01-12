@@ -17,7 +17,8 @@ library StorageLib {
     enum ScoringRules {
         MajorityRule,
         BordaCount,
-        TokenGovernance
+        TokenGovernance,
+        QuadraticVoting
     }
     struct ProposalArg {
         HeaderFork headerFork;

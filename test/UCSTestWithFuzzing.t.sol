@@ -6,6 +6,7 @@ import { UCSTestBase } from "lib/UCSTestBase.sol";
 import { DoubleOp } from "src/DoubleOp.sol";
 import { ProposeOp } from "src/ProposeOp.sol";
 import { MajorityVoteForProposalOp } from "src/MajorityVoteForProposalOp.sol";
+import { BordaVoteForForksOp } from "src/BordaVoteForForksOp.sol";
 import { ExecuteProposalOp } from "src/ExecuteProposalOp.sol";
 import { TallyForksOp } from "src/TallyForksOp.sol";
 import { StorageLib } from "src/StorageLib.sol";
@@ -17,6 +18,8 @@ contract UCSTestWithStateFuzzing is UCSTestBase {
         implementations[ProposeOp.propose.selector] = address(new ProposeOp());
         implementations[MajorityVoteForProposalOp.majorityVoteForProposal.selector] = address(new MajorityVoteForProposalOp());
         implementations[ExecuteProposalOp.executeProposal.selector] = address(new ExecuteProposalOp());
+        implementations[BordaVoteForForksOp.bordaVoteForHeaderForks.selector] = address(new BordaVoteForForksOp());
+        implementations[BordaVoteForForksOp.bordaVoteForBodyForks.selector] = address(new BordaVoteForForksOp());
         implementations[TallyForksOp.tallyForks.selector] = address(new TallyForksOp());
     }
 
@@ -65,17 +68,55 @@ contract UCSTestWithStateFuzzing is UCSTestBase {
         assertEq(flagAfter, true);
     }
 
-    function test_executeProposal_bordaRule() public {
+    function test_bordaVoteForHeaderForks() public {
         uint pid = 0;
+        uint fork1stId = 9;
+        uint fork2ndId = 1;
+        uint fork3rdId = 5;
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        $p.bodyForks.push();
-        $p.proposalMeta.scoringRule = StorageLib.ScoringRules.BordaCount;
+        StorageLib.HeaderFork[] storage $hfs = $p.headerForks;
+        for (uint i; i < 10; i++) {
+            $hfs.push();
+        }
 
-        bool flagBefore = StorageLib.$Proposals().globalSuperImportantFlag;
-        ExecuteProposalOp(address(this)).executeProposal(pid);
-        bool flagAfter = StorageLib.$Proposals().globalSuperImportantFlag;
-        assertEq(flagBefore, false);
-        assertEq(flagAfter, true);
+        uint fork1stScoreBefore = $p.headerForks[fork1stId].currentScore;
+        uint fork2ndScoreBefore = $p.headerForks[fork2ndId].currentScore;
+        uint fork3rdScoreBefore = $p.headerForks[fork3rdId].currentScore;
+
+        BordaVoteForForksOp(address(this)).bordaVoteForHeaderForks(pid, [fork1stId, fork2ndId, fork3rdId]);
+
+        uint fork1stScoreAfter = $p.headerForks[fork1stId].currentScore;
+        uint fork2ndScoreAfter = $p.headerForks[fork2ndId].currentScore;
+        uint fork3rdScoreAfter = $p.headerForks[fork3rdId].currentScore;
+
+        assertEq(fork1stScoreBefore + 3, fork1stScoreAfter);
+        assertEq(fork2ndScoreBefore + 2, fork2ndScoreAfter);
+        assertEq(fork3rdScoreBefore + 1, fork3rdScoreAfter);
+    }
+    function test_bordaVoteForBodyForks() public {
+        uint pid = 0;
+        uint fork1stId = 7;
+        uint fork2ndId = 6;
+        uint fork3rdId = 5;
+        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.BodyFork[] storage $bfs = $p.bodyForks;
+        for (uint i; i < 10; i++) {
+            $bfs.push();
+        }
+
+        uint fork1stScoreBefore = $p.bodyForks[fork1stId].currentScore;
+        uint fork2ndScoreBefore = $p.bodyForks[fork2ndId].currentScore;
+        uint fork3rdScoreBefore = $p.bodyForks[fork3rdId].currentScore;
+
+        BordaVoteForForksOp(address(this)).bordaVoteForBodyForks(pid, [fork1stId, fork2ndId, fork3rdId]);
+
+        uint fork1stScoreAfter = $p.bodyForks[fork1stId].currentScore;
+        uint fork2ndScoreAfter = $p.bodyForks[fork2ndId].currentScore;
+        uint fork3rdScoreAfter = $p.bodyForks[fork3rdId].currentScore;
+
+        assertEq(fork1stScoreBefore + 3, fork1stScoreAfter);
+        assertEq(fork2ndScoreBefore + 2, fork2ndScoreAfter);
+        assertEq(fork3rdScoreBefore + 1, fork3rdScoreAfter);
     }
 
     function test_tallyForks_bordaRule() public {
@@ -111,5 +152,19 @@ contract UCSTestWithStateFuzzing is UCSTestBase {
         assertEq($p.bodyForksMeta.winningBody3rd, 6);
         assertEq($p.bodyForksMeta.nextTallyFrom, 11);
     }
+
+    function test_executeProposal_bordaRule() public {
+        uint pid = 0;
+        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        $p.bodyForks.push();
+        $p.proposalMeta.scoringRule = StorageLib.ScoringRules.BordaCount;
+
+        bool flagBefore = StorageLib.$Proposals().globalSuperImportantFlag;
+        ExecuteProposalOp(address(this)).executeProposal(pid);
+        bool flagAfter = StorageLib.$Proposals().globalSuperImportantFlag;
+        assertEq(flagBefore, false);
+        assertEq(flagAfter, true);
+    }
+
 
 }
