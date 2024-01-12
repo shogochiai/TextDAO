@@ -10,6 +10,7 @@ abstract contract UCSTestBase is Test {
 
     fallback(bytes calldata) external payable returns (bytes memory){
         address opAddress = implementations[msg.sig];
+        require(opAddress != address(0), "Called implementation is not registered.");
         (bool success, bytes memory data) = opAddress.delegatecall(msg.data);
         require(success);
         return data;

@@ -20,14 +20,13 @@ This project was born for solving unconfortable UUPS-based testing/devops experi
   - Made up your state and run [fuzz testing](https://mirror.xyz/shogochiai.eth/qw8PutYbxhm3g8FaW9g4NjKq14giC8jVtq_aMFOvkSU).
 
 ## Status
-- DoubleOp and ProposeOp test cases are demonstrated.
+- DoubleOp, ProposeOp, and VoteOp test cases are demonstrated.
+  - ProposeOp and VoteOp are sharing the same state. Functions can share their storage and you can treat UCS proxy as a singleton contract.
+![propose op](./docs/images/proposeop.png)
+![vote op](./docs/images/voteop.png)
 
 ## Roadmap
-- Cross-op state mutation.
 - More example like "ve", "DAO", and "AA"
 
 ## Screenshots
-
 ![test cases](./docs/images/test-cases.png)
-![propose op](./docs/images/proposeop.png)
-![test result](./docs/images/test-result.png)

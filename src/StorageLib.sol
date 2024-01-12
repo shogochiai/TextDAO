@@ -10,8 +10,19 @@ library StorageLib {
      ********************/
     /// @custom:storage-location erc7201:ucstest.proposeop.proposals
     struct ProposeOpStorage {
-        mapping(uint => string) proposals;
+        mapping(uint => Proposal) proposals;
         uint nextProposalId;
+    }
+    struct Proposal {
+        string title;
+        string body;
+        Command[] commands;
+        uint yay;
+        uint nay;
+    }
+    struct Command {
+        address passopAddr;
+        bytes txbytes;
     }
 
     // keccak256(abi.encode(uint256(keccak256("ucstest.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
