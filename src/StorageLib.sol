@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 /**
  * StorageLib v0.1.0
  */
-library StorageLib {
+library StorageLib {    
     /*********************
      *  ProposeOpStorage
      ********************/
@@ -14,17 +14,59 @@ library StorageLib {
         uint nextProposalId;
         bool globalSuperImportantFlag;
     }
+    enum ScoringRules {
+        MajorityRule,
+        BordaCount,
+        TokenGovernance
+    }
+    struct ProposalArg {
+        HeaderFork headerFork;
+        BodyFork bodyFork;
+        HeaderForksMeta headerForksMeta;
+        BodyForksMeta bodyForksMeta;
+        ProposalMeta proposalMeta;
+    }
     struct Proposal {
+        HeaderFork[] headerForks;
+        BodyFork[] bodyForks;
+        HeaderForksMeta headerForksMeta;
+        BodyForksMeta bodyForksMeta;
+        ProposalMeta proposalMeta;
+    }
+    struct HeaderFork {
         string title;
+        uint currentScore;
+    }
+    struct BodyFork {
         string body;
-        uint quorum;
         Command[] commands;
-        uint yay;
-        uint nay;
+        uint currentScore;
     }
     struct Command {
         address target;
         bytes txbytes;
+    }
+    struct HeaderForksMeta {
+        uint quorumScore;
+        uint expireAt;
+        uint winningHeader1st;
+        uint winningHeader2nd;
+        uint winningHeader3rd;
+        uint nextTallyFrom;
+    }
+    struct BodyForksMeta {
+        uint quorumScore;
+        uint expireAt;
+        uint winningBody1st;
+        uint winningBody2nd;
+        uint winningBody3rd;
+        uint nextTallyFrom;
+    }
+    struct ProposalMeta {
+        ScoringRules scoringRule;
+        uint currentScore;
+        uint quorumScore;
+        uint expireAt;
     }
 
     // keccak256(abi.encode(uint256(keccak256("ucstest.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
