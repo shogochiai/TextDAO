@@ -52,7 +52,7 @@ TallyForksOp example shows UCS is able to sustain several voting rule (even you 
 - Commit [2ce217](https://github.com/shogochiai/erc7546ucs-tdd-example/tree/2ce21728bcb4fbccf6931517c4d0bddbbb84e50d) `forge test`, solc 0.8.23, 2 files
   - Compilation time: 5.43s
   - Test running time: 105.02ms
-- Commit []() `forge test`, solc 0.8.23, 8 files
+- Commit [be2f7f](https://github.com/shogochiai/erc7546ucs-tdd-example/tree/be2f7f973dd880708307ece5144c24fef0987e96) `forge test`, solc 0.8.23, 8 files
   - Compilation time: 6.37s
   - Test running time: 110.27ms
 - You won't need to browse X (Twitter) every time you run test :)
