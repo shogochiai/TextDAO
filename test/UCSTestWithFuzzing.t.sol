@@ -5,6 +5,7 @@ import { Test, stdStorage, StdStorage } from "forge-std/Test.sol";
 import { UCSTestBase } from "lib/UCSTestBase.sol";
 import { DoubleOp } from "src/DoubleOp.sol";
 import { ProposeOp } from "src/ProposeOp.sol";
+import {StorageLib} from "src/StorageLib.sol";
 
 contract UCSTestWithStateFuzzing is UCSTestBase {
     using stdStorage for StdStorage;
@@ -25,8 +26,10 @@ contract UCSTestWithStateFuzzing is UCSTestBase {
     }
 
     function test_propose() public {
-        uint pid = ProposeOp(address(this)).propose("This is a testProposal.");
-        assertGt(pid, 0);
+        string memory proposeText = "This is a testProposal.";
+        uint pid = ProposeOp(address(this)).propose(proposeText);
+        assertEq(pid, 1);
+        assertEq(StorageLib.$Proposals().proposals[pid], proposeText);
     }
 
 }
