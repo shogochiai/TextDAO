@@ -1,7 +1,7 @@
 # ERC-7546 UCS TDD Example
 
 ## Overview
-This project was born for solving unconfortable UUPS-based testing/devops experience.  
+This project was born to solve unconfortable UUPS-based testing/devops experience.  
 
 **The downside of UUPS testing are**
   - You must be proxy-concerned.
@@ -22,11 +22,11 @@ This project was born for solving unconfortable UUPS-based testing/devops experi
 ## Status
 - DoubleOp, ProposeOp, VoteOp, and ExecuteOp test cases are demonstrated.
   - ProposeOp and VoteOp are sharing the same state. Functions can share their storage and you can treat UCS proxy as a singleton contract.
+    ![propose op](./docs/images/proposeop.png)
+    ![vote op](./docs/images/voteop.png)
   - The fuzz test of ExecuteOp has "fuzzable" prerequisite state.
-![propose op](./docs/images/proposeop.png)
-![vote op](./docs/images/voteop.png)
-![execute op](./docs/images/executeop.png)
-![test execute](./docs/images/testexecute.png)
+    ![execute op](./docs/images/executeop.png)
+    ![test execute](./docs/images/testexecute.png)
 
 ## Roadmap
-- More example like "ve", "DAO", and "AA"
+- More example like "ve" and "AA"
