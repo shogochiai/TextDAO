@@ -6,6 +6,7 @@ import { UCSTestBase } from "lib/UCSTestBase.sol";
 import { DoubleOp } from "src/DoubleOp.sol";
 import { ProposeOp } from "src/ProposeOp.sol";
 import { VoteOp } from "src/VoteOp.sol";
+import { ExecuteOp } from "src/ExecuteOp.sol";
 import { StorageLib } from "src/StorageLib.sol";
 
 contract UCSTestWithStateFuzzing is UCSTestBase {
@@ -14,6 +15,7 @@ contract UCSTestWithStateFuzzing is UCSTestBase {
         implementations[DoubleOp.double.selector] = address(new DoubleOp());
         implementations[ProposeOp.propose.selector] = address(new ProposeOp());
         implementations[VoteOp.vote.selector] = address(new VoteOp());
+        implementations[ExecuteOp.execute.selector] = address(new ExecuteOp());
     }
 
     function test_double(uint x) public {
@@ -32,12 +34,28 @@ contract UCSTestWithStateFuzzing is UCSTestBase {
         assertEq(StorageLib.$Proposals().proposals[pid].title, p.title);
     }
 
-    function test_yayVote() public {
+    function test_vote() public {
         uint pid = 1;
         uint yayBefore = StorageLib.$Proposals().proposals[pid].yay;
         VoteOp(address(this)).vote(pid, true);
         uint yayAfter = StorageLib.$Proposals().proposals[pid].yay;
         assertEq(yayBefore + 1, yayAfter);
+    }
+
+    function test_execute(uint _yay, uint _nay) public {
+        uint pid = 1;
+        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        $p.quorum = 8;
+        vm.assume(_yay > $p.quorum);
+        vm.assume(_yay > _nay);
+        $p.yay = _yay;
+        $p.nay = _nay;
+
+        bool flagBefore = StorageLib.$Proposals().globalSuperImportantFlag;
+        ExecuteOp(address(this)).execute(pid);
+        bool flagAfter = StorageLib.$Proposals().globalSuperImportantFlag;
+        assertEq(flagBefore, false);
+        assertEq(flagAfter, true);
     }
 
 

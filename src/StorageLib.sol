@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.13;
 
 /**
  * StorageLib v0.1.0
@@ -12,16 +12,18 @@ library StorageLib {
     struct ProposeOpStorage {
         mapping(uint => Proposal) proposals;
         uint nextProposalId;
+        bool globalSuperImportantFlag;
     }
     struct Proposal {
         string title;
         string body;
+        uint quorum;
         Command[] commands;
         uint yay;
         uint nay;
     }
     struct Command {
-        address passopAddr;
+        address target;
         bytes txbytes;
     }
 
