@@ -28,7 +28,7 @@ This project was born to solve unconfortable UUPS-based testing/devops experienc
 ProposeOp and MajorityVoteForProposal are sharing the same state. Functions can share their storage and you can treat UCS proxy as a singleton contract.
 
 ![propose op](./docs/images/propose.png)
-![majority vote for proposal op](./docs/images/mjvToP.png)
+![majority vote for proposal op](./docs/images/mjvToProp.png)
 
 
 ### Fuzzable state and faster test 
