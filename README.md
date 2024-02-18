@@ -1,4 +1,4 @@
-# TxtDAO
+# TextDAO
 
 ## Overview
 - A DAO with ERC-7546 UCS, it means DAO plugin architecture.
@@ -48,13 +48,13 @@ Action {
   bytes abiParams;
 }
 ```
-### TxtSavePassOp
+### TextSavePassOp
 
 #### Amazingly simple contract
 ```
-contract TxtSavePassOp {
-  function txtSave(uint pid, uint txtId, bytes32[] metadataURIs) public onlyPassed(pid) {
-    txts[txtId] = metadataURIs;
+contract TextSavePassOp {
+  function textSave(uint pid, uint textId, bytes32[] metadataURIs) public onlyPassed(pid) {
+    texts[textId] = metadataURIs;
   }
 }
 ```
@@ -65,9 +65,9 @@ contract TxtSavePassOp {
 Command memory cmd;
 cmd.id = $.newCommandId();
 Action memory act;
-act.addr = TXT_SAVE_OP_ADDR;
-act.func = "txtSave(uint256, uint256, bytes32[])";
-act.abiParams = abi.encode(pid, $.newTxtId(), [cid1, cid2]);
+act.addr = TEXT_SAVE_OP_ADDR;
+act.func = "textSave(uint256, uint256, bytes32[])";
+act.abiParams = abi.encode(pid, $.newTextId(), [cid1, cid2]);
 act.actions[0] = act;
 
 // Just FYI, calldata will be like this in ExecuteOp.sol
@@ -100,15 +100,15 @@ bytes.concat(
 - ExecuteOp
 
 ### Law
-- ProposeOp([{TxtSavePassOp, pid, txtId, [txtURI1, txtURI2]}, {XxxPassOp}])
+- ProposeOp([{TextSavePassOp, pid, textId, [textURI1, textURI2]}, {XxxPassOp}])
 - MajorityVoteForInspectionOp
   - pick Reps
-- ForkOp([txtURI3, txtURI4]) // TxtSavePassOp, pid, and txtId are to be omitted?
+- ForkOp([textURI3, textURI4]) // TextSavePassOp, pid, and textId are to be omitted?
 - RankedChoiceVoteForForksOp(fid, [...ranks])
   - onlyReps
 - TallyForksOp
 - ExecuteOp
-- TxtSavePassOp() // modeling https://gist.github.com/shogochiai/fc636df8c13be967f37884acf8e8f6f3
+- TextSavePassOp() // modeling https://gist.github.com/shogochiai/fc636df8c13be967f37884acf8e8f6f3
 - ex) ProposeOp(AddBotPassOp, botAddr)
 
 --- Common Util Ops
