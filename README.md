@@ -2,7 +2,7 @@
 
 ## Overview
 - A DAO with ERC-7546 UCS, it means DAO plugin architecture.
-- RCV voting for text diff reveiw.
+- RCV voting for text diff review.
 
 ## Motivation
 - No more google docs for DAOs.
