@@ -7,11 +7,11 @@ contract ProposeOp {
     function propose(StorageLib.ProposalArg calldata _p) external returns (uint proposalId) {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[proposalId];
-        $p.headerForks.push(_p.headerFork);
-        $p.bodyForks.push(_p.bodyFork);
+        $p.headers.push(_p.header);
+        $p.cmds.push(_p.cmd);
         $p.proposalMeta = _p.proposalMeta;
-        $p.headerForksMeta.winningHeader1st = proposalId;
-        $p.bodyForksMeta.winningBody1st = proposalId;
+        $p.proposalMeta.headerRank[0] = _p.header.id;
+        $p.proposalMeta.cmdRank[0] = _p.cmd.id;
 
         proposalId = $.nextProposalId;
         $.nextProposalId++;

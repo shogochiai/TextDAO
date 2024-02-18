@@ -22,11 +22,11 @@ contract Test1 is UCSTestBase {
 
     function test_propose() public {
         StorageLib.ProposalArg memory p;
-        p.headerFork.title = "This is a test proposal.";
+        p.header.metadataURI = "Qc.....xh";
         uint pid = ProposeOp(address(this)).propose(p);
         assertEq(pid, 0);
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        assertEq($p.headerForks[$p.headerForksMeta.winningHeader1st].title, p.headerFork.title);
+        assertEq($p.headers[$p.proposalMeta.headerRank[0]].metadataURI, p.header.metadataURI);
     }
 
     function test_rcvHeaderForks() public {
@@ -35,20 +35,20 @@ contract Test1 is UCSTestBase {
         uint fork2ndId = 1;
         uint fork3rdId = 5;
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        StorageLib.HeaderFork[] storage $hfs = $p.headerForks;
+        StorageLib.Header[] storage $headers = $p.headers;
         for (uint i; i < 10; i++) {
-            $hfs.push();
+            $headers.push();
         }
 
-        uint fork1stScoreBefore = $p.headerForks[fork1stId].currentScore;
-        uint fork2ndScoreBefore = $p.headerForks[fork2ndId].currentScore;
-        uint fork3rdScoreBefore = $p.headerForks[fork3rdId].currentScore;
+        uint fork1stScoreBefore = $p.headers[fork1stId].currentScore;
+        uint fork2ndScoreBefore = $p.headers[fork2ndId].currentScore;
+        uint fork3rdScoreBefore = $p.headers[fork3rdId].currentScore;
 
         RCVForForksOp(address(this)).rcvForHeaderForks(pid, [fork1stId, fork2ndId, fork3rdId]);
 
-        uint fork1stScoreAfter = $p.headerForks[fork1stId].currentScore;
-        uint fork2ndScoreAfter = $p.headerForks[fork2ndId].currentScore;
-        uint fork3rdScoreAfter = $p.headerForks[fork3rdId].currentScore;
+        uint fork1stScoreAfter = $p.headers[fork1stId].currentScore;
+        uint fork2ndScoreAfter = $p.headers[fork2ndId].currentScore;
+        uint fork3rdScoreAfter = $p.headers[fork3rdId].currentScore;
 
         assertEq(fork1stScoreBefore + 3, fork1stScoreAfter);
         assertEq(fork2ndScoreBefore + 2, fork2ndScoreAfter);
@@ -60,20 +60,20 @@ contract Test1 is UCSTestBase {
         uint fork2ndId = 6;
         uint fork3rdId = 5;
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        StorageLib.BodyFork[] storage $bfs = $p.bodyForks;
+        StorageLib.Command[] storage $cmds = $p.cmds;
         for (uint i; i < 10; i++) {
-            $bfs.push();
+            $cmds.push();
         }
 
-        uint fork1stScoreBefore = $p.bodyForks[fork1stId].currentScore;
-        uint fork2ndScoreBefore = $p.bodyForks[fork2ndId].currentScore;
-        uint fork3rdScoreBefore = $p.bodyForks[fork3rdId].currentScore;
+        uint fork1stScoreBefore = $p.cmds[fork1stId].currentScore;
+        uint fork2ndScoreBefore = $p.cmds[fork2ndId].currentScore;
+        uint fork3rdScoreBefore = $p.cmds[fork3rdId].currentScore;
 
         RCVForForksOp(address(this)).rcvForBodyForks(pid, [fork1stId, fork2ndId, fork3rdId]);
 
-        uint fork1stScoreAfter = $p.bodyForks[fork1stId].currentScore;
-        uint fork2ndScoreAfter = $p.bodyForks[fork2ndId].currentScore;
-        uint fork3rdScoreAfter = $p.bodyForks[fork3rdId].currentScore;
+        uint fork1stScoreAfter = $p.cmds[fork1stId].currentScore;
+        uint fork2ndScoreAfter = $p.cmds[fork2ndId].currentScore;
+        uint fork3rdScoreAfter = $p.cmds[fork3rdId].currentScore;
 
         assertEq(fork1stScoreBefore + 3, fork1stScoreAfter);
         assertEq(fork2ndScoreBefore + 2, fork2ndScoreAfter);
@@ -86,35 +86,35 @@ contract Test1 is UCSTestBase {
 
         $p.proposalMeta.expireAt = block.timestamp + 1000;
 
-        StorageLib.HeaderFork[] storage $hfs = $p.headerForks;
-        StorageLib.BodyFork[] storage $bfs = $p.bodyForks;
+        StorageLib.Header[] storage $headers = $p.headers;
+        StorageLib.Command[] storage $cmds = $p.cmds;
 
         for (uint i; i < 10; i++) {
-            $hfs.push();
-            $bfs.push();
+            $headers.push();
+            $cmds.push();
         }
-        $bfs.push();
+        $cmds.push();
 
-        $p.headerForksMeta.quorumScore = 8;
-        $p.bodyForksMeta.quorumScore = 8;
+        $p.proposalMeta.quorumScore = 8;
+        $p.proposalMeta.quorumScore = 8;
 
-        $p.headerForks[8].currentScore = 10;
-        $p.headerForks[9].currentScore = 9;
-        $p.headerForks[3].currentScore = 8;
-        $p.bodyForks[4].currentScore = 10;
-        $p.bodyForks[5].currentScore = 9;
-        $p.bodyForks[6].currentScore = 8;
+        $p.headers[8].currentScore = 10;
+        $p.headers[9].currentScore = 9;
+        $p.headers[3].currentScore = 8;
+        $p.cmds[4].currentScore = 10;
+        $p.cmds[5].currentScore = 9;
+        $p.cmds[6].currentScore = 8;
 
         TallyForksOp(address(this)).tallyForks(pid);
 
-        assertEq($p.headerForksMeta.winningHeader1st, 8);
-        assertEq($p.headerForksMeta.winningHeader2nd, 9);
-        assertEq($p.headerForksMeta.winningHeader3rd, 3);
-        assertEq($p.headerForksMeta.nextTallyFrom, 10);
-        assertEq($p.bodyForksMeta.winningBody1st, 4);
-        assertEq($p.bodyForksMeta.winningBody2nd, 5);
-        assertEq($p.bodyForksMeta.winningBody3rd, 6);
-        assertEq($p.bodyForksMeta.nextTallyFrom, 11);
+        assertEq($p.proposalMeta.headerRank[0], 8);
+        assertEq($p.proposalMeta.headerRank[1], 9);
+        assertEq($p.proposalMeta.headerRank[2], 3);
+        assertEq($p.proposalMeta.nextHeaderTallyFrom, 10);
+        assertEq($p.proposalMeta.cmdRank[0], 4);
+        assertEq($p.proposalMeta.cmdRank[1], 5);
+        assertEq($p.proposalMeta.cmdRank[2], 6);
+        assertEq($p.proposalMeta.nextCmdTallyFrom, 11);
     }
 
     function test_tallyForks_failWithExpired() public {
@@ -123,24 +123,24 @@ contract Test1 is UCSTestBase {
 
         $p.proposalMeta.expireAt = 0;
 
-        StorageLib.HeaderFork[] storage $hfs = $p.headerForks;
-        StorageLib.BodyFork[] storage $bfs = $p.bodyForks;
+        StorageLib.Header[] storage $headers = $p.headers;
+        StorageLib.Command[] storage $cmds = $p.cmds;
 
         for (uint i; i < 10; i++) {
-            $hfs.push();
-            $bfs.push();
+            $headers.push();
+            $cmds.push();
         }
-        $bfs.push();
+        $cmds.push();
 
-        $p.headerForksMeta.quorumScore = 8;
-        $p.bodyForksMeta.quorumScore = 8;
+        $p.proposalMeta.quorumScore = 8;
+        $p.proposalMeta.quorumScore = 8;
 
-        $p.headerForks[8].currentScore = 10;
-        $p.headerForks[9].currentScore = 9;
-        $p.headerForks[3].currentScore = 8;
-        $p.bodyForks[4].currentScore = 10;
-        $p.bodyForks[5].currentScore = 9;
-        $p.bodyForks[6].currentScore = 8;
+        $p.headers[8].currentScore = 10;
+        $p.headers[9].currentScore = 9;
+        $p.headers[3].currentScore = 8;
+        $p.cmds[4].currentScore = 10;
+        $p.cmds[5].currentScore = 9;
+        $p.cmds[6].currentScore = 8;
 
         vm.expectRevert("This proposal has been expired. You cannot run new tally to update ranks.");
         TallyForksOp(address(this)).tallyForks(pid);
@@ -151,7 +151,7 @@ contract Test1 is UCSTestBase {
     function test_executeProposal() public {
         uint pid = 0;
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        $p.bodyForks.push();
+        $p.cmds.push();
 
         ExecuteProposalOp(address(this)).executeProposal(pid);
     }

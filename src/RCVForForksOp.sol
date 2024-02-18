@@ -5,20 +5,20 @@ import { StorageLib } from "./internal/StorageLib.sol";
 import { RCVLib } from "./internal/RCVLib.sol";
 
 contract RCVForForksOp {
-    function rcvForHeaderForks(uint pid, uint[3] calldata fids) external returns (bool) {
+    function rcvForHeaderForks(uint pid, uint[3] calldata headerIds) external returns (bool) {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
         
-        $p.headerForks[fids[0]].currentScore += 3;
-        $p.headerForks[fids[1]].currentScore += 2;
-        $p.headerForks[fids[2]].currentScore += 1;
+        $p.headers[headerIds[0]].currentScore += 3;
+        $p.headers[headerIds[1]].currentScore += 2;
+        $p.headers[headerIds[2]].currentScore += 1;
     }
-    function rcvForBodyForks(uint pid, uint[3] calldata fids) external returns (bool) {
+    function rcvForBodyForks(uint pid, uint[3] calldata cmdIds) external returns (bool) {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
-        $p.bodyForks[fids[0]].currentScore += 3;
-        $p.bodyForks[fids[1]].currentScore += 2;
-        $p.bodyForks[fids[2]].currentScore += 1;
+        $p.cmds[cmdIds[0]].currentScore += 3;
+        $p.cmds[cmdIds[1]].currentScore += 2;
+        $p.cmds[cmdIds[2]].currentScore += 1;
     }
 }

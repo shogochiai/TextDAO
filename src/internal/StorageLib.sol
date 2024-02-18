@@ -15,52 +15,43 @@ library StorageLib {
         bool globalSuperImportantFlag;
     }
     struct ProposalArg {
-        HeaderFork headerFork;
-        BodyFork bodyFork;
-        HeaderForksMeta headerForksMeta;
-        BodyForksMeta bodyForksMeta;
+        Header header;
+        Command cmd;
         ProposalMeta proposalMeta;
     }
     struct Proposal {
-        HeaderFork[] headerForks;
-        BodyFork[] bodyForks;
-        HeaderForksMeta headerForksMeta;
-        BodyForksMeta bodyForksMeta;
+        Header[] headers;
+        Command[] cmds;
         ProposalMeta proposalMeta;
     }
-    struct HeaderFork {
-        string title;
+    struct Header {
+        uint id;
         uint currentScore;
+        bytes32 metadataURI;
+        uint[] tagIds;
     }
-    struct BodyFork {
-        string body;
-        Command[] commands;
-        uint currentScore;
+    struct Tag {
+        uint id;
+        bytes32 metadataURI;
     }
     struct Command {
-        address target;
-        bytes txbytes;
+        uint id;
+        Action[] actions;
+        uint currentScore;
     }
-    struct HeaderForksMeta {
-        uint quorumScore;
-        uint expireAt;
-        uint winningHeader1st;
-        uint winningHeader2nd;
-        uint winningHeader3rd;
-        uint nextTallyFrom;
-    }
-    struct BodyForksMeta {
-        uint quorumScore;
-        uint expireAt;
-        uint winningBody1st;
-        uint winningBody2nd;
-        uint winningBody3rd;
-        uint nextTallyFrom;
+    struct Action {
+        address addr;
+        string func;
+        bytes abiParams;
     }
     struct ProposalMeta {
         uint currentScore;
         uint quorumScore;
         uint expireAt;
+        uint[] headerRank;
+        uint[] cmdRank;
+        uint nextHeaderTallyFrom;
+        uint nextCmdTallyFrom;
     }
 
     // keccak256(abi.encode(uint256(keccak256("ucstest.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));

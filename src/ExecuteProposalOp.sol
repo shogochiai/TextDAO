@@ -9,13 +9,16 @@ contract ExecuteProposalOp {
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         require($p.proposalMeta.expireAt <= block.timestamp, "Proposal must be finished.");
-        require($p.bodyForks.length > 0, "No body forks to execute.");
+        require($p.cmds.length > 0, "No body forks to execute.");
 
-        StorageLib.Command[] storage $cmds = $p.bodyForks[$p.bodyForksMeta.winningBody1st].commands;
+        StorageLib.Action[] storage $actions = $p.cmds[$p.proposalMeta.cmdRank[0]].actions;
 
-        for (uint i; i < $cmds.length; i++) {
-            StorageLib.Command memory cmd = $cmds[i];
-            (bool result,) = cmd.target.call(cmd.txbytes);
+        for (uint i; i < $actions.length; i++) {
+            StorageLib.Action memory action = $actions[i];
+            (bool result,) = action.addr.call(bytes.concat(
+                bytes4(keccak256(bytes(action.func))),
+                action.abiParams
+            ));
             require(result);
         }
     }

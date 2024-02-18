@@ -17,6 +17,7 @@ abstract contract UCSTestBase is Test {
         if (success) {
             return data;
         } else {
+            // vm.expectRevert needs this.
             revert(DecodeErrorString.decodeRevertReason(data));
         }
     }

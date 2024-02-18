@@ -17,37 +17,6 @@
 Sample implementation of voting for forked options (RCV) is [here](./src/TallyForksOp.sol)
 i.e., headers and cmds are forkable RCV voting target in this document.
 
-### headers and cmds for TallyVotesOp
-
-#### Relations
-```
-proposal initially has a header
-proposal can have many headers
-proposal can have many cmds
-```
-
-#### Types
-```
-Header is Forkable {
-  uint id;
-  bytes32 metadataURI;
-  uint[] tagIds;
-}
-Tag {
-  uint id;
-  bytes32 metadataURI;
-}
-Command is Forkable
-Command {
-  uint id;
-  Action[] actions;
-}
-Action {
-  address addr;
-  string func;
-  bytes abiParams;
-}
-```
 ### TextSavePassOp
 
 #### Amazingly simple contract
