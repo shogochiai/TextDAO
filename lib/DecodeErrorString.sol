@@ -2,23 +2,46 @@ pragma solidity 0.8.23;
 
 
 library DecodeErrorString {
-    function decodeRevertReason(bytes memory data) public pure returns (string memory) {
-        // Ensure the data is at least 4 + 32 + 32 bytes (function selector + offset + string length)
-        require(data.length >= 68, "Data too short");
-
-        // Skip the first 4 bytes (error signature) and the next 32 bytes (offset),
-        // then read the next 32 bytes to get the string length
-        uint256 stringLength;
+    /**
+     * @dev Decodes a revert reason from ABI-encoded data.
+     * @param data ABI-encoded revert reason.
+     * @return reason The decoded revert reason as a string.
+     */
+    function decodeRevertReason(bytes memory data) internal pure returns (string memory reason) {
+        // Require that the data length is at least enough to contain a length prefix
+        require(data.length >= 4, "Data too short");
+        // Skip the function selector
         assembly {
-            stringLength := mload(add(data, 68))
+            reason := add(data, 0x04)
         }
+    }
 
-        // Extract the string itself
-        bytes memory stringData = new bytes(stringLength);
-        for (uint256 i = 0; i < stringLength; i++) {
-            stringData[i] = data[i + 68];
+    /**
+     * @dev Decodes a panic code from bytes.
+     * @param data Bytes containing the panic code.
+     * @return code The decoded panic code as a uint256.
+     */
+    function decodePanicCode(bytes memory data) internal pure returns (uint256 code) {
+        require(data.length >= 4, "Data too short for panic code");
+        // Panic codes are 4 bytes long, following the function selector
+        assembly {
+            code := mload(add(data, 0x24))
         }
+    }
 
-        return string(stringData);
+    /**
+     * @dev Attempts to decode both revert reasons and panic codes.
+     * @param data Bytes containing either a revert reason or a panic code.
+     * @return result The decoded message as a string.
+     */
+    function decodeRevertReasonAndPanicCode(bytes memory data) internal pure returns (string memory result) {
+        // Check if the data length corresponds to a panic code (4 bytes for the selector + 32 bytes for the uint256)
+        if (data.length == 36) {
+            uint256 panicCode = decodePanicCode(data);
+            result = string(abi.encodePacked("Panic code: ", panicCode));
+        } else {
+            // Assume it's a revert reason for any other length
+            result = decodeRevertReason(data);
+        }
     }
 }
