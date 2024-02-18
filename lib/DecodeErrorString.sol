@@ -7,13 +7,24 @@ library DecodeErrorString {
      * @param data ABI-encoded revert reason.
      * @return reason The decoded revert reason as a string.
      */
-    function decodeRevertReason(bytes memory data) internal pure returns (string memory reason) {
-        // Require that the data length is at least enough to contain a length prefix
-        require(data.length >= 4, "Data too short");
-        // Skip the function selector
+    function decodeRevertReason(bytes memory data) public pure returns (string memory) {
+        // Ensure the data is at least 4 + 32 + 32 bytes (function selector + offset + string length)
+        require(data.length >= 68, "Data too short");
+
+        // Skip the first 4 bytes (error signature) and the next 32 bytes (offset),
+        // then read the next 32 bytes to get the string length
+        uint256 stringLength;
         assembly {
-            reason := add(data, 0x04)
+            stringLength := mload(add(data, 68))
         }
+
+        // Extract the string itself
+        bytes memory stringData = new bytes(stringLength);
+        for (uint256 i = 0; i < stringLength; i++) {
+            stringData[i] = data[i + 68];
+        }
+
+        return string(stringData);
     }
 
     /**
@@ -38,10 +49,37 @@ library DecodeErrorString {
         // Check if the data length corresponds to a panic code (4 bytes for the selector + 32 bytes for the uint256)
         if (data.length == 36) {
             uint256 panicCode = decodePanicCode(data);
-            result = string(abi.encodePacked("Panic code: ", panicCode));
+            result = panicCodeToString(panicCode);
         } else {
             // Assume it's a revert reason for any other length
             result = decodeRevertReason(data);
+        }
+    }
+
+    /**
+     * @dev Converts a panic code to a human-readable string.
+     * @param code The panic code as a uint256.
+     * @return reason The corresponding human-readable string.
+     */
+    function panicCodeToString(uint256 code) private pure returns (string memory reason) {
+        if (code == 0x01) {
+            return "panic: Division by zero.";
+        } else if (code == 0x11) {
+            return "panic: Arithmetic operation underflow.";
+        } else if (code == 0x12) {
+            return "panic: Arithmetic operation overflow.";
+        } else if (code == 0x21) {
+            return "panic: Pop from an empty array.";
+        } else if (code == 0x22) {
+            return "panic: Array or memory access out of bounds.";
+        } else if (code == 0x31) {
+            return "panic: Allocation of too much memory.";
+        } else if (code == 0x32) {
+            return "panic: array out-of-bounds access (0x32)";
+        } else if (code == 0x41) {
+            return "panic: Zero-initialized variable of internal function type.";
+        } else {
+            return "Unknown panic code.";
         }
     }
 }
