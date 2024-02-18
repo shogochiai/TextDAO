@@ -66,18 +66,19 @@ Command memory cmd;
 cmd.id = $.newCommandId();
 Action memory act;
 act.addr = TXT_SAVE_OP_ADDR;
+act.func = "txtSave(uint256, uint256, bytes32[])";
+act.abiParams = abi.encode(pid, $.newTxtId(), [cid1, cid2]);
+act.actions[0] = act;
 
-/* 
 // Just FYI, calldata will be like this in ExecuteOp.sol
+/* 
 bytes.concat(
   bytes4(keccak256(act.actions[i].func)),
   _abiParams.actions[i].abiParams
 )
 */
 
-act.func = "txtSave(uint256, uint256, bytes32[])";
-act.abiParams = abi.encode(pid, $.newTxtId(), [cid1, cid2]);
-act.actions[0] = act;
+
 ```
 
 
