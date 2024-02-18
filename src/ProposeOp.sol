@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.23;
 
-import { StorageLib } from "./StorageLib.sol";
+import { StorageLib } from "./internal/StorageLib.sol";
 
 contract ProposeOp {
     function propose(StorageLib.ProposalArg calldata _p) external returns (uint proposalId) {

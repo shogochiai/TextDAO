@@ -1,7 +1,9 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.23;
 
 import { Test } from "forge-std/Test.sol";
+import { DecodeErrorString } from "./DecodeErrorString.sol";
+// import { console2 } from "forge-std/console2.sol";
 
 abstract contract UCSTestBase is Test {
     mapping(bytes4 => address) implementations; // selector => impl
@@ -12,7 +14,10 @@ abstract contract UCSTestBase is Test {
         address opAddress = implementations[msg.sig];
         require(opAddress != address(0), "Called implementation is not registered.");
         (bool success, bytes memory data) = opAddress.delegatecall(msg.data);
-        require(success);
-        return data;
+        if (success) {
+            return data;
+        } else {
+            revert(DecodeErrorString.decodeRevertReason(data));
+        }
     }
 }

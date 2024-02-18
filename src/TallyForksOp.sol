@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.23;
 
-import { StorageLib } from "./StorageLib.sol";
-import { SortLib } from "./SortLib.sol";
+import { StorageLib } from "./internal/StorageLib.sol";
+import { SortLib } from "./internal/SortLib.sol";
 
 contract TallyForksOp {
     function tallyForks(uint pid) external returns (bool) {
@@ -10,6 +10,8 @@ contract TallyForksOp {
         StorageLib.Proposal storage $p = $.proposals[pid];
         StorageLib.HeaderFork[] storage $hfs = $p.headerForks;
         StorageLib.BodyFork[] storage $bfs = $p.bodyForks;
+
+        require($p.proposalMeta.expireAt > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
 
         uint[] memory headerForksRanking = SortLib.rankHeaderForks($hfs);
         uint[] memory bodyForksRanking = SortLib.rankBodyForks($bfs);
