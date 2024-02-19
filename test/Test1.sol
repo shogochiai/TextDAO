@@ -163,8 +163,12 @@ contract Test1 is UCSTestBase {
     function test_executeProposal_successWithText() public {
         uint pid = 0;
         uint textId = 0;
-        bytes32 metadataURI1 = bytes32(uint256(1));
-        bytes32 metadataURI2 = bytes32(uint256(2));
+
+        // Note: Array variable is only available as function args. 
+        bytes32[] memory metadataURIs = new bytes32[](2);
+        metadataURIs[0] = bytes32(uint256(1));
+        metadataURIs[1] = bytes32(uint256(2));
+
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
         StorageLib.Text storage $text = StorageLib.$Texts().texts[textId];
 
@@ -176,7 +180,7 @@ contract Test1 is UCSTestBase {
 
         $action.addr = address(new TextSavePassOp());
         $action.func = "textSave(uint256,uint256,bytes32[])";
-        $action.abiParams = abi.encode(pid, textId, [metadataURI1, metadataURI1]);
+        $action.abiParams = abi.encode(pid, textId, metadataURIs);
 
         $p.proposalMeta.cmdRank.push(); // Note: initialize for storage array
         $p.proposalMeta.cmdRank[0] = $cmd.id;

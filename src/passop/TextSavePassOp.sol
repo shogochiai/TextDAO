@@ -2,6 +2,7 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "../internal/StorageLib.sol";
+import { console2 } from "forge-std/console2.sol";
 
 contract TextSavePassOp {
     function textSave(uint pid, uint textId, bytes32[] memory metadataURIs) public onlyPassed(pid) returns (bool) {

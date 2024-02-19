@@ -15,6 +15,7 @@ contract ExecuteProposalOp {
 
         StorageLib.Action[] storage $actions = $p.cmds[$p.proposalMeta.cmdRank[0]].actions;
 
+
         for (uint i; i < $actions.length; i++) {
             StorageLib.Action memory action = $actions[i];
             // Note: Is msg.value of this proxy consistent among all delegatecalls?
@@ -22,6 +23,7 @@ contract ExecuteProposalOp {
                 bytes4(keccak256(bytes(action.func))),
                 action.abiParams
             ));
+
             if (success) {
             } else {
                 revert(DecodeErrorString.decodeRevertReasonAndPanicCode(data));
