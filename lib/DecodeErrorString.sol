@@ -9,7 +9,11 @@ library DecodeErrorString {
      */
     function decodeRevertReason(bytes memory data) public pure returns (string memory) {
         // Ensure the data is at least 4 + 32 + 32 bytes (function selector + offset + string length)
-        require(data.length >= 68, "Data too short");
+        if (data.length == 0) {
+            revert("reverted with no error message.");
+        } else if (data.length < 68) {
+            revert("Data too short for revert reason");
+        }
 
         // Skip the first 4 bytes (error signature) and the next 32 bytes (offset),
         // then read the next 32 bytes to get the string length
@@ -33,7 +37,11 @@ library DecodeErrorString {
      * @return code The decoded panic code as a uint256.
      */
     function decodePanicCode(bytes memory data) internal pure returns (uint256 code) {
-        require(data.length >= 4, "Data too short for panic code");
+        if (data.length == 0) {
+            revert("reverted with no error message.");
+        } else if (data.length < 4) {
+            revert("Data too short for panic code");
+        }
         // Panic codes are 4 bytes long, following the function selector
         assembly {
             code := mload(add(data, 0x24))

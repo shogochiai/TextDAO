@@ -163,19 +163,22 @@ contract Test1 is UCSTestBase {
     function test_executeProposal_successWithText() public {
         uint pid = 0;
         uint tetId = 0;
-        bytes32 metadataURI1 = bytes32(1);
-        bytes32 metadataURI2 = bytes32(2);
+        bytes32 metadataURI1 = bytes32(uint256(1));
+        bytes32 metadataURI2 = bytes32(uint256(2));
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        $p.cmds.push();
+        $p.cmds.push(); // Note: initialize for storage array
+        StorageLib.Command storage $cmd = $p.cmds[0];
+        $cmd.id = 0;
+        $cmd.actions.push(); // Note: initialize for storage array
+        StorageLib.Action storage $action = $cmd.actions[0];
+
+        $action.addr = address(new TextSavePassOp());
+        $action.func = "function textSave(uint256,uint256,bytes32[])";
+        $action.abiParams = abi.encode(pid, tetId, [metadataURI1, metadataURI1]);
+
         $p.proposalMeta.cmdRank = new uint[](3);
-        StorageLib.Command memory cmd;
-        StorageLib.Action memory action;
-        action.addr = new TextSavePassOp();
-        action.func = "function textSave(uint256,uint256,bytes32[])";
-        action.abiParams = abi.encode(pid, tetId, [metadataURI1, metadataURI1]);
-        cmd.actions = new StorageLib.Action[](1);
-        cmd.actions[0] = action;
-        $p.proposalMeta.cmdRank[0] = 
+        $p.proposalMeta.cmdRank[0] = $cmd.id;
+
 
         ExecuteProposalOp(address(this)).executeProposal(pid);
     }

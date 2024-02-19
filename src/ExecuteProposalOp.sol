@@ -20,7 +20,7 @@ contract ExecuteProposalOp {
                 bytes4(keccak256(bytes(action.func))),
                 action.abiParams
             ));
-            require(result);
+            require(result, "Delegate call of passops are failed.");
         }
     }
 }
