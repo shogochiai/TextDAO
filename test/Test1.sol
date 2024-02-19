@@ -4,6 +4,7 @@ pragma solidity ^0.8.23;
 import { Test } from "forge-std/Test.sol";
 import { UCSTestBase } from "lib/UCSTestBase.sol";
 import { ProposeOp } from "src/ProposeOp.sol";
+import { ForkOp } from "src/ForkOp.sol";
 import { RCVForForksOp } from "src/RCVForForksOp.sol";
 import { ExecuteProposalOp } from "src/ExecuteProposalOp.sol";
 import { TallyForksOp } from "src/TallyForksOp.sol";
@@ -14,9 +15,10 @@ contract Test1 is UCSTestBase {
 
     function setUp() public override {
         implementations[ProposeOp.propose.selector] = address(new ProposeOp());
+        implementations[ForkOp.fork.selector] = address(new ForkOp());
         implementations[ExecuteProposalOp.executeProposal.selector] = address(new ExecuteProposalOp());
-        implementations[RCVForForksOp.rcvForHeaderForks.selector] = address(new RCVForForksOp());
-        implementations[RCVForForksOp.rcvForBodyForks.selector] = address(new RCVForForksOp());
+        implementations[RCVForForksOp.voteHeaders.selector] = address(new RCVForForksOp());
+        implementations[RCVForForksOp.voteCmds.selector] = address(new RCVForForksOp());
         implementations[TallyForksOp.tallyForks.selector] = address(new TallyForksOp());
     }
 
@@ -32,7 +34,23 @@ contract Test1 is UCSTestBase {
         assertEq($p.headers[0].metadataURI, p.header.metadataURI);
     }
 
-    function test_rcvHeaderForks() public {
+    function test_fork() public {
+        uint pid = 0;
+        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
+
+        StorageLib.ProposalArg memory p;
+        p.header.metadataURI = "Qc.....xh";
+        p.cmd.actions = new StorageLib.Action[](1);
+
+        assertEq($p.headers.length, 0);
+        assertEq($p.cmds.length, 0);
+        uint forkId = ForkOp(address(this)).fork(pid, p);
+        assertEq($p.headers.length, 1);
+        assertEq($p.cmds.length, 1);
+        // assertGt(forkId, 0);
+    }
+    function test_voteHeaders() public {
         uint pid = 0;
         uint fork1stId = 9;
         uint fork2ndId = 1;
@@ -47,7 +65,7 @@ contract Test1 is UCSTestBase {
         uint fork2ndScoreBefore = $p.headers[fork2ndId].currentScore;
         uint fork3rdScoreBefore = $p.headers[fork3rdId].currentScore;
 
-        RCVForForksOp(address(this)).rcvForHeaderForks(pid, [fork1stId, fork2ndId, fork3rdId]);
+        RCVForForksOp(address(this)).voteHeaders(pid, [fork1stId, fork2ndId, fork3rdId]);
 
         uint fork1stScoreAfter = $p.headers[fork1stId].currentScore;
         uint fork2ndScoreAfter = $p.headers[fork2ndId].currentScore;
@@ -57,7 +75,7 @@ contract Test1 is UCSTestBase {
         assertEq(fork2ndScoreBefore + 2, fork2ndScoreAfter);
         assertEq(fork3rdScoreBefore + 1, fork3rdScoreAfter);
     }
-    function test_rcvForBodyForks() public {
+    function test_voteCmds() public {
         uint pid = 0;
         uint fork1stId = 7;
         uint fork2ndId = 6;
@@ -72,7 +90,7 @@ contract Test1 is UCSTestBase {
         uint fork2ndScoreBefore = $p.cmds[fork2ndId].currentScore;
         uint fork3rdScoreBefore = $p.cmds[fork3rdId].currentScore;
 
-        RCVForForksOp(address(this)).rcvForBodyForks(pid, [fork1stId, fork2ndId, fork3rdId]);
+        RCVForForksOp(address(this)).voteCmds(pid, [fork1stId, fork2ndId, fork3rdId]);
 
         uint fork1stScoreAfter = $p.cmds[fork1stId].currentScore;
         uint fork2ndScoreAfter = $p.cmds[fork2ndId].currentScore;
