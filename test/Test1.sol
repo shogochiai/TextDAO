@@ -8,6 +8,7 @@ import { RCVForForksOp } from "src/RCVForForksOp.sol";
 import { ExecuteProposalOp } from "src/ExecuteProposalOp.sol";
 import { TallyForksOp } from "src/TallyForksOp.sol";
 import { StorageLib } from "src/internal/StorageLib.sol";
+import { TextSavePassOp } from "src/passop/TextSavePassOp.sol";
 
 contract Test1 is UCSTestBase {
 
@@ -26,7 +27,9 @@ contract Test1 is UCSTestBase {
         uint pid = ProposeOp(address(this)).propose(p);
         assertEq(pid, 0);
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        assertEq($p.headers[$p.proposalMeta.headerRank[0]].metadataURI, p.header.metadataURI);
+        assertEq($p.proposalMeta.headerRank.length, 0);
+        assertEq($p.proposalMeta.cmdRank.length, 0);
+        assertEq($p.headers[0].metadataURI, p.header.metadataURI);
     }
 
     function test_rcvHeaderForks() public {
@@ -148,10 +151,31 @@ contract Test1 is UCSTestBase {
     }
 
 
-    function test_executeProposal() public {
+    function test_executeProposal_success() public {
         uint pid = 0;
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
         $p.cmds.push();
+        $p.proposalMeta.cmdRank = new uint[](3);
+
+        ExecuteProposalOp(address(this)).executeProposal(pid);
+    }
+
+    function test_executeProposal_successWithText() public {
+        uint pid = 0;
+        uint tetId = 0;
+        bytes32 metadataURI1 = bytes32(1);
+        bytes32 metadataURI2 = bytes32(2);
+        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        $p.cmds.push();
+        $p.proposalMeta.cmdRank = new uint[](3);
+        StorageLib.Command memory cmd;
+        StorageLib.Action memory action;
+        action.addr = new TextSavePassOp();
+        action.func = "function textSave(uint256,uint256,bytes32[])";
+        action.abiParams = abi.encode(pid, tetId, [metadataURI1, metadataURI1]);
+        cmd.actions = new StorageLib.Action[](1);
+        cmd.actions[0] = action;
+        $p.proposalMeta.cmdRank[0] = 
 
         ExecuteProposalOp(address(this)).executeProposal(pid);
     }

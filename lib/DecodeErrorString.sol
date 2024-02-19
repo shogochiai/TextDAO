@@ -57,7 +57,7 @@ library DecodeErrorString {
     }
 
     /**
-     * @dev Converts a panic code to a human-readable string.
+     * @dev Converts a panic code to a human-readable string. (These messages are not accurate and also need to be chase upstream implementation.)
      * @param code The panic code as a uint256.
      * @return reason The corresponding human-readable string.
      */

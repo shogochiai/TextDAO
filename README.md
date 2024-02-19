@@ -11,46 +11,6 @@
 
 ---
 # Architecture
-
-## Data Model
-
-Sample implementation of voting for forked options (RCV) is [here](./src/TallyForksOp.sol)
-i.e., headers and cmds are forkable RCV voting target in this document.
-
-### TextSavePassOp
-
-#### Amazingly simple contract
-```
-contract TextSavePassOp {
-  function textSave(uint pid, uint textId, bytes32[] metadataURIs) public onlyPassed(pid) {
-    texts[textId] = metadataURIs;
-  }
-}
-```
-
-#### Sample Tx Composition
-```
-// Must be JS, but written in Solidity...
-Command memory cmd;
-cmd.id = $.newCommandId();
-Action memory act;
-act.addr = TEXT_SAVE_OP_ADDR;
-act.func = "textSave(uint256, uint256, bytes32[])";
-act.abiParams = abi.encode(pid, $.newTextId(), [cid1, cid2]);
-act.actions[0] = act;
-
-// Just FYI, calldata will be like this in ExecuteOp.sol
-/* 
-bytes.concat(
-  bytes4(keccak256(act.actions[i].func)),
-  _abiParams.actions[i].abiParams
-)
-*/
-
-
-```
-
-
 ## Functions
 ### Join Request
 - ProposeOp({JoinPassOp, arg1, arg2})

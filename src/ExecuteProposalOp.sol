@@ -10,12 +10,13 @@ contract ExecuteProposalOp {
 
         require($p.proposalMeta.expireAt <= block.timestamp, "Proposal must be finished.");
         require($p.cmds.length > 0, "No body forks to execute.");
+        require($p.proposalMeta.cmdRank.length > 0, "Tally must be done at least once.");
 
         StorageLib.Action[] storage $actions = $p.cmds[$p.proposalMeta.cmdRank[0]].actions;
 
         for (uint i; i < $actions.length; i++) {
             StorageLib.Action memory action = $actions[i];
-            (bool result,) = action.addr.call(bytes.concat(
+            (bool result,) = action.addr.delegatecall(bytes.concat(
                 bytes4(keccak256(bytes(action.func))),
                 action.abiParams
             ));

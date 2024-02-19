@@ -8,11 +8,10 @@ library StorageLib {
     /*********************
      *  ProposeOpStorage
      ********************/
-    /// @custom:storage-location erc7201:ucstest.proposeop.proposals
+    /// @custom:storage-location erc7201:textDAO.proposeop.proposals
     struct ProposeOpStorage {
         mapping(uint => Proposal) proposals;
         uint nextProposalId;
-        bool globalSuperImportantFlag;
     }
     struct ProposalArg {
         Header header;
@@ -54,28 +53,35 @@ library StorageLib {
         uint nextCmdTallyFrom;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("ucstest.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant PROPOSALS_STORAGE_LOCATION =
-        0x5807a52450ab8f738d6948632d619254c674252efb511a8ef74d8ec2510c9b00;
+        0xd43a2afe07b94a8ce70d10f193569d2c070c983eb6cea4616d25510ca5dae200;
 
     function $Proposals() internal pure returns (ProposeOpStorage storage $) {
         assembly { $.slot := PROPOSALS_STORAGE_LOCATION }
     }
 
+
+
     /*********************
-     *  DoubleOpStorage
+     *  TextSavePassOp Storage
      ********************/
-    /// @custom:storage-location erc7201:ucstest.doubleop.doubles
-    struct DoubleOpStorage {
-        uint number;
+    /// @custom:storage-location erc7201:textDAO.textSavePassOp.texts
+    struct TextSavePassOpStorage {
+        mapping(uint => Text) texts;
+        uint nextTextId;
+    }
+    struct Text {
+        uint id;
+        bytes32[] metadataURIs;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("ucstest.doubleop.doubles")) - 1)) & ~bytes32(uint256(0xff));
-    bytes32 private constant DOUBLE_STORAGE_LOCATION =
-        0x028a2b90115601a2588b788693111cdb6f9f0f791eb66b87999400137d907c00;
+    // keccak256(abi.encode(uint256(keccak256("textDAO.textSavePassOp.texts")) - 1)) & ~bytes32(uint256(0xff));
+    bytes32 private constant TEXTS_STORAGE_LOCATION =
+        0x6b4e5911a84ec39982af20b4b46881b8065fae500bf9de0e93910e5b75a3be00;
 
-    function $Doubles() internal pure returns (DoubleOpStorage storage $) {
-        assembly { $.slot := DOUBLE_STORAGE_LOCATION }
+    function $Texts() internal pure returns (TextSavePassOpStorage storage $) {
+        assembly { $.slot := TEXTS_STORAGE_LOCATION }
     }
 
 }
