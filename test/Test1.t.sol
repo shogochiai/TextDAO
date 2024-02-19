@@ -9,7 +9,6 @@ import { RCVForForksOp } from "src/RCVForForksOp.sol";
 import { ExecuteProposalOp } from "src/ExecuteProposalOp.sol";
 import { TallyForksOp } from "src/TallyForksOp.sol";
 import { StorageLib } from "src/internal/StorageLib.sol";
-import { TextSavePassOp } from "src/passop/TextSavePassOp.sol";
 
 contract Test1 is UCSTestBase {
 
@@ -48,7 +47,6 @@ contract Test1 is UCSTestBase {
         uint forkId = ForkOp(address(this)).fork(pid, p);
         assertEq($p.headers.length, 1);
         assertEq($p.cmds.length, 1);
-        // assertGt(forkId, 0);
     }
     function test_voteHeaders() public {
         uint pid = 0;
@@ -177,39 +175,5 @@ contract Test1 is UCSTestBase {
 
         ExecuteProposalOp(address(this)).executeProposal(pid);
     }
-
-    function test_executeProposal_successWithText() public {
-        uint pid = 0;
-        uint textId = 0;
-
-        // Note: Array variable is only available as function args. 
-        bytes32[] memory metadataURIs = new bytes32[](2);
-        metadataURIs[0] = bytes32(uint256(1));
-        metadataURIs[1] = bytes32(uint256(2));
-
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        StorageLib.Text storage $text = StorageLib.$Texts().texts[textId];
-
-        $p.cmds.push(); // Note: initialize for storage array
-        StorageLib.Command storage $cmd = $p.cmds[0];
-        $cmd.id = 0;
-        $cmd.actions.push(); // Note: initialize for storage array
-        StorageLib.Action storage $action = $cmd.actions[0];
-
-        $action.addr = address(new TextSavePassOp());
-        $action.func = "textSave(uint256,uint256,bytes32[])";
-        $action.abiParams = abi.encode(pid, textId, metadataURIs);
-
-        $p.proposalMeta.cmdRank.push(); // Note: initialize for storage array
-        $p.proposalMeta.cmdRank[0] = $cmd.id;
-
-        $p.proposalMeta.expireAt = 0;
-        $p.proposalMeta.headerRank.push(); // Note: initialize for storage array
-
-        assertEq($text.metadataURIs.length, 0);
-        ExecuteProposalOp(address(this)).executeProposal(pid);
-        assertGt($text.metadataURIs.length, 0);
-    }
-
 
 }

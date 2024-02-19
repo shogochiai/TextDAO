@@ -2,20 +2,14 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "../internal/StorageLib.sol";
-import { console2 } from "forge-std/console2.sol";
+import { PassOpBase } from "./PassOpBase.sol";
 
-contract TextSavePassOp {
+contract TextSavePassOp is PassOpBase {
     function textSave(uint pid, uint textId, bytes32[] memory metadataURIs) public onlyPassed(pid) returns (bool) {
         StorageLib.TextSavePassOpStorage storage $ = StorageLib.$Texts();
         StorageLib.Text storage $text = $.texts[textId];
         $text.id = $.nextTextId;
         $text.metadataURIs = metadataURIs;
         $.nextTextId++;
-    }
-    modifier onlyPassed(uint pid) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $.proposals[pid];
-        require($p.proposalMeta.expireAt < block.timestamp && $p.proposalMeta.headerRank.length > 0, "Corresponding proposal must be expired and tallied.");
-        _;
     }
 }

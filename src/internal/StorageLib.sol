@@ -84,4 +84,30 @@ library StorageLib {
         assembly { $.slot := TEXTS_STORAGE_LOCATION }
     }
 
+
+    /*********************
+     *  MemberJoinPassOp Storage
+     ********************/
+    /// @custom:storage-location erc7201:textDAO.memberJoinPassOp.members
+    struct MemberJoinPassOpStorage {
+        mapping(uint => Member) members;
+        uint nextMemberId;
+    }
+    struct Member {
+        uint id;
+        address addr;
+        bytes32 metadataURI;
+    }
+
+    // keccak256(abi.encode(uint256(keccak256("textDAO.memberJoinPassOp.members")) - 1)) & ~bytes32(uint256(0xff));
+    bytes32 private constant MEMBERSS_STORAGE_LOCATION =
+        0x2440ca222525c850943cc10edec2af9e450af2275dab1d00440eb269aaf15900;
+
+    function $Members() internal pure returns (MemberJoinPassOpStorage storage $) {
+        assembly { $.slot := MEMBERSS_STORAGE_LOCATION }
+    }
+
+
+    
+
 }
