@@ -162,10 +162,12 @@ contract Test1 is UCSTestBase {
 
     function test_executeProposal_successWithText() public {
         uint pid = 0;
-        uint tetId = 0;
+        uint textId = 0;
         bytes32 metadataURI1 = bytes32(uint256(1));
         bytes32 metadataURI2 = bytes32(uint256(2));
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.Text storage $text = StorageLib.$Texts().texts[textId];
+
         $p.cmds.push(); // Note: initialize for storage array
         StorageLib.Command storage $cmd = $p.cmds[0];
         $cmd.id = 0;
@@ -173,14 +175,18 @@ contract Test1 is UCSTestBase {
         StorageLib.Action storage $action = $cmd.actions[0];
 
         $action.addr = address(new TextSavePassOp());
-        $action.func = "function textSave(uint256,uint256,bytes32[])";
-        $action.abiParams = abi.encode(pid, tetId, [metadataURI1, metadataURI1]);
+        $action.func = "textSave(uint256,uint256,bytes32[])";
+        $action.abiParams = abi.encode(pid, textId, [metadataURI1, metadataURI1]);
 
-        $p.proposalMeta.cmdRank = new uint[](3);
+        $p.proposalMeta.cmdRank.push(); // Note: initialize for storage array
         $p.proposalMeta.cmdRank[0] = $cmd.id;
 
+        $p.proposalMeta.expireAt = 0;
+        $p.proposalMeta.headerRank.push(); // Note: initialize for storage array
 
+        assertEq($text.metadataURIs.length, 0);
         ExecuteProposalOp(address(this)).executeProposal(pid);
+        assertGt($text.metadataURIs.length, 0);
     }
 
 
