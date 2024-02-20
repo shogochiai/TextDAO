@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-// import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
-// import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/vrf/VRFConsumerBaseV2.sol";
+import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 /**
  * StorageLib v0.1.0
@@ -54,6 +54,8 @@ library StorageLib {
         uint[] cmdRank;
         uint nextHeaderTallyFrom;
         uint nextCmdTallyFrom;
+        address[] reps;
+        uint nextRepId;
     }
 
     // keccak256(abi.encode(uint256(keccak256("textDAO.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
@@ -111,33 +113,26 @@ library StorageLib {
     }
 
 
-    // /*********************
-    //  *  VRF Storage
-    //  ********************/
-    // /// @custom:storage-location erc7201:textDAO.vrf.vrf
-    // struct VRFStorage {
-    //     VRFCoordinatorV2Interface COORDINATOR;
-    //     uint64 s_subscriptionId;
-    //     address vrfCoordinator; /* VRF Coordinator address */
-    //     bytes32 keyHash; /* Key hash */
-    //     uint32 callbackGasLimit; /* Callback gas limit */
-    //     uint16 requestConfirmations; /* Request confirmations */
-    //     uint32 numWords;  /* Number of words */
+    /*********************
+     *  VRF Storage
+     ********************/
+    /// @custom:storage-location erc7201:textDAO.vrf.vrf
+    struct VRFStorage {
+        mapping(uint => Request) requests;
+        uint nextId;
+    }
+    struct Request {
+        uint requestId;
+        uint proposalId;
+    }
 
-    //     // The requestId returned from requestRandomWords is used to match the request with the response.
-    //     // You could use this to match the randomness request with its response in your application.
-    //     uint256 requestId;
-    //     uint256[] randomWords;
-    //     uint256 s_requestId;
-    // }
+    // keccak256(abi.encode(uint256(keccak256("textDAO.vrf.vrf")) - 1)) & ~bytes32(uint256(0xff));
+    bytes32 private constant VRF_STORAGE_LOCATION =
+        0xd9fa33bd289c873d1fdb39b1afdc38aa40e8cb7210f0fbe10770706df952a700;
 
-    // // keccak256(abi.encode(uint256(keccak256("textDAO.vrf.vrf")) - 1)) & ~bytes32(uint256(0xff));
-    // bytes32 private constant VRF_STORAGE_LOCATION =
-    //     0xd9fa33bd289c873d1fdb39b1afdc38aa40e8cb7210f0fbe10770706df952a700;
-
-    // function $VRF() internal pure returns (VRFStorage storage $) {
-    //     assembly { $.slot := VRF_STORAGE_LOCATION }
-    // }
+    function $VRF() internal pure returns (VRFStorage storage $) {
+        assembly { $.slot := VRF_STORAGE_LOCATION }
+    }
 
     
 

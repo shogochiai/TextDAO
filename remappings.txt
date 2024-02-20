@@ -1,1 +1,1 @@
-@chainlink/=github:smartcontractkit/chainlink/contracts/
+@chainlink/=lib/chainlink/contracts/src/v0.8/
