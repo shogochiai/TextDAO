@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "./internal/StorageLib.sol";
-import { DecodeErrorString } from "../lib/DecodeErrorString.sol";
+import { DecodeErrorString } from "../../lib/DecodeErrorString.sol";
 
 contract ExecuteProposalOp {
     function executeProposal(uint pid) external returns (bool) {

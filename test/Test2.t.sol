@@ -3,14 +3,14 @@ pragma solidity ^0.8.23;
 
 import { Test } from "forge-std/Test.sol";
 import { UCSTestBase } from "lib/UCSTestBase.sol";
-import { ProposeOp } from "src/ProposeOp.sol";
-import { ForkOp } from "src/ForkOp.sol";
-import { RCVForForksOp } from "src/RCVForForksOp.sol";
-import { ExecuteProposalOp } from "src/ExecuteProposalOp.sol";
-import { TallyForksOp } from "src/TallyForksOp.sol";
-import { StorageLib } from "src/internal/StorageLib.sol";
-import { TextSavePassOp } from "src/passop/TextSavePassOp.sol";
-import { MemberJoinPassOp } from "src/passop/MemberJoinPassOp.sol";
+import { ProposeOp } from "src/textDAO/ProposeOp.sol";
+import { ForkOp } from "src/textDAO/ForkOp.sol";
+import { RCVForForksOp } from "src/textDAO/RCVForForksOp.sol";
+import { ExecuteProposalOp } from "src/textDAO/ExecuteProposalOp.sol";
+import { TallyForksOp } from "src/textDAO/TallyForksOp.sol";
+import { StorageLib } from "src/textDAO/internal/StorageLib.sol";
+import { TextSavePassOp } from "src/textDAO/passop/TextSavePassOp.sol";
+import { MemberJoinPassOp } from "src/textDAO/passop/MemberJoinPassOp.sol";
 
 contract Test2 is UCSTestBase {
 
