@@ -8,6 +8,49 @@ contract ProposeOp {
     function propose(StorageLib.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[proposalId];
+        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
+        StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
+
+        if ($p.proposalMeta.repsNum == 0) {
+            $p.proposalMeta.repsNum = 30;
+        }
+
+        if ($p.proposalMeta.repsNum < $member.nextMemberId) {
+            /*
+                VRF Request to choose reps
+            */
+
+            require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetVRFPassOp::createAndFundSubscription first.");
+
+            if ($vrf.vrfCoordinator == address(0)) {
+                $vrf.vrfCoordinator = address(30);
+            }
+            if ($vrf.keyHash == bytes32(0)) {
+                $vrf.keyHash = bytes32(0);
+            }
+            if ($vrf.callbackGasLimit == uint32(0)) {
+                $vrf.callbackGasLimit = uint32(2000000);
+            }
+            if ($vrf.requestConfirmations == uint16(0)) {
+                $vrf.requestConfirmations = uint16(3);
+            }
+            if ($vrf.numWords == uint32(0)) {
+                $vrf.numWords = uint32(30);
+            }
+
+            // Assumes the subscription is funded sufficiently.
+            uint256 requestId = VRFCoordinatorV2Interface($vrf.vrfCoordinator).requestRandomWords(
+                $vrf.keyHash,
+                $vrf.subscriptionId,
+                $vrf.requestConfirmations,
+                $vrf.callbackGasLimit,
+                $vrf.numWords
+            );
+
+            $vrf.requests[$vrf.nextId].requestId = requestId;
+            $vrf.requests[$vrf.nextId].proposalId = proposalId;
+            $vrf.nextId++;
+        }
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
@@ -19,32 +62,6 @@ contract ProposeOp {
         
         proposalId = $.nextProposalId;
         $.nextProposalId++;
-
-
-
-        /*
-            VRF Request to choose reps
-        */
-        uint64 s_subscriptionId = uint64(0);
-        address vrfCoordinator = address(0);
-        bytes32 keyHash = bytes32(0);
-        uint32 callbackGasLimit = uint32(2000000);
-        uint16 requestConfirmations = uint16(6);
-        uint32 numWords =  uint32(30);
-
-        // Assumes the subscription is funded sufficiently.
-        uint256 requestId = VRFCoordinatorV2Interface(vrfCoordinator).requestRandomWords(
-            keyHash,
-            s_subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            numWords
-        );
-
-        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
-        $vrf.requests[$vrf.nextId].requestId = requestId;
-        $vrf.requests[$vrf.nextId].proposalId = proposalId;
-        $vrf.nextId++;
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWordsReturned) public returns (bool) {

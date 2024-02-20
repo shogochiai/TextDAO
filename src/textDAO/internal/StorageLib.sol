@@ -54,6 +54,7 @@ library StorageLib {
         uint[] cmdRank;
         uint nextHeaderTallyFrom;
         uint nextCmdTallyFrom;
+        uint repsNum;
         address[] reps;
         uint nextRepId;
     }
@@ -120,6 +121,13 @@ library StorageLib {
     struct VRFStorage {
         mapping(uint => Request) requests;
         uint nextId;
+        uint64 subscriptionId;
+        address vrfCoordinator;
+        bytes32 keyHash;
+        uint32 callbackGasLimit;
+        uint16 requestConfirmations;
+        uint32 numWords;
+        address LINKTOKEN;
     }
     struct Request {
         uint requestId;
