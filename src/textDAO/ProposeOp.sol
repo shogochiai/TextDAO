@@ -49,7 +49,7 @@ contract ProposeOp {
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWordsReturned) public returns (bool) {
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
-        StorageLib.Request storage $r = $vrf[requestId];
+        StorageLib.Request storage $r = $vrf.requests[requestId];
         StorageLib.ProposeOpStorage storage $prop = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $prop.proposals[$r.proposalId];
         StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
@@ -58,7 +58,8 @@ contract ProposeOp {
         uint256[] memory randomWords = randomWordsReturned;
 
         for (uint i; i < randomWords.length; i++) {
-            $p.proposalMeta.reps[$p.proposalMeta.nextRepId] = $member.members[uint256(randomWords[i]) % $member.nextMemberId];
+            uint pickedIndex = uint256(randomWords[i]) % $member.nextMemberId;
+            $p.proposalMeta.reps[$p.proposalMeta.nextRepId] = $member.members[pickedIndex].addr;
             $p.proposalMeta.nextRepId++;
         }
     }
