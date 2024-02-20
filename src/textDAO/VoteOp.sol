@@ -4,7 +4,7 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "./internal/StorageLib.sol";
 import { RCVLib } from "./internal/RCVLib.sol";
 
-contract RCVForForksOp {
+contract VoteOp {
     function voteHeaders(uint pid, uint[3] calldata headerIds) external returns (bool) {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];

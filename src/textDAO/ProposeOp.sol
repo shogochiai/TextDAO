@@ -68,8 +68,9 @@ contract ProposeOp {
         StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
 
         bool result;
-        for (uint i; i <  $member.nextMemberId; i++) {
-             result = $member.members[i].addr == msg.sender || result;
+
+        for (uint i; i < $member.nextMemberId; i++) {
+            result = $member.members[i].addr == msg.sender || result;
         }
         require(result, "You are not the member.");
         _;

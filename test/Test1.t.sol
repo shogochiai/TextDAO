@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { Test } from "forge-std/Test.sol";
 import { UCSTestBase } from "lib/UCSTestBase.sol";
 import { ProposeOp } from "src/textDAO/ProposeOp.sol";
 import { ForkOp } from "src/textDAO/ForkOp.sol";
-import { RCVForForksOp } from "src/textDAO/RCVForForksOp.sol";
+import { VoteOp } from "src/textDAO/VoteOp.sol";
 import { ExecuteProposalOp } from "src/textDAO/ExecuteProposalOp.sol";
 import { TallyForksOp } from "src/textDAO/TallyForksOp.sol";
 import { StorageLib } from "src/textDAO/internal/StorageLib.sol";
+import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Test1 is UCSTestBase {
 
@@ -16,8 +16,8 @@ contract Test1 is UCSTestBase {
         implementations[ProposeOp.propose.selector] = address(new ProposeOp());
         implementations[ForkOp.fork.selector] = address(new ForkOp());
         implementations[ExecuteProposalOp.executeProposal.selector] = address(new ExecuteProposalOp());
-        implementations[RCVForForksOp.voteHeaders.selector] = address(new RCVForForksOp());
-        implementations[RCVForForksOp.voteCmds.selector] = address(new RCVForForksOp());
+        implementations[VoteOp.voteHeaders.selector] = address(new VoteOp());
+        implementations[VoteOp.voteCmds.selector] = address(new VoteOp());
         implementations[TallyForksOp.tallyForks.selector] = address(new TallyForksOp());
     }
 
@@ -25,7 +25,16 @@ contract Test1 is UCSTestBase {
     function test_propose() public {
         StorageLib.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
+
+        address vrfCoordinator = address(0);
+        vm.mockCall(vrfCoordinator, abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector), abi.encode(1));
+
+        StorageLib.MemberJoinPassOpStorage storage $m = StorageLib.$Members();
+        $m.nextMemberId = 1;
+        $m.members[0].addr = address(this);
+
         uint pid = ProposeOp(address(this)).propose(p);
+
         assertEq(pid, 0);
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
         assertEq($p.proposalMeta.headerRank.length, 0);
@@ -41,6 +50,9 @@ contract Test1 is UCSTestBase {
         StorageLib.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
         p.cmd.actions = new StorageLib.Action[](1);
+
+        $p.proposalMeta.reps.push(); // array init
+        $p.proposalMeta.reps[0] = address(this); 
 
         assertEq($p.headers.length, 0);
         assertEq($p.cmds.length, 0);
@@ -63,7 +75,7 @@ contract Test1 is UCSTestBase {
         uint fork2ndScoreBefore = $p.headers[fork2ndId].currentScore;
         uint fork3rdScoreBefore = $p.headers[fork3rdId].currentScore;
 
-        RCVForForksOp(address(this)).voteHeaders(pid, [fork1stId, fork2ndId, fork3rdId]);
+        VoteOp(address(this)).voteHeaders(pid, [fork1stId, fork2ndId, fork3rdId]);
 
         uint fork1stScoreAfter = $p.headers[fork1stId].currentScore;
         uint fork2ndScoreAfter = $p.headers[fork2ndId].currentScore;
@@ -88,7 +100,7 @@ contract Test1 is UCSTestBase {
         uint fork2ndScoreBefore = $p.cmds[fork2ndId].currentScore;
         uint fork3rdScoreBefore = $p.cmds[fork3rdId].currentScore;
 
-        RCVForForksOp(address(this)).voteCmds(pid, [fork1stId, fork2ndId, fork3rdId]);
+        VoteOp(address(this)).voteCmds(pid, [fork1stId, fork2ndId, fork3rdId]);
 
         uint fork1stScoreAfter = $p.cmds[fork1stId].currentScore;
         uint fork2ndScoreAfter = $p.cmds[fork2ndId].currentScore;

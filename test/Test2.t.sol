@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { Test } from "forge-std/Test.sol";
 import { UCSTestBase } from "lib/UCSTestBase.sol";
 import { ProposeOp } from "src/textDAO/ProposeOp.sol";
 import { ForkOp } from "src/textDAO/ForkOp.sol";
-import { RCVForForksOp } from "src/textDAO/RCVForForksOp.sol";
+import { VoteOp } from "src/textDAO/VoteOp.sol";
 import { ExecuteProposalOp } from "src/textDAO/ExecuteProposalOp.sol";
 import { TallyForksOp } from "src/textDAO/TallyForksOp.sol";
 import { StorageLib } from "src/textDAO/internal/StorageLib.sol";
@@ -18,8 +17,8 @@ contract Test2 is UCSTestBase {
         implementations[ProposeOp.propose.selector] = address(new ProposeOp());
         implementations[ForkOp.fork.selector] = address(new ForkOp());
         implementations[ExecuteProposalOp.executeProposal.selector] = address(new ExecuteProposalOp());
-        implementations[RCVForForksOp.voteHeaders.selector] = address(new RCVForForksOp());
-        implementations[RCVForForksOp.voteCmds.selector] = address(new RCVForForksOp());
+        implementations[VoteOp.voteHeaders.selector] = address(new VoteOp());
+        implementations[VoteOp.voteCmds.selector] = address(new VoteOp());
         implementations[TallyForksOp.tallyForks.selector] = address(new TallyForksOp());
     }
 
