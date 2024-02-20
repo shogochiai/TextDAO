@@ -15,6 +15,12 @@ library StorageLib {
     struct ProposeOpStorage {
         mapping(uint => Proposal) proposals;
         uint nextProposalId;
+        ProposalsConfig config;
+    }
+    struct ProposalsConfig {
+        uint expiryDuration;
+        uint repsNum;
+        uint quorumScore;
     }
     struct ProposalArg {
         Header header;
@@ -48,15 +54,13 @@ library StorageLib {
     }
     struct ProposalMeta {
         uint currentScore;
-        uint quorumScore;
-        uint expireAt;
         uint[] headerRank;
         uint[] cmdRank;
         uint nextHeaderTallyFrom;
         uint nextCmdTallyFrom;
-        uint repsNum;
         address[] reps;
         uint nextRepId;
+        uint createdAt;
     }
 
     // keccak256(abi.encode(uint256(keccak256("textDAO.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
@@ -122,16 +126,19 @@ library StorageLib {
         mapping(uint => Request) requests;
         uint nextId;
         uint64 subscriptionId;
+        VRFConfig config;
+    }
+    struct Request {
+        uint requestId;
+        uint proposalId;
+    }
+    struct VRFConfig {
         address vrfCoordinator;
         bytes32 keyHash;
         uint32 callbackGasLimit;
         uint16 requestConfirmations;
         uint32 numWords;
         address LINKTOKEN;
-    }
-    struct Request {
-        uint requestId;
-        uint proposalId;
     }
 
     // keccak256(abi.encode(uint256(keccak256("textDAO.vrf.vrf")) - 1)) & ~bytes32(uint256(0xff));

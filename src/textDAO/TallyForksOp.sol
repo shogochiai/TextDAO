@@ -11,7 +11,7 @@ contract TallyForksOp {
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;
 
-        require($p.proposalMeta.expireAt > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
+        require($p.proposalMeta.createdAt + $.config.expiryDuration > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
 
         uint[] memory headerRank = new uint[]($headers.length);
         headerRank = SortLib.rankHeaders($headers);

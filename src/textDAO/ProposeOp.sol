@@ -11,40 +11,27 @@ contract ProposeOp {
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
         StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
 
-        if ($p.proposalMeta.repsNum == 0) {
-            $p.proposalMeta.repsNum = 30;
-        }
-
-        if ($p.proposalMeta.repsNum < $member.nextMemberId) {
+        if ($.config.repsNum < $member.nextMemberId) {
             /*
                 VRF Request to choose reps
             */
 
             require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetVRFPassOp::createAndFundSubscription first.");
+            require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFPassOp::setVRFConfig first.");
+            require($vrf.config.keyHash != 0, "No Chainlink VRF keyHash. Try SetVRFPassOp::setVRFConfig first.");
+            require($vrf.config.callbackGasLimit != 0, "No Chainlink VRF callbackGasLimit. Try SetVRFPassOp::setVRFConfig first.");
+            require($vrf.config.requestConfirmations != 0, "No Chainlink VRF requestConfirmations. Try SetVRFPassOp::setVRFConfig first.");
+            require($vrf.config.numWords != 0, "No Chainlink VRF numWords. Try SetVRFPassOp::setVRFConfig first.");
+            require($vrf.config.LINKTOKEN != address(0), "No Chainlink VRF LINKTOKEN. Try SetVRFPassOp::setVRFConfig first.");
 
-            if ($vrf.vrfCoordinator == address(0)) {
-                $vrf.vrfCoordinator = address(30);
-            }
-            if ($vrf.keyHash == bytes32(0)) {
-                $vrf.keyHash = bytes32(0);
-            }
-            if ($vrf.callbackGasLimit == uint32(0)) {
-                $vrf.callbackGasLimit = uint32(2000000);
-            }
-            if ($vrf.requestConfirmations == uint16(0)) {
-                $vrf.requestConfirmations = uint16(3);
-            }
-            if ($vrf.numWords == uint32(0)) {
-                $vrf.numWords = uint32(30);
-            }
 
             // Assumes the subscription is funded sufficiently.
-            uint256 requestId = VRFCoordinatorV2Interface($vrf.vrfCoordinator).requestRandomWords(
-                $vrf.keyHash,
+            uint256 requestId = VRFCoordinatorV2Interface($vrf.config.vrfCoordinator).requestRandomWords(
+                $vrf.config.keyHash,
                 $vrf.subscriptionId,
-                $vrf.requestConfirmations,
-                $vrf.callbackGasLimit,
-                $vrf.numWords
+                $vrf.config.requestConfirmations,
+                $vrf.config.callbackGasLimit,
+                $vrf.config.numWords
             );
 
             $vrf.requests[$vrf.nextId].requestId = requestId;

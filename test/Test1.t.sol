@@ -23,20 +23,28 @@ contract Test1 is UCSTestBase {
 
 
     function test_propose() public {
+        StorageLib.MemberJoinPassOpStorage storage $m = StorageLib.$Members();
+        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
+
         StorageLib.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
 
-        address vrfCoordinator = address(0);
-        vm.mockCall(vrfCoordinator, abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector), abi.encode(1));
+        $vrf.config.vrfCoordinator = address(1);
+        $vrf.subscriptionId = uint64(1);
+        $vrf.config.keyHash = bytes32(uint256(1));
+        $vrf.config.callbackGasLimit = uint32(1);
+        $vrf.config.requestConfirmations = uint16(1);
+        $vrf.config.numWords = uint32(1);
+        $vrf.config.LINKTOKEN = address(1);
+        vm.mockCall($vrf.config.vrfCoordinator, abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector), abi.encode(1));
 
-        StorageLib.MemberJoinPassOpStorage storage $m = StorageLib.$Members();
         $m.nextMemberId = 1;
         $m.members[0].addr = address(this);
 
         uint pid = ProposeOp(address(this)).propose(p);
+        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
 
         assertEq(pid, 0);
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
         assertEq($p.proposalMeta.headerRank.length, 0);
         assertEq($p.proposalMeta.cmdRank.length, 0);
         assertEq($p.headers[0].metadataURI, p.header.metadataURI);
@@ -113,9 +121,11 @@ contract Test1 is UCSTestBase {
 
     function test_tallyForks_success() public {
         uint pid = 0;
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
 
-        $p.proposalMeta.expireAt = block.timestamp + 1000;
+        $p.proposalMeta.createdAt = 0;
+        $.config.expiryDuration = 1000;
 
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;
@@ -126,8 +136,7 @@ contract Test1 is UCSTestBase {
         }
         $cmds.push();
 
-        $p.proposalMeta.quorumScore = 8;
-        $p.proposalMeta.quorumScore = 8;
+        $.config.quorumScore = 8;
 
         $p.headers[8].currentScore = 10;
         $p.headers[9].currentScore = 9;
@@ -150,9 +159,11 @@ contract Test1 is UCSTestBase {
 
     function test_tallyForks_failWithExpired() public {
         uint pid = 0;
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
 
-        $p.proposalMeta.expireAt = 0;
+        $p.proposalMeta.createdAt = 0;
+        $.config.expiryDuration = 0;
 
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;
@@ -163,8 +174,7 @@ contract Test1 is UCSTestBase {
         }
         $cmds.push();
 
-        $p.proposalMeta.quorumScore = 8;
-        $p.proposalMeta.quorumScore = 8;
+        $.config.quorumScore = 8;
 
         $p.headers[8].currentScore = 10;
         $p.headers[9].currentScore = 9;

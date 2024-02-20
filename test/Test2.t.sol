@@ -31,7 +31,9 @@ contract Test2 is UCSTestBase {
         metadataURIs[0] = bytes32(uint256(1));
         metadataURIs[1] = bytes32(uint256(2));
 
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
+
         StorageLib.Text storage $text = StorageLib.$Texts().texts[textId];
 
         $p.cmds.push(); // Note: initialize for storage array
@@ -47,7 +49,8 @@ contract Test2 is UCSTestBase {
         $p.proposalMeta.cmdRank.push(); // Note: initialize for storage array
         $p.proposalMeta.cmdRank[0] = $cmd.id;
 
-        $p.proposalMeta.expireAt = 0;
+        $p.proposalMeta.createdAt = 0;
+        $.config.expiryDuration = 0;
         $p.proposalMeta.headerRank.push(); // Note: initialize for storage array
 
         assertEq($text.metadataURIs.length, 0);
@@ -70,7 +73,8 @@ contract Test2 is UCSTestBase {
         member2.addr = address(2);
         candidates[1] = member2;
 
-        StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
         StorageLib.MemberJoinPassOpStorage storage $m = StorageLib.$Members();
 
         $p.cmds.push(); // Note: initialize for storage array
@@ -86,7 +90,8 @@ contract Test2 is UCSTestBase {
         $p.proposalMeta.cmdRank.push(); // Note: initialize for storage array
         $p.proposalMeta.cmdRank[0] = $cmd.id;
 
-        $p.proposalMeta.expireAt = 0;
+        $p.proposalMeta.createdAt = 0;
+        $.config.expiryDuration = 0;
         $p.proposalMeta.headerRank.push(); // Note: initialize for storage array
 
         assertEq($m.members[0].addr, address(0));

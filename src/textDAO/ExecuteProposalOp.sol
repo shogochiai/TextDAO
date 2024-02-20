@@ -9,7 +9,7 @@ contract ExecuteProposalOp {
         StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
-        require($p.proposalMeta.expireAt <= block.timestamp, "Proposal must be finished.");
+        require($p.proposalMeta.createdAt + $.config.expiryDuration <= block.timestamp, "Proposal must be finished.");
         require($p.cmds.length > 0, "No body forks to execute.");
         require($p.proposalMeta.cmdRank.length > 0, "Tally must be done at least once.");
 
