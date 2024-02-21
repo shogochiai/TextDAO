@@ -4,9 +4,9 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { DecodeErrorString } from "~/_predicates/DecodeErrorString.sol";
 
-contract ExecuteProposalOp {
+contract ExecuteProposal {
     function executeProposal(uint pid) external returns (bool) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         require($p.proposalMeta.createdAt + $.config.expiryDuration <= block.timestamp, "Proposal must be finished.");

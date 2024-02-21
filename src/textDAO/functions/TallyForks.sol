@@ -4,9 +4,9 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { SortLib } from "~/_predicates/SortLib.sol";
 
-contract TallyForksOp {
+contract TallyForks {
     function tallyForks(uint pid) external returns (bool) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;

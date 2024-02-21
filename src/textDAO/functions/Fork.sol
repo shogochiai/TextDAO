@@ -3,9 +3,9 @@ pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 
-contract ForkOp {
+contract Fork {
     function fork(uint pid, StorageLib.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         if (_p.header.metadataURI.length > 0) {
@@ -18,7 +18,7 @@ contract ForkOp {
     }
 
     modifier onlyReps(uint pid) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         bool result;

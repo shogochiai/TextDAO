@@ -4,9 +4,9 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { RCVLib } from "~/_predicates/RCVLib.sol";
 
-contract VoteOp {
+contract Vote {
     function voteHeaders(uint pid, uint[3] calldata headerIds) external returns (bool) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
         
         $p.headers[headerIds[0]].currentScore += 3;
@@ -14,7 +14,7 @@ contract VoteOp {
         $p.headers[headerIds[2]].currentScore += 1;
     }
     function voteCmds(uint pid, uint[3] calldata cmdIds) external returns (bool) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         $p.cmds[cmdIds[0]].currentScore += 3;

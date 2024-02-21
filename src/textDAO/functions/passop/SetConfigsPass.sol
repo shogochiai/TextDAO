@@ -6,9 +6,9 @@ import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { PassOpBase } from "~/textDAO/functions/passop/PassOpBase.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
-contract SetConfigsPassOp is PassOpBase {
+contract SetConfigsPass is PassOpBase {
     function setProposalsConfig(uint pid, StorageLib.ProposalsConfig memory config) public onlyPassed(pid) returns (bool) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         $.config.expiryDuration = config.expiryDuration;
         $.config.repsNum = config.repsNum;
         $.config.quorumScore = config.quorumScore;

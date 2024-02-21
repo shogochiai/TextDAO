@@ -9,10 +9,10 @@ import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
  */
 library StorageLib {    
     /*********************
-     *  ProposeOpStorage
+     *  ProposeStorage
      ********************/
     /// @custom:storage-location erc7201:textDAO.proposeop.proposals
-    struct ProposeOpStorage {
+    struct ProposeStorage {
         mapping(uint => Proposal) proposals;
         uint nextProposalId;
         ProposalsConfig config;
@@ -67,17 +67,17 @@ library StorageLib {
     bytes32 private constant PROPOSALS_STORAGE_LOCATION =
         0xd43a2afe07b94a8ce70d10f193569d2c070c983eb6cea4616d25510ca5dae200;
 
-    function $Proposals() internal pure returns (ProposeOpStorage storage $) {
+    function $Proposals() internal pure returns (ProposeStorage storage $) {
         assembly { $.slot := PROPOSALS_STORAGE_LOCATION }
     }
 
 
 
     /*********************
-     *  TextSavePassOp Storage
+     *  TextSavePass Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.textSavePassOp.texts
-    struct TextSavePassOpStorage {
+    /// @custom:storage-location erc7201:textDAO.textSavePass.texts
+    struct TextSavePassStorage {
         mapping(uint => Text) texts;
         uint nextTextId;
     }
@@ -86,20 +86,20 @@ library StorageLib {
         bytes32[] metadataURIs;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.textSavePassOp.texts")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.textSavePass.texts")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant TEXTS_STORAGE_LOCATION =
         0x6b4e5911a84ec39982af20b4b46881b8065fae500bf9de0e93910e5b75a3be00;
 
-    function $Texts() internal pure returns (TextSavePassOpStorage storage $) {
+    function $Texts() internal pure returns (TextSavePassStorage storage $) {
         assembly { $.slot := TEXTS_STORAGE_LOCATION }
     }
 
 
     /*********************
-     *  MemberJoinPassOp Storage
+     *  MemberJoinPass Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.memberJoinPassOp.members
-    struct MemberJoinPassOpStorage {
+    /// @custom:storage-location erc7201:textDAO.memberJoinPass.members
+    struct MemberJoinPassStorage {
         mapping(uint => Member) members;
         uint nextMemberId;
     }
@@ -109,11 +109,11 @@ library StorageLib {
         bytes32 metadataURI;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.memberJoinPassOp.members")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.memberJoinPass.members")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant MEMBERSS_STORAGE_LOCATION =
         0x2440ca222525c850943cc10edec2af9e450af2275dab1d00440eb269aaf15900;
 
-    function $Members() internal pure returns (MemberJoinPassOpStorage storage $) {
+    function $Members() internal pure returns (MemberJoinPassStorage storage $) {
         assembly { $.slot := MEMBERSS_STORAGE_LOCATION }
     }
 

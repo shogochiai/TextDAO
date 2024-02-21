@@ -4,25 +4,25 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
-contract ProposeOp {
+contract Propose {
     function propose(StorageLib.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[proposalId];
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
-        StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
+        StorageLib.MemberJoinPassStorage storage $member = StorageLib.$Members();
 
         if ($.config.repsNum < $member.nextMemberId) {
             /*
                 VRF Request to choose reps
             */
 
-            require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetVRFPassOp::createAndFundSubscription first.");
-            require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFPassOp::setVRFConfig first.");
-            require($vrf.config.keyHash != 0, "No Chainlink VRF keyHash. Try SetVRFPassOp::setVRFConfig first.");
-            require($vrf.config.callbackGasLimit != 0, "No Chainlink VRF callbackGasLimit. Try SetVRFPassOp::setVRFConfig first.");
-            require($vrf.config.requestConfirmations != 0, "No Chainlink VRF requestConfirmations. Try SetVRFPassOp::setVRFConfig first.");
-            require($vrf.config.numWords != 0, "No Chainlink VRF numWords. Try SetVRFPassOp::setVRFConfig first.");
-            require($vrf.config.LINKTOKEN != address(0), "No Chainlink VRF LINKTOKEN. Try SetVRFPassOp::setVRFConfig first.");
+            require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetVRFPass::createAndFundSubscription first.");
+            require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFPass::setVRFConfig first.");
+            require($vrf.config.keyHash != 0, "No Chainlink VRF keyHash. Try SetVRFPass::setVRFConfig first.");
+            require($vrf.config.callbackGasLimit != 0, "No Chainlink VRF callbackGasLimit. Try SetVRFPass::setVRFConfig first.");
+            require($vrf.config.requestConfirmations != 0, "No Chainlink VRF requestConfirmations. Try SetVRFPass::setVRFConfig first.");
+            require($vrf.config.numWords != 0, "No Chainlink VRF numWords. Try SetVRFPass::setVRFConfig first.");
+            require($vrf.config.LINKTOKEN != address(0), "No Chainlink VRF LINKTOKEN. Try SetVRFPass::setVRFConfig first.");
 
 
             // Assumes the subscription is funded sufficiently.
@@ -54,9 +54,9 @@ contract ProposeOp {
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWordsReturned) public returns (bool) {
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
         StorageLib.Request storage $r = $vrf.requests[requestId];
-        StorageLib.ProposeOpStorage storage $prop = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $prop = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $prop.proposals[$r.proposalId];
-        StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
+        StorageLib.MemberJoinPassStorage storage $member = StorageLib.$Members();
 
 
         uint256[] memory randomWords = randomWordsReturned;
@@ -69,7 +69,7 @@ contract ProposeOp {
     }
 
     modifier onlyMember() {
-        StorageLib.MemberJoinPassOpStorage storage $member = StorageLib.$Members();
+        StorageLib.MemberJoinPassStorage storage $member = StorageLib.$Members();
 
         bool result;
 
