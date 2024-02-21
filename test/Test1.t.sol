@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "~/textDAO/_predicates/UCSTestBase.sol";
+import { UCSTestBase } from "~/_predicates/UCSTestBase.sol";
 import { Propose } from "~/textDAO/functions/Propose.sol";
 import { Fork } from "~/textDAO/functions/Fork.sol";
 import { Vote } from "~/textDAO/functions/Vote.sol";
@@ -23,7 +23,7 @@ contract Test1 is UCSTestBase {
 
 
     function test_propose() public {
-        StorageLib.MemberJoinPassStorage storage $m = StorageLib.$Members();
+        StorageLib.MemberJoinUnsafeStorage storage $m = StorageLib.$Members();
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
 
         StorageLib.ProposalArg memory p;

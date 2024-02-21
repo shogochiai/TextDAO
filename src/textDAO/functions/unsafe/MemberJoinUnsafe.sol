@@ -2,11 +2,11 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { PassOpBase } from "~/textDAO/functions/passop/PassOpBase.sol";
+import { UnsafeBase } from "~/_predicates/UnsafeBase.sol";
 
-contract MemberJoinPass is PassOpBase {
-    function memberJoin(uint pid, StorageLib.Member[] memory candidates) public onlyPassed(pid) returns (bool) {
-        StorageLib.MemberJoinPassStorage storage $ = StorageLib.$Members();
+contract MemberJoinUnsafe is UnsafeBase {
+    function memberJoin(uint pid, StorageLib.Member[] memory candidates) public unsafe(pid) returns (bool) {
+        StorageLib.MemberJoinUnsafeStorage storage $ = StorageLib.$Members();
 
         for (uint i; i < candidates.length; i++) {
             $.members[$.nextMemberId+i].id = candidates[i].id;

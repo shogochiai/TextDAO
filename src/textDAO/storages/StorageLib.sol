@@ -74,10 +74,10 @@ library StorageLib {
 
 
     /*********************
-     *  TextSavePass Storage
+     *  TextSaveUnsafe Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.textSavePass.texts
-    struct TextSavePassStorage {
+    /// @custom:storage-location erc7201:textDAO.textSaveUnsafe.texts
+    struct TextSaveUnsafeStorage {
         mapping(uint => Text) texts;
         uint nextTextId;
     }
@@ -86,20 +86,20 @@ library StorageLib {
         bytes32[] metadataURIs;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.textSavePass.texts")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.textSaveUnsafe.texts")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant TEXTS_STORAGE_LOCATION =
         0x6b4e5911a84ec39982af20b4b46881b8065fae500bf9de0e93910e5b75a3be00;
 
-    function $Texts() internal pure returns (TextSavePassStorage storage $) {
+    function $Texts() internal pure returns (TextSaveUnsafeStorage storage $) {
         assembly { $.slot := TEXTS_STORAGE_LOCATION }
     }
 
 
     /*********************
-     *  MemberJoinPass Storage
+     *  MemberJoinUnsafe Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.memberJoinPass.members
-    struct MemberJoinPassStorage {
+    /// @custom:storage-location erc7201:textDAO.memberJoinUnsafe.members
+    struct MemberJoinUnsafeStorage {
         mapping(uint => Member) members;
         uint nextMemberId;
     }
@@ -109,11 +109,11 @@ library StorageLib {
         bytes32 metadataURI;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.memberJoinPass.members")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.memberJoinUnsafe.members")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant MEMBERSS_STORAGE_LOCATION =
         0x2440ca222525c850943cc10edec2af9e450af2275dab1d00440eb269aaf15900;
 
-    function $Members() internal pure returns (MemberJoinPassStorage storage $) {
+    function $Members() internal pure returns (MemberJoinUnsafeStorage storage $) {
         assembly { $.slot := MEMBERSS_STORAGE_LOCATION }
     }
 

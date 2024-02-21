@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "~/textDAO/_predicates/UCSTestBase.sol";
+import { UCSTestBase } from "~/_predicates/UCSTestBase.sol";
 import { Propose } from "~/textDAO/functions/Propose.sol";
 import { Fork } from "~/textDAO/functions/Fork.sol";
 import { Vote } from "~/textDAO/functions/Vote.sol";
 import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
 import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { TextSavePass } from "~/textDAO/functions/passop/TextSavePass.sol";
-import { MemberJoinPass } from "~/textDAO/functions/passop/MemberJoinPass.sol";
+import { TextSaveUnsafe } from "~/textDAO/functions/unsafe/TextSaveUnsafe.sol";
+import { MemberJoinUnsafe } from "~/textDAO/functions/unsafe/MemberJoinUnsafe.sol";
 
 contract Test2 is UCSTestBase {
 
@@ -42,7 +42,7 @@ contract Test2 is UCSTestBase {
         $cmd.actions.push(); // Note: initialize for storage array
         StorageLib.Action storage $action = $cmd.actions[0];
 
-        $action.addr = address(new TextSavePass());
+        $action.addr = address(new TextSaveUnsafe());
         $action.func = "textSave(uint256,uint256,bytes32[])";
         $action.abiParams = abi.encode(pid, textId, metadataURIs);
 
@@ -75,7 +75,7 @@ contract Test2 is UCSTestBase {
 
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
-        StorageLib.MemberJoinPassStorage storage $m = StorageLib.$Members();
+        StorageLib.MemberJoinUnsafeStorage storage $m = StorageLib.$Members();
 
         $p.cmds.push(); // Note: initialize for storage array
         StorageLib.Command storage $cmd = $p.cmds[0];
@@ -83,7 +83,7 @@ contract Test2 is UCSTestBase {
         $cmd.actions.push(); // Note: initialize for storage array
         StorageLib.Action storage $action = $cmd.actions[0];
 
-        $action.addr = address(new MemberJoinPass());
+        $action.addr = address(new MemberJoinUnsafe());
         $action.func = "memberJoin(uint256,(uint256,address,bytes32)[])";
         $action.abiParams = abi.encode(pid, candidates);
 
