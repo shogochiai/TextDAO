@@ -1,29 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "lib/UCSTestBase.sol";
-import { ProposeOp } from "src/textDAO/ProposeOp.sol";
-import { ForkOp } from "src/textDAO/ForkOp.sol";
-import { VoteOp } from "src/textDAO/VoteOp.sol";
-import { ExecuteProposalOp } from "src/textDAO/ExecuteProposalOp.sol";
-import { TallyForksOp } from "src/textDAO/TallyForksOp.sol";
-import { StorageLib } from "src/textDAO/internal/StorageLib.sol";
+import { UCSTestBase } from "~/textDAO/_predicates/UCSTestBase.sol";
+import { Propose } from "~/textDAO/functions/Propose.sol";
+import { Fork } from "~/textDAO/functions/Fork.sol";
+import { Vote } from "~/textDAO/functions/Vote.sol";
+import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
+import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
+import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Test1 is UCSTestBase {
 
     function setUp() public override {
-        implementations[ProposeOp.propose.selector] = address(new ProposeOp());
-        implementations[ForkOp.fork.selector] = address(new ForkOp());
-        implementations[ExecuteProposalOp.executeProposal.selector] = address(new ExecuteProposalOp());
-        implementations[VoteOp.voteHeaders.selector] = address(new VoteOp());
-        implementations[VoteOp.voteCmds.selector] = address(new VoteOp());
-        implementations[TallyForksOp.tallyForks.selector] = address(new TallyForksOp());
+        implementations[Propose.propose.selector] = address(new Propose());
+        implementations[Fork.fork.selector] = address(new Fork());
+        implementations[ExecuteProposal.executeProposal.selector] = address(new ExecuteProposal());
+        implementations[Vote.voteHeaders.selector] = address(new Vote());
+        implementations[Vote.voteCmds.selector] = address(new Vote());
+        implementations[TallyForks.tallyForks.selector] = address(new TallyForks());
     }
 
 
     function test_propose() public {
-        StorageLib.MemberJoinPassOpStorage storage $m = StorageLib.$Members();
+        StorageLib.MemberJoinPassStorage storage $m = StorageLib.$Members();
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
 
         StorageLib.ProposalArg memory p;
@@ -41,7 +41,7 @@ contract Test1 is UCSTestBase {
         $m.nextMemberId = 1;
         $m.members[0].addr = address(this);
 
-        uint pid = ProposeOp(address(this)).propose(p);
+        uint pid = Propose(address(this)).propose(p);
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
 
         assertEq(pid, 0);
@@ -52,7 +52,7 @@ contract Test1 is UCSTestBase {
 
     function test_fork() public {
         uint pid = 0;
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         StorageLib.ProposalArg memory p;
@@ -64,7 +64,7 @@ contract Test1 is UCSTestBase {
 
         assertEq($p.headers.length, 0);
         assertEq($p.cmds.length, 0);
-        uint forkId = ForkOp(address(this)).fork(pid, p);
+        uint forkId = Fork(address(this)).fork(pid, p);
         assertEq($p.headers.length, 1);
         assertEq($p.cmds.length, 1);
     }
@@ -83,7 +83,7 @@ contract Test1 is UCSTestBase {
         uint fork2ndScoreBefore = $p.headers[fork2ndId].currentScore;
         uint fork3rdScoreBefore = $p.headers[fork3rdId].currentScore;
 
-        VoteOp(address(this)).voteHeaders(pid, [fork1stId, fork2ndId, fork3rdId]);
+        Vote(address(this)).voteHeaders(pid, [fork1stId, fork2ndId, fork3rdId]);
 
         uint fork1stScoreAfter = $p.headers[fork1stId].currentScore;
         uint fork2ndScoreAfter = $p.headers[fork2ndId].currentScore;
@@ -108,7 +108,7 @@ contract Test1 is UCSTestBase {
         uint fork2ndScoreBefore = $p.cmds[fork2ndId].currentScore;
         uint fork3rdScoreBefore = $p.cmds[fork3rdId].currentScore;
 
-        VoteOp(address(this)).voteCmds(pid, [fork1stId, fork2ndId, fork3rdId]);
+        Vote(address(this)).voteCmds(pid, [fork1stId, fork2ndId, fork3rdId]);
 
         uint fork1stScoreAfter = $p.cmds[fork1stId].currentScore;
         uint fork2ndScoreAfter = $p.cmds[fork2ndId].currentScore;
@@ -121,7 +121,7 @@ contract Test1 is UCSTestBase {
 
     function test_tallyForks_success() public {
         uint pid = 0;
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         $p.proposalMeta.createdAt = 0;
@@ -145,7 +145,7 @@ contract Test1 is UCSTestBase {
         $p.cmds[5].currentScore = 9;
         $p.cmds[6].currentScore = 8;
 
-        TallyForksOp(address(this)).tallyForks(pid);
+        TallyForks(address(this)).tallyForks(pid);
 
         assertEq($p.proposalMeta.headerRank[0], 8);
         assertEq($p.proposalMeta.headerRank[1], 9);
@@ -159,7 +159,7 @@ contract Test1 is UCSTestBase {
 
     function test_tallyForks_failWithExpired() public {
         uint pid = 0;
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         $p.proposalMeta.createdAt = 0;
@@ -184,7 +184,7 @@ contract Test1 is UCSTestBase {
         $p.cmds[6].currentScore = 8;
 
         vm.expectRevert("This proposal has been expired. You cannot run new tally to update ranks.");
-        TallyForksOp(address(this)).tallyForks(pid);
+        TallyForks(address(this)).tallyForks(pid);
 
     }
 
@@ -195,7 +195,7 @@ contract Test1 is UCSTestBase {
         $p.cmds.push();
         $p.proposalMeta.cmdRank = new uint[](3);
 
-        ExecuteProposalOp(address(this)).executeProposal(pid);
+        ExecuteProposal(address(this)).executeProposal(pid);
     }
 
 }

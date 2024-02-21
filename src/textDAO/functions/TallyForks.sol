@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { SortLib } from "~/_predicates/SortLib.sol";
+import { SortLib } from "~/textDAO/_predicates/SortLib.sol";
 
 contract TallyForks {
     function tallyForks(uint pid) external returns (bool) {

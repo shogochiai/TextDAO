@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { DecodeErrorString } from "~/_predicates/DecodeErrorString.sol";
+import { DecodeErrorString } from "~/textDAO/_predicates/DecodeErrorString.sol";
 
 contract ExecuteProposal {
     function executeProposal(uint pid) external returns (bool) {

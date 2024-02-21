@@ -2,7 +2,6 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { RCVLib } from "~/_predicates/RCVLib.sol";
 
 contract Vote {
     function voteHeaders(uint pid, uint[3] calldata headerIds) external returns (bool) {

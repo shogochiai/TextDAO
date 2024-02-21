@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "lib/UCSTestBase.sol";
-import { ProposeOp } from "src/textDAO/ProposeOp.sol";
-import { ForkOp } from "src/textDAO/ForkOp.sol";
-import { VoteOp } from "src/textDAO/VoteOp.sol";
-import { ExecuteProposalOp } from "src/textDAO/ExecuteProposalOp.sol";
-import { TallyForksOp } from "src/textDAO/TallyForksOp.sol";
-import { StorageLib } from "src/textDAO/internal/StorageLib.sol";
-import { TextSavePassOp } from "src/textDAO/passop/TextSavePassOp.sol";
-import { MemberJoinPassOp } from "src/textDAO/passop/MemberJoinPassOp.sol";
+import { UCSTestBase } from "~/textDAO/_predicates/UCSTestBase.sol";
+import { Propose } from "~/textDAO/functions/Propose.sol";
+import { Fork } from "~/textDAO/functions/Fork.sol";
+import { Vote } from "~/textDAO/functions/Vote.sol";
+import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
+import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
+import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { TextSavePass } from "~/textDAO/functions/passop/TextSavePass.sol";
+import { MemberJoinPass } from "~/textDAO/functions/passop/MemberJoinPass.sol";
 
 contract Test2 is UCSTestBase {
 
     function setUp() public override {
-        implementations[ProposeOp.propose.selector] = address(new ProposeOp());
-        implementations[ForkOp.fork.selector] = address(new ForkOp());
-        implementations[ExecuteProposalOp.executeProposal.selector] = address(new ExecuteProposalOp());
-        implementations[VoteOp.voteHeaders.selector] = address(new VoteOp());
-        implementations[VoteOp.voteCmds.selector] = address(new VoteOp());
-        implementations[TallyForksOp.tallyForks.selector] = address(new TallyForksOp());
+        implementations[Propose.propose.selector] = address(new Propose());
+        implementations[Fork.fork.selector] = address(new Fork());
+        implementations[ExecuteProposal.executeProposal.selector] = address(new ExecuteProposal());
+        implementations[Vote.voteHeaders.selector] = address(new Vote());
+        implementations[Vote.voteCmds.selector] = address(new Vote());
+        implementations[TallyForks.tallyForks.selector] = address(new TallyForks());
     }
 
     function test_executeProposal_successWithText() public {
@@ -31,7 +31,7 @@ contract Test2 is UCSTestBase {
         metadataURIs[0] = bytes32(uint256(1));
         metadataURIs[1] = bytes32(uint256(2));
 
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
         StorageLib.Text storage $text = StorageLib.$Texts().texts[textId];
@@ -42,7 +42,7 @@ contract Test2 is UCSTestBase {
         $cmd.actions.push(); // Note: initialize for storage array
         StorageLib.Action storage $action = $cmd.actions[0];
 
-        $action.addr = address(new TextSavePassOp());
+        $action.addr = address(new TextSavePass());
         $action.func = "textSave(uint256,uint256,bytes32[])";
         $action.abiParams = abi.encode(pid, textId, metadataURIs);
 
@@ -54,7 +54,7 @@ contract Test2 is UCSTestBase {
         $p.proposalMeta.headerRank.push(); // Note: initialize for storage array
 
         assertEq($text.metadataURIs.length, 0);
-        ExecuteProposalOp(address(this)).executeProposal(pid);
+        ExecuteProposal(address(this)).executeProposal(pid);
         assertGt($text.metadataURIs.length, 0);
     }
 
@@ -73,9 +73,9 @@ contract Test2 is UCSTestBase {
         member2.addr = address(2);
         candidates[1] = member2;
 
-        StorageLib.ProposeOpStorage storage $ = StorageLib.$Proposals();
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
-        StorageLib.MemberJoinPassOpStorage storage $m = StorageLib.$Members();
+        StorageLib.MemberJoinPassStorage storage $m = StorageLib.$Members();
 
         $p.cmds.push(); // Note: initialize for storage array
         StorageLib.Command storage $cmd = $p.cmds[0];
@@ -83,7 +83,7 @@ contract Test2 is UCSTestBase {
         $cmd.actions.push(); // Note: initialize for storage array
         StorageLib.Action storage $action = $cmd.actions[0];
 
-        $action.addr = address(new MemberJoinPassOp());
+        $action.addr = address(new MemberJoinPass());
         $action.func = "memberJoin(uint256,(uint256,address,bytes32)[])";
         $action.abiParams = abi.encode(pid, candidates);
 
@@ -97,7 +97,7 @@ contract Test2 is UCSTestBase {
         assertEq($m.members[0].addr, address(0));
         assertEq($m.members[1].addr, address(0));
         assertEq($m.nextMemberId, 0);
-        ExecuteProposalOp(address(this)).executeProposal(pid);
+        ExecuteProposal(address(this)).executeProposal(pid);
         assertEq($m.members[0].addr, address(1));
         assertEq($m.members[1].addr, address(2));
         assertEq($m.nextMemberId, candidates.length);
