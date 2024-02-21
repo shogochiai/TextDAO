@@ -122,11 +122,9 @@ contract Test1 is UCSTestBase {
 
     function test_tallyForks_success() public {
         uint pid = 0;
-        StorageLib.ConfigOverrideStorage storage $configOverride = StorageLib.$ConfigOverride();
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 
-        $configOverride.overrides[SelectorLib.selector("tallyForks(uint256)")].quorumScore = 10;
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 1000;
 
@@ -136,6 +134,9 @@ contract Test1 is UCSTestBase {
         for (uint i; i < 10; i++) {
             $headers.push();
             $cmds.push();
+            $cmds[i].actions.push();
+            StorageLib.Action storage $action = $cmds[i].actions[0];
+            $action.func = "tallyForks(uint256)";
         }
         $cmds.push();
 
@@ -150,15 +151,59 @@ contract Test1 is UCSTestBase {
 
         TallyForks(address(this)).tallyForks(pid);
 
-        // assertEq($p.proposalMeta.headerRank[0], 8);
-        // assertEq($p.proposalMeta.headerRank[1], 9);
-        // assertEq($p.proposalMeta.headerRank[2], 3);
-        // assertEq($p.proposalMeta.nextHeaderTallyFrom, 10);
-        // assertEq($p.proposalMeta.cmdRank[0], 4);
-        // assertEq($p.proposalMeta.cmdRank[1], 5);
-        // assertEq($p.proposalMeta.cmdRank[2], 6);
-        // assertEq($p.proposalMeta.nextCmdTallyFrom, 11);
+        assertEq($p.proposalMeta.headerRank[0], 8);
+        assertEq($p.proposalMeta.headerRank[1], 9);
+        assertEq($p.proposalMeta.headerRank[2], 3);
+        assertEq($p.proposalMeta.nextHeaderTallyFrom, 10);
+        assertEq($p.proposalMeta.cmdRank[0], 4);
+        assertEq($p.proposalMeta.cmdRank[1], 5);
+        assertEq($p.proposalMeta.cmdRank[2], 6);
+        assertEq($p.proposalMeta.nextCmdTallyFrom, 11);
     }
+
+    function test_tallyForks_failCommandQuorumWithOverride() public {
+        uint pid = 0;
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
+        StorageLib.ConfigOverrideStorage storage $configOverride = StorageLib.$ConfigOverride();
+
+        $p.proposalMeta.createdAt = 0;
+        $.config.expiryDuration = 1000;
+
+        StorageLib.Header[] storage $headers = $p.headers;
+        StorageLib.Command[] storage $cmds = $p.cmds;
+
+        for (uint i; i < 10; i++) {
+            $headers.push();
+            $cmds.push();
+            $cmds[i].actions.push();
+            StorageLib.Action storage $action = $cmds[i].actions[0];
+            $action.func = "tallyForks(uint256)";
+        }
+        $cmds.push();
+
+        $.config.quorumScore = 8;
+        $configOverride.overrides[SelectorLib.selector("tallyForks(uint256)")].quorumScore = 15;
+
+        $p.headers[8].currentScore = 10;
+        $p.headers[9].currentScore = 9;
+        $p.headers[3].currentScore = 8;
+        $p.cmds[4].currentScore = 10;
+        $p.cmds[5].currentScore = 9;
+        $p.cmds[6].currentScore = 8;
+
+        TallyForks(address(this)).tallyForks(pid);
+
+        assertEq($p.proposalMeta.headerRank[0], 8);
+        assertEq($p.proposalMeta.headerRank[1], 9);
+        assertEq($p.proposalMeta.headerRank[2], 3);
+        assertEq($p.proposalMeta.nextHeaderTallyFrom, 10);
+        assertEq($p.proposalMeta.cmdRank[0], 0);
+        assertEq($p.proposalMeta.cmdRank[1], 0);
+        assertEq($p.proposalMeta.cmdRank[2], 0);
+        assertEq($p.proposalMeta.nextCmdTallyFrom, 0);
+    }
+
 
     function test_tallyForks_failWithExpired() public {
         uint pid = 0;
@@ -174,6 +219,9 @@ contract Test1 is UCSTestBase {
         for (uint i; i < 10; i++) {
             $headers.push();
             $cmds.push();
+            $cmds[i].actions.push();
+            StorageLib.Action storage $action = $cmds[i].actions[0];
+            $action.func = "tallyForks(uint256)";
         }
         $cmds.push();
 

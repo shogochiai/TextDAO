@@ -4,6 +4,7 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { SortLib } from "~/_predicates/SortLib.sol";
 import { SelectorLib } from "~/_predicates/SelectorLib.sol";
+import { console2 } from "forge-std/console2.sol";
 
 contract TallyForks {
     function tallyForks(uint pid) external returns (bool) {
@@ -53,6 +54,8 @@ contract TallyForks {
             $p.proposalMeta.headerRank[1] = headerRank[1];
             $p.proposalMeta.headerRank[2] = headerRank[2];
             $p.proposalMeta.nextHeaderTallyFrom = $headers.length;
+        } else {
+            // emit HeaderQuorumFailed
         }
 
         if ($p.proposalMeta.cmdRank.length == 0) {
@@ -63,6 +66,8 @@ contract TallyForks {
             $p.proposalMeta.cmdRank[1] = cmdRank[1];
             $p.proposalMeta.cmdRank[2] = cmdRank[2];
             $p.proposalMeta.nextCmdTallyFrom = $cmds.length;
+        } else {
+            // emit CommandQuorumFailed
         }
 
         // TODO: Reset headers and cmds for next session
