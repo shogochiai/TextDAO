@@ -48,7 +48,6 @@ library StorageLib {
         uint currentScore;
     }
     struct Action {
-        address addr;
         string func;
         bytes abiParams;
     }

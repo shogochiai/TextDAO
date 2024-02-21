@@ -19,7 +19,7 @@ contract ExecuteProposal {
         for (uint i; i < $actions.length; i++) {
             StorageLib.Action memory action = $actions[i];
             // Note: Is msg.value of this proxy consistent among all delegatecalls?
-            (bool success, bytes memory data) = action.addr.delegatecall(bytes.concat(
+            (bool success, bytes memory data) = address(this).delegatecall(bytes.concat(
                 bytes4(keccak256(bytes(action.func))),
                 action.abiParams
             ));

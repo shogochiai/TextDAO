@@ -8,7 +8,7 @@ import { Vote } from "~/textDAO/functions/Vote.sol";
 import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
 import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { TextSaveUnsafe } from "~/textDAO/functions/unsafe/TextSaveUnsafe.sol";
+import { SaveTextUnsafe } from "~/textDAO/functions/unsafe/SaveTextUnsafe.sol";
 import { MemberJoinUnsafe } from "~/textDAO/functions/unsafe/MemberJoinUnsafe.sol";
 
 contract Test2 is UCSTestBase {
@@ -20,6 +20,8 @@ contract Test2 is UCSTestBase {
         implementations[Vote.voteHeaders.selector] = address(new Vote());
         implementations[Vote.voteCmds.selector] = address(new Vote());
         implementations[TallyForks.tallyForks.selector] = address(new TallyForks());
+        implementations[SaveTextUnsafe.saveText.selector] = address(new SaveTextUnsafe());
+        implementations[MemberJoinUnsafe.memberJoin.selector] = address(new MemberJoinUnsafe());
     }
 
     function test_executeProposal_successWithText() public {
@@ -42,8 +44,7 @@ contract Test2 is UCSTestBase {
         $cmd.actions.push(); // Note: initialize for storage array
         StorageLib.Action storage $action = $cmd.actions[0];
 
-        $action.addr = address(new TextSaveUnsafe());
-        $action.func = "textSave(uint256,uint256,bytes32[])";
+        $action.func = "saveText(uint256,uint256,bytes32[])";
         $action.abiParams = abi.encode(pid, textId, metadataURIs);
 
         $p.proposalMeta.cmdRank.push(); // Note: initialize for storage array
@@ -83,7 +84,6 @@ contract Test2 is UCSTestBase {
         $cmd.actions.push(); // Note: initialize for storage array
         StorageLib.Action storage $action = $cmd.actions[0];
 
-        $action.addr = address(new MemberJoinUnsafe());
         $action.func = "memberJoin(uint256,(uint256,address,bytes32)[])";
         $action.abiParams = abi.encode(pid, candidates);
 
