@@ -24,7 +24,9 @@ contract Test3 is UCSTestBase {
         implementations[MemberJoinUnsafe.memberJoin.selector] = address(new MemberJoinUnsafe());
     }
 
- 
+    function test_configOverride_successQuorum() public {
+        
+    } 
 
 
 }

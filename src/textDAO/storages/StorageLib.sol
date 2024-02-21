@@ -148,6 +148,26 @@ library StorageLib {
         assembly { $.slot := VRF_STORAGE_LOCATION }
     }
 
+
+    /*********************
+     *  ConfigOverride Storage
+     ********************/
+    /// @custom:storage-location erc7201:textDAO.CONF_OVERRIDE_STORAGE_LOCATION
+    struct ConfigOverrideStorage {
+        mapping(bytes4 => ConfigOverride) overrides;
+        uint nextId;
+    }
+    struct ConfigOverride {
+        uint quorumScore;
+    }
+
+    // keccak256(abi.encode(uint256(keccak256("textDAO.CONF_OVERRIDE_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
+    bytes32 private constant CONF_OVERRIDE_STORAGE_LOCATION =
+        0x531151f4103280746205c56419d2c949e0976d9ee39d3c364618181eba5ee500;
+
+    function $ConfigOverride() internal pure returns (ConfigOverrideStorage storage $) {
+        assembly { $.slot := CONF_OVERRIDE_STORAGE_LOCATION }
+    }
     
 
 }
