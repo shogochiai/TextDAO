@@ -11,7 +11,7 @@ library StorageLib {
     /*********************
      *  ProposeStorage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.proposeop.proposals
+    /// @custom:storage-location erc7201:textDAO.PROPOSALS_STORAGE_LOCATION
     struct ProposeStorage {
         mapping(uint => Proposal) proposals;
         uint nextProposalId;
@@ -63,9 +63,9 @@ library StorageLib {
         uint createdAt;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.proposeop.proposals")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.PROPOSALS_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant PROPOSALS_STORAGE_LOCATION =
-        0xd43a2afe07b94a8ce70d10f193569d2c070c983eb6cea4616d25510ca5dae200;
+        0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400;
 
     function $Proposals() internal pure returns (ProposeStorage storage $) {
         assembly { $.slot := PROPOSALS_STORAGE_LOCATION }
@@ -76,7 +76,7 @@ library StorageLib {
     /*********************
      *  TextSaveUnsafe Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.textSaveUnsafe.texts
+    /// @custom:storage-location erc7201:textDAO.TEXTS_STORAGE_LOCATION
     struct TextSaveUnsafeStorage {
         mapping(uint => Text) texts;
         uint nextTextId;
@@ -86,9 +86,9 @@ library StorageLib {
         bytes32[] metadataURIs;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.textSaveUnsafe.texts")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.TEXTS_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant TEXTS_STORAGE_LOCATION =
-        0x6b4e5911a84ec39982af20b4b46881b8065fae500bf9de0e93910e5b75a3be00;
+        0x0a45678f7ac13226a0ead4e3b54db0ab263e1a30cc1ea3f19d7212aea5cd1d00;
 
     function $Texts() internal pure returns (TextSaveUnsafeStorage storage $) {
         assembly { $.slot := TEXTS_STORAGE_LOCATION }
@@ -98,7 +98,7 @@ library StorageLib {
     /*********************
      *  MemberJoinUnsafe Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.memberJoinUnsafe.members
+    /// @custom:storage-location erc7201:textDAO.MEMBERS_STORAGE_LOCATION
     struct MemberJoinUnsafeStorage {
         mapping(uint => Member) members;
         uint nextMemberId;
@@ -109,19 +109,19 @@ library StorageLib {
         bytes32 metadataURI;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.memberJoinUnsafe.members")) - 1)) & ~bytes32(uint256(0xff));
-    bytes32 private constant MEMBERSS_STORAGE_LOCATION =
-        0x2440ca222525c850943cc10edec2af9e450af2275dab1d00440eb269aaf15900;
+    // keccak256(abi.encode(uint256(keccak256("textDAO.MEMBERS_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
+    bytes32 private constant MEMBERS_STORAGE_LOCATION =
+        0x2f8cab7d49dc616a0e8eb4e6f8b67d31c656445bf0c9ad5e38bc38d1128dcc00;
 
     function $Members() internal pure returns (MemberJoinUnsafeStorage storage $) {
-        assembly { $.slot := MEMBERSS_STORAGE_LOCATION }
+        assembly { $.slot := MEMBERS_STORAGE_LOCATION }
     }
 
 
     /*********************
      *  VRF Storage
      ********************/
-    /// @custom:storage-location erc7201:textDAO.vrf.vrf
+    /// @custom:storage-location erc7201:textDAO.VRF_STORAGE_LOCATION
     struct VRFStorage {
         mapping(uint => Request) requests;
         uint nextId;
@@ -141,9 +141,9 @@ library StorageLib {
         address LINKTOKEN;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.vrf.vrf")) - 1)) & ~bytes32(uint256(0xff));
+    // keccak256(abi.encode(uint256(keccak256("textDAO.VRF_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant VRF_STORAGE_LOCATION =
-        0xd9fa33bd289c873d1fdb39b1afdc38aa40e8cb7210f0fbe10770706df952a700;
+        0x67f28ff67f7d7020f2b2ac7c9bd5f2a6dd9f19a9b15d92c4070c4572728ab000;
 
     function $VRF() internal pure returns (VRFStorage storage $) {
         assembly { $.slot := VRF_STORAGE_LOCATION }
