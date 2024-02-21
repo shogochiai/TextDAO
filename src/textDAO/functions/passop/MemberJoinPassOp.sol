@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { StorageLib } from "../internal/StorageLib.sol";
-import { PassOpBase } from "./PassOpBase.sol";
+import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { PassOpBase } from "~/textDAO/functions/passop/PassOpBase.sol";
 
 contract MemberJoinPassOp is PassOpBase {
     function memberJoin(uint pid, StorageLib.Member[] memory candidates) public onlyPassed(pid) returns (bool) {

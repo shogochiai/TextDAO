@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { StorageLib } from "./internal/StorageLib.sol";
+import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 
 contract ForkOp {
     function fork(uint pid, StorageLib.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {

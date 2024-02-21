@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { StorageLib } from "./internal/StorageLib.sol";
-import { SortLib } from "./internal/SortLib.sol";
+import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { SortLib } from "~/_predicates/SortLib.sol";
 
 contract TallyForksOp {
     function tallyForks(uint pid) external returns (bool) {
