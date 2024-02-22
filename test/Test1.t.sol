@@ -127,6 +127,7 @@ contract Test1 is UCSTestBase {
 
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 1000;
+        $.config.tallyInterval = 1000;
 
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;
@@ -169,6 +170,7 @@ contract Test1 is UCSTestBase {
 
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 1000;
+        $.config.tallyInterval = 1000;
 
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;
@@ -212,6 +214,7 @@ contract Test1 is UCSTestBase {
 
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 0;
+        $.config.tallyInterval = 1000;
 
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;

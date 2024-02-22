@@ -106,12 +106,14 @@ contract TallyForks {
         }
 
         // interval flag
+        require($.config.tallyInterval > 0, "Set tally interval at config.");
         $p.tallied[block.timestamp / $.config.tallyInterval] = true;
     }
 
     modifier onlyOncePerInterval(uint pid) {
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
+        require($.config.tallyInterval > 0, "Set tally interval at config.");
         require(!$p.tallied[block.timestamp / $.config.tallyInterval], "This interval is already tallied.");
         _;
     }
