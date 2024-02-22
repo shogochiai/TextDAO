@@ -7,41 +7,43 @@ import { SelectorLib } from "~/_predicates/SelectorLib.sol";
 import { console2 } from "forge-std/console2.sol";
 
 contract TallyForks {
-    function tallyForks(uint pid) external returns (bool) {
+    function tallyForks(uint pid) external onlyOncePerInterval(pid) returns (bool) {
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
         StorageLib.Header[] storage $headers = $p.headers;
         StorageLib.Command[] storage $cmds = $p.cmds;
         StorageLib.ConfigOverrideStorage storage $configOverride = StorageLib.$ConfigOverride();
 
+        StorageLib.ProposalVars memory vars;
+
         require($p.proposalMeta.createdAt + $.config.expiryDuration > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
 
-        uint[] memory headerRank = new uint[]($headers.length);
-        headerRank = SortLib.rankHeaders($headers);
-        uint[] memory cmdRank = new uint[]($cmds.length);
-        cmdRank = SortLib.rankCmds($cmds);
+        vars.headerRank = new uint[]($headers.length);
+        vars.headerRank = SortLib.rankHeaders($headers);
+        vars.cmdRank = new uint[]($cmds.length);
+        vars.cmdRank = SortLib.rankCmds($cmds);
 
-        uint headerTopScore = $headers[headerRank[0]].currentScore;
+        uint headerTopScore = $headers[vars.headerRank[0]].currentScore;
         bool headerCond = headerTopScore >= $.config.quorumScore;
-        StorageLib.Command storage $topCmd = $cmds[cmdRank[0]];
+        StorageLib.Command storage $topCmd = $cmds[vars.cmdRank[0]];
         uint cmdTopScore = $topCmd.currentScore;
 
 
         // Note: Passing multiple actions requires unanymous achivement of all quorum including harder conditions.
-        bool[] memory cmdConds = new bool[]($topCmd.actions.length);
-        bool cmdCondSum;
+        vars.cmdConds = new bool[]($topCmd.actions.length);
+        vars.cmdCondSum;
         for (uint i; i < $topCmd.actions.length; i++) {
             StorageLib.Action storage $action = $topCmd.actions[i];
             uint quorumOverride = $configOverride.overrides[SelectorLib.selector($action.func)].quorumScore;
             if (quorumOverride > 0) {
-                cmdConds[i] = cmdTopScore >= quorumOverride; // Special quorum
+                vars.cmdConds[i] = cmdTopScore >= quorumOverride; // Special quorum
             } else {
-                cmdConds[i] = cmdTopScore >= $.config.quorumScore; // Global quorum
+                vars.cmdConds[i] = cmdTopScore >= $.config.quorumScore; // Global quorum
             }
-            if (cmdConds[i]) {
-                cmdCondSum = true;
+            if (vars.cmdConds[i]) {
+                vars.cmdCondSum = true;
             } else {
-                cmdCondSum = false;
+                vars.cmdCondSum = false;
                 break;
             }
         }
@@ -50,9 +52,9 @@ contract TallyForks {
             $p.proposalMeta.headerRank = new uint[](3);
         }
         if (headerCond) {
-            $p.proposalMeta.headerRank[0] = headerRank[0];
-            $p.proposalMeta.headerRank[1] = headerRank[1];
-            $p.proposalMeta.headerRank[2] = headerRank[2];
+            $p.proposalMeta.headerRank[0] = vars.headerRank[0];
+            $p.proposalMeta.headerRank[1] = vars.headerRank[1];
+            $p.proposalMeta.headerRank[2] = vars.headerRank[2];
             $p.proposalMeta.nextHeaderTallyFrom = $headers.length;
         } else {
             // emit HeaderQuorumFailed
@@ -61,16 +63,66 @@ contract TallyForks {
         if ($p.proposalMeta.cmdRank.length == 0) {
             $p.proposalMeta.cmdRank = new uint[](3);
         }
-        if (cmdCondSum) {
-            $p.proposalMeta.cmdRank[0] = cmdRank[0];
-            $p.proposalMeta.cmdRank[1] = cmdRank[1];
-            $p.proposalMeta.cmdRank[2] = cmdRank[2];
+        if (vars.cmdCondSum) {
+            $p.proposalMeta.cmdRank[0] = vars.cmdRank[0];
+            $p.proposalMeta.cmdRank[1] = vars.cmdRank[1];
+            $p.proposalMeta.cmdRank[2] = vars.cmdRank[2];
             $p.proposalMeta.nextCmdTallyFrom = $cmds.length;
         } else {
             // emit CommandQuorumFailed
         }
 
-        // TODO: Reset headers and cmds for next session
+        // Repeatable tally
+        for (uint i = 0; i < 3; ++i) {
+            vars.headerRank2 = $p.proposalMeta.headerRank[i];
+            vars.cmdRank2 = $p.proposalMeta.cmdRank[i];
 
+            // Copy top ranked Headers and Commands to temporary arrays
+            if(vars.headerRank2 < $p.headers.length){
+                vars.topHeaders[i].id = $p.headers[vars.headerRank2].id;
+                vars.topHeaders[i].currentScore = $p.headers[vars.headerRank2].currentScore;
+                vars.topHeaders[i].metadataURI = $p.headers[vars.headerRank2].metadataURI;
+                for (uint j; j < $p.headers[vars.headerRank2].tagIds.length; j++) {
+                    vars.topHeaders[i].tagIds[j] = $p.headers[vars.headerRank2].tagIds[j];
+                }
+            }
+            
+            if(vars.cmdRank2 < $p.cmds.length){
+                vars.topCommands[i].id = $p.cmds[vars.cmdRank2].id;
+                for (uint j; j < $p.cmds[vars.cmdRank2].actions.length; j++) {
+                    vars.topCommands[i].actions[j].func = $p.cmds[vars.cmdRank2].actions[j].func;
+                    vars.topCommands[i].actions[j].abiParams = $p.cmds[vars.cmdRank2].actions[j].abiParams;
+                }
+                vars.topCommands[i].currentScore = $p.cmds[vars.cmdRank2].currentScore;
+            }
+        }
+
+        // Re-populate with top ranked items
+        // next{Header,Cmd}TallyFrom effectively remains these top-3 elements
+        for (uint i = 0; i < 3; ++i) {
+            $p.headers[vars.headerRank2].id = vars.topHeaders[i].id;
+            $p.headers[vars.headerRank2].currentScore = vars.topHeaders[i].currentScore;
+            $p.headers[vars.headerRank2].metadataURI = vars.topHeaders[i].metadataURI;
+            for (uint j; j < vars.topHeaders[i].tagIds.length; j++) {
+                $p.headers[vars.headerRank2].tagIds[j] = vars.topHeaders[i].tagIds[j];
+            }
+
+            $p.cmds[vars.cmdRank2].id = vars.topCommands[i].id;
+            for (uint j; j < vars.topCommands[i].actions.length; j++) {
+                $p.cmds[vars.cmdRank2].actions[j].func = vars.topCommands[i].actions[j].func;
+                $p.cmds[vars.cmdRank2].actions[j].abiParams = vars.topCommands[i].actions[j].abiParams;
+            }
+            $p.cmds[vars.cmdRank2].currentScore = vars.topCommands[i].currentScore;
+        }
+
+        // interval flag
+        $p.tallied[block.timestamp / $.config.tallyInterval] = true;
+    }
+
+    modifier onlyOncePerInterval(uint pid) {
+        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageLib.Proposal storage $p = $.proposals[pid];
+        require(!$p.tallied[block.timestamp / $.config.tallyInterval], "This interval is already tallied.");
+        _;
     }
 }

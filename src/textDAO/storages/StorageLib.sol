@@ -19,6 +19,7 @@ library StorageLib {
     }
     struct ProposalsConfig {
         uint expiryDuration;
+        uint tallyInterval;
         uint repsNum;
         uint quorumScore;
     }
@@ -30,6 +31,7 @@ library StorageLib {
     struct Proposal {
         Header[] headers;
         Command[] cmds;
+        mapping(uint => bool) tallied;
         ProposalMeta proposalMeta;
     }
     struct Header {
@@ -60,6 +62,16 @@ library StorageLib {
         address[] reps;
         uint nextRepId;
         uint createdAt;
+    }
+    struct ProposalVars {
+        uint[] headerRank;
+        uint[] cmdRank;
+        bool[] cmdConds;
+        bool cmdCondSum;
+        StorageLib.Header[3] topHeaders;
+        StorageLib.Command[3] topCommands;
+        uint headerRank2;
+        uint cmdRank2;
     }
 
     // keccak256(abi.encode(uint256(keccak256("textDAO.PROPOSALS_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
