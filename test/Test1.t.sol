@@ -183,7 +183,7 @@ contract Test1 is UCSTestBase {
         $cmds.push();
 
         $.config.quorumScore = 8;
-        $configOverride.overrides[SelectorLib.selector("tallyForks(uint256)")].quorumScore = 15;
+        $configOverride.overrides[TallyForks.tallyForks.selector].quorumScore = 15;
 
         $p.headers[8].currentScore = 10;
         $p.headers[9].currentScore = 9;
