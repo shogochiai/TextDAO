@@ -19,9 +19,9 @@ contract TallyForks {
         require($p.proposalMeta.createdAt + $.config.expiryDuration > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
 
         vars.headerRank = new uint[]($headers.length);
-        vars.headerRank = SortLib.rankHeaders($headers);
+        vars.headerRank = SortLib.rankHeaders($headers, $p.proposalMeta.nextHeaderTallyFrom);
         vars.cmdRank = new uint[]($cmds.length);
-        vars.cmdRank = SortLib.rankCmds($cmds);
+        vars.cmdRank = SortLib.rankCmds($cmds, $p.proposalMeta.nextCmdTallyFrom);
 
         uint headerTopScore = $headers[vars.headerRank[0]].currentScore;
         bool headerCond = headerTopScore >= $.config.quorumScore;
