@@ -79,21 +79,11 @@ contract TallyForks {
 
             // Copy top ranked Headers and Commands to temporary arrays
             if(vars.headerRank2 < $p.headers.length){
-                vars.topHeaders[i].id = $p.headers[vars.headerRank2].id;
-                vars.topHeaders[i].currentScore = $p.headers[vars.headerRank2].currentScore;
-                vars.topHeaders[i].metadataURI = $p.headers[vars.headerRank2].metadataURI;
-                for (uint j; j < $p.headers[vars.headerRank2].tagIds.length; j++) {
-                    vars.topHeaders[i].tagIds[j] = $p.headers[vars.headerRank2].tagIds[j];
-                }
+                vars.topHeaders[i] = $p.headers[vars.headerRank2];
             }
             
             if(vars.cmdRank2 < $p.cmds.length){
-                vars.topCommands[i].id = $p.cmds[vars.cmdRank2].id;
-                for (uint j; j < $p.cmds[vars.cmdRank2].actions.length; j++) {
-                    vars.topCommands[i].actions[j].func = $p.cmds[vars.cmdRank2].actions[j].func;
-                    vars.topCommands[i].actions[j].abiParams = $p.cmds[vars.cmdRank2].actions[j].abiParams;
-                }
-                vars.topCommands[i].currentScore = $p.cmds[vars.cmdRank2].currentScore;
+                vars.topCommands[i] = $p.cmds[vars.cmdRank2];
             }
         }
 
