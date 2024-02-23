@@ -6,8 +6,8 @@ import { SelectorLib } from "~/_predicates/SelectorLib.sol";
 import { Propose } from "~/textDAO/functions/Propose.sol";
 import { Fork } from "~/textDAO/functions/Fork.sol";
 import { Vote } from "~/textDAO/functions/Vote.sol";
-import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
-import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
+import { Execute } from "~/textDAO/functions/Execute.sol";
+import { Tally } from "~/textDAO/functions/Tally.sol";
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
@@ -16,10 +16,10 @@ contract Test1 is UCSTestBase {
     function setUp() public override {
         implementations[Propose.propose.selector] = address(new Propose());
         implementations[Fork.fork.selector] = address(new Fork());
-        implementations[ExecuteProposal.executeProposal.selector] = address(new ExecuteProposal());
+        implementations[Execute.execute.selector] = address(new Execute());
         implementations[Vote.voteHeaders.selector] = address(new Vote());
         implementations[Vote.voteCmds.selector] = address(new Vote());
-        implementations[TallyForks.tallyForks.selector] = address(new TallyForks());
+        implementations[Tally.tally.selector] = address(new Tally());
     }
 
 
@@ -120,7 +120,7 @@ contract Test1 is UCSTestBase {
         assertEq(fork3rdScoreBefore + 1, fork3rdScoreAfter);
     }
 
-    function test_tallyForks_success() public {
+    function test_tally_success() public {
         uint pid = 0;
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
@@ -137,7 +137,7 @@ contract Test1 is UCSTestBase {
             $cmds.push();
             $cmds[i].actions.push();
             StorageLib.Action storage $action = $cmds[i].actions[0];
-            $action.func = "tallyForks(uint256)";
+            $action.func = "tally(uint256)";
         }
         $cmds.push();
 
@@ -150,7 +150,7 @@ contract Test1 is UCSTestBase {
         $p.cmds[5].currentScore = 9;
         $p.cmds[6].currentScore = 8;
 
-        TallyForks(address(this)).tallyForks(pid);
+        Tally(address(this)).tally(pid);
 
         assertEq($p.proposalMeta.headerRank[0], 8);
         assertEq($p.proposalMeta.headerRank[1], 9);
@@ -162,7 +162,7 @@ contract Test1 is UCSTestBase {
         assertEq($p.proposalMeta.nextCmdTallyFrom, 11);
     }
 
-    function test_tallyForks_failCommandQuorumWithOverride() public {
+    function test_tally_failCommandQuorumWithOverride() public {
         uint pid = 0;
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
@@ -180,12 +180,12 @@ contract Test1 is UCSTestBase {
             $cmds.push();
             $cmds[i].actions.push();
             StorageLib.Action storage $action = $cmds[i].actions[0];
-            $action.func = "tallyForks(uint256)";
+            $action.func = "tally(uint256)";
         }
         $cmds.push();
 
         $.config.quorumScore = 8;
-        $configOverride.overrides[TallyForks.tallyForks.selector].quorumScore = 15;
+        $configOverride.overrides[Tally.tally.selector].quorumScore = 15;
 
         $p.headers[8].currentScore = 10;
         $p.headers[9].currentScore = 9;
@@ -194,7 +194,7 @@ contract Test1 is UCSTestBase {
         $p.cmds[5].currentScore = 9;
         $p.cmds[6].currentScore = 8;
 
-        TallyForks(address(this)).tallyForks(pid);
+        Tally(address(this)).tally(pid);
 
         assertEq($p.proposalMeta.headerRank[0], 8);
         assertEq($p.proposalMeta.headerRank[1], 9);
@@ -207,7 +207,7 @@ contract Test1 is UCSTestBase {
     }
 
 
-    function test_tallyForks_failWithExpired() public {
+    function test_tally_failWithExpired() public {
         uint pid = 0;
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
@@ -224,7 +224,7 @@ contract Test1 is UCSTestBase {
             $cmds.push();
             $cmds[i].actions.push();
             StorageLib.Action storage $action = $cmds[i].actions[0];
-            $action.func = "tallyForks(uint256)";
+            $action.func = "tally(uint256)";
         }
         $cmds.push();
 
@@ -238,18 +238,18 @@ contract Test1 is UCSTestBase {
         $p.cmds[6].currentScore = 8;
 
         vm.expectRevert("This proposal has been expired. You cannot run new tally to update ranks.");
-        TallyForks(address(this)).tallyForks(pid);
+        Tally(address(this)).tally(pid);
 
     }
 
 
-    function test_executeProposal_success() public {
+    function test_execute_success() public {
         uint pid = 0;
         StorageLib.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
         $p.cmds.push();
         $p.proposalMeta.cmdRank = new uint[](3);
 
-        ExecuteProposal(address(this)).executeProposal(pid);
+        Execute(address(this)).execute(pid);
     }
 
 }

@@ -5,8 +5,8 @@ import { UCSTestBase } from "~/_predicates/UCSTestBase.sol";
 import { Propose } from "~/textDAO/functions/Propose.sol";
 import { Fork } from "~/textDAO/functions/Fork.sol";
 import { Vote } from "~/textDAO/functions/Vote.sol";
-import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
-import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
+import { Execute } from "~/textDAO/functions/Execute.sol";
+import { Tally } from "~/textDAO/functions/Tally.sol";
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { SaveTextProtected } from "~/textDAO/functions/protected/SaveTextProtected.sol";
 import { MemberJoinProtected } from "~/textDAO/functions/protected/MemberJoinProtected.sol";
@@ -16,15 +16,15 @@ contract Test2 is UCSTestBase {
     function setUp() public override {
         implementations[Propose.propose.selector] = address(new Propose());
         implementations[Fork.fork.selector] = address(new Fork());
-        implementations[ExecuteProposal.executeProposal.selector] = address(new ExecuteProposal());
+        implementations[Execute.execute.selector] = address(new Execute());
         implementations[Vote.voteHeaders.selector] = address(new Vote());
         implementations[Vote.voteCmds.selector] = address(new Vote());
-        implementations[TallyForks.tallyForks.selector] = address(new TallyForks());
+        implementations[Tally.tally.selector] = address(new Tally());
         implementations[SaveTextProtected.saveText.selector] = address(new SaveTextProtected());
         implementations[MemberJoinProtected.memberJoin.selector] = address(new MemberJoinProtected());
     }
 
-    function test_executeProposal_successWithText() public {
+    function test_execute_successWithText() public {
         uint pid = 0;
         uint textId = 0;
 
@@ -55,13 +55,13 @@ contract Test2 is UCSTestBase {
         $p.proposalMeta.headerRank.push(); // Note: initialize for storage array
 
         assertEq($text.metadataURIs.length, 0);
-        ExecuteProposal(address(this)).executeProposal(pid);
+        Execute(address(this)).execute(pid);
         assertGt($text.metadataURIs.length, 0);
     }
 
 
 
-    function test_executeProposal_successWithJoin() public {
+    function test_execute_successWithJoin() public {
         uint pid = 0;
 
         StorageLib.Member[] memory candidates = new StorageLib.Member[](2);
@@ -97,7 +97,7 @@ contract Test2 is UCSTestBase {
         assertEq($m.members[0].addr, address(0));
         assertEq($m.members[1].addr, address(0));
         assertEq($m.nextMemberId, 0);
-        ExecuteProposal(address(this)).executeProposal(pid);
+        Execute(address(this)).execute(pid);
         assertEq($m.members[0].addr, address(1));
         assertEq($m.members[1].addr, address(2));
         assertEq($m.nextMemberId, candidates.length);

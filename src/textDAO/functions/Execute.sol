@@ -4,8 +4,8 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { DecodeErrorString } from "~/_predicates/DecodeErrorString.sol";
 
-contract ExecuteProposal {
-    function executeProposal(uint pid) external returns (bool) {
+contract Execute {
+    function execute(uint pid) external returns (bool) {
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
 

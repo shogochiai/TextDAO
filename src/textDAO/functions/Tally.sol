@@ -4,10 +4,9 @@ pragma solidity ^0.8.23;
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
 import { SortLib } from "~/_predicates/SortLib.sol";
 import { SelectorLib } from "~/_predicates/SelectorLib.sol";
-import { console2 } from "forge-std/console2.sol";
 
-contract TallyForks {
-    function tallyForks(uint pid) external onlyOncePerInterval(pid) returns (bool) {
+contract Tally {
+    function tally(uint pid) external onlyOncePerInterval(pid) returns (bool) {
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
         StorageLib.Header[] storage $headers = $p.headers;
