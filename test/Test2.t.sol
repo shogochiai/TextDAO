@@ -8,8 +8,8 @@ import { Vote } from "~/textDAO/functions/Vote.sol";
 import { ExecuteProposal } from "~/textDAO/functions/ExecuteProposal.sol";
 import { TallyForks } from "~/textDAO/functions/TallyForks.sol";
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { SaveTextUnsafe } from "~/textDAO/functions/unsafe/SaveTextUnsafe.sol";
-import { MemberJoinUnsafe } from "~/textDAO/functions/unsafe/MemberJoinUnsafe.sol";
+import { SaveTextProtected } from "~/textDAO/functions/protected/SaveTextProtected.sol";
+import { MemberJoinProtected } from "~/textDAO/functions/protected/MemberJoinProtected.sol";
 
 contract Test2 is UCSTestBase {
 
@@ -20,8 +20,8 @@ contract Test2 is UCSTestBase {
         implementations[Vote.voteHeaders.selector] = address(new Vote());
         implementations[Vote.voteCmds.selector] = address(new Vote());
         implementations[TallyForks.tallyForks.selector] = address(new TallyForks());
-        implementations[SaveTextUnsafe.saveText.selector] = address(new SaveTextUnsafe());
-        implementations[MemberJoinUnsafe.memberJoin.selector] = address(new MemberJoinUnsafe());
+        implementations[SaveTextProtected.saveText.selector] = address(new SaveTextProtected());
+        implementations[MemberJoinProtected.memberJoin.selector] = address(new MemberJoinProtected());
     }
 
     function test_executeProposal_successWithText() public {
@@ -76,7 +76,7 @@ contract Test2 is UCSTestBase {
 
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[pid];
-        StorageLib.MemberJoinUnsafeStorage storage $m = StorageLib.$Members();
+        StorageLib.MemberJoinProtectedStorage storage $m = StorageLib.$Members();
 
         $p.cmds.push(); // Note: initialize for storage array
         StorageLib.Command storage $cmd = $p.cmds[0];

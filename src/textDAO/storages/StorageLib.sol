@@ -85,10 +85,10 @@ library StorageLib {
 
 
     /*********************
-     *  TextSaveUnsafe Storage
+     *  TextSaveProtected Storage
      ********************/
     /// @custom:storage-location erc7201:textDAO.TEXTS_STORAGE_LOCATION
-    struct TextSaveUnsafeStorage {
+    struct TextSaveProtectedStorage {
         mapping(uint => Text) texts;
         uint nextTextId;
     }
@@ -101,16 +101,16 @@ library StorageLib {
     bytes32 private constant TEXTS_STORAGE_LOCATION =
         0x0a45678f7ac13226a0ead4e3b54db0ab263e1a30cc1ea3f19d7212aea5cd1d00;
 
-    function $Texts() internal pure returns (TextSaveUnsafeStorage storage $) {
+    function $Texts() internal pure returns (TextSaveProtectedStorage storage $) {
         assembly { $.slot := TEXTS_STORAGE_LOCATION }
     }
 
 
     /*********************
-     *  MemberJoinUnsafe Storage
+     *  MemberJoinProtected Storage
      ********************/
     /// @custom:storage-location erc7201:textDAO.MEMBERS_STORAGE_LOCATION
-    struct MemberJoinUnsafeStorage {
+    struct MemberJoinProtectedStorage {
         mapping(uint => Member) members;
         uint nextMemberId;
     }
@@ -124,7 +124,7 @@ library StorageLib {
     bytes32 private constant MEMBERS_STORAGE_LOCATION =
         0x2f8cab7d49dc616a0e8eb4e6f8b67d31c656445bf0c9ad5e38bc38d1128dcc00;
 
-    function $Members() internal pure returns (MemberJoinUnsafeStorage storage $) {
+    function $Members() internal pure returns (MemberJoinProtectedStorage storage $) {
         assembly { $.slot := MEMBERS_STORAGE_LOCATION }
     }
 

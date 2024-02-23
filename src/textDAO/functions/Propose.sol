@@ -9,19 +9,19 @@ contract Propose {
         StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $.proposals[proposalId];
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
-        StorageLib.MemberJoinUnsafeStorage storage $member = StorageLib.$Members();
+        StorageLib.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
 
         if ($.config.repsNum < $member.nextMemberId) {
             /*
                 VRF Request to choose reps
             */
 
-            require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetConfigsUnsafe::createAndFundSubscription first.");
-            require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFUnsafe::setVRFConfig first.");
-            require($vrf.config.keyHash != 0, "No Chainlink VRF keyHash. Try SetConfigsUnsafe::setVRFConfig first.");
-            require($vrf.config.callbackGasLimit != 0, "No Chainlink VRF callbackGasLimit. Try SetConfigsUnsafe::setVRFConfig first.");
-            require($vrf.config.requestConfirmations != 0, "No Chainlink VRF requestConfirmations. Try SetConfigsUnsafe::setVRFConfig first.");
-            require($vrf.config.numWords != 0, "No Chainlink VRF numWords. Try SetConfigsUnsafe::setVRFConfig first.");
+            require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetConfigsProtected::createAndFundSubscription first.");
+            require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFProtected::setVRFConfig first.");
+            require($vrf.config.keyHash != 0, "No Chainlink VRF keyHash. Try SetConfigsProtected::setVRFConfig first.");
+            require($vrf.config.callbackGasLimit != 0, "No Chainlink VRF callbackGasLimit. Try SetConfigsProtected::setVRFConfig first.");
+            require($vrf.config.requestConfirmations != 0, "No Chainlink VRF requestConfirmations. Try SetConfigsProtected::setVRFConfig first.");
+            require($vrf.config.numWords != 0, "No Chainlink VRF numWords. Try SetConfigsProtected::setVRFConfig first.");
             require($vrf.config.LINKTOKEN != address(0), "No Chainlink VRF LINKTOKEN. Try SetConfigs::setVRFConfig first.");
 
 
@@ -56,7 +56,7 @@ contract Propose {
         StorageLib.Request storage $r = $vrf.requests[requestId];
         StorageLib.ProposeStorage storage $prop = StorageLib.$Proposals();
         StorageLib.Proposal storage $p = $prop.proposals[$r.proposalId];
-        StorageLib.MemberJoinUnsafeStorage storage $member = StorageLib.$Members();
+        StorageLib.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
 
 
         uint256[] memory randomWords = randomWordsReturned;
@@ -69,7 +69,7 @@ contract Propose {
     }
 
     modifier onlyMember() {
-        StorageLib.MemberJoinUnsafeStorage storage $member = StorageLib.$Members();
+        StorageLib.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
 
         bool result;
 

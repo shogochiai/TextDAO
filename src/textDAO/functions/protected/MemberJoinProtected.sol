@@ -2,11 +2,11 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { UnsafeBase } from "~/_predicates/UnsafeBase.sol";
+import { ProtectionBase } from "~/_predicates/ProtectionBase.sol";
 
-contract MemberJoinUnsafe is UnsafeBase {
-    function memberJoin(uint pid, StorageLib.Member[] memory candidates) public unsafe(pid) returns (bool) {
-        StorageLib.MemberJoinUnsafeStorage storage $ = StorageLib.$Members();
+contract MemberJoinProtected is ProtectionBase {
+    function memberJoin(uint pid, StorageLib.Member[] memory candidates) public protected(pid) returns (bool) {
+        StorageLib.MemberJoinProtectedStorage storage $ = StorageLib.$Members();
 
         for (uint i; i < candidates.length; i++) {
             $.members[$.nextMemberId+i].id = candidates[i].id;

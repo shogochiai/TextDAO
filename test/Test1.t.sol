@@ -24,7 +24,7 @@ contract Test1 is UCSTestBase {
 
 
     function test_propose() public {
-        StorageLib.MemberJoinUnsafeStorage storage $m = StorageLib.$Members();
+        StorageLib.MemberJoinProtectedStorage storage $m = StorageLib.$Members();
         StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
 
         StorageLib.ProposalArg memory p;
