@@ -2,18 +2,20 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
+import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
 import { SortLib } from "~/_predicates/SortLib.sol";
 import { SelectorLib } from "~/_predicates/SelectorLib.sol";
 
 contract Tally {
     function tally(uint pid) external onlyOncePerInterval(pid) returns (bool) {
-        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $.proposals[pid];
-        StorageLib.Header[] storage $headers = $p.headers;
-        StorageLib.Command[] storage $cmds = $p.cmds;
-        StorageLib.ConfigOverrideStorage storage $configOverride = StorageLib.$ConfigOverride();
+        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageScheme.Proposal storage $p = $.proposals[pid];
+        StorageScheme.Header[] storage $headers = $p.headers;
+        StorageScheme.Command[] storage $cmds = $p.cmds;
+        StorageScheme.ConfigOverrideStorage storage $configOverride = StorageLib.$ConfigOverride();
 
-        StorageLib.ProposalVars memory vars;
+        StorageScheme.ProposalVars memory vars;
 
         require($p.proposalMeta.createdAt + $.config.expiryDuration > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
 
@@ -24,7 +26,7 @@ contract Tally {
 
         uint headerTopScore = $headers[vars.headerRank[0]].currentScore;
         bool headerCond = headerTopScore >= $.config.quorumScore;
-        StorageLib.Command storage $topCmd = $cmds[vars.cmdRank[0]];
+        StorageScheme.Command storage $topCmd = $cmds[vars.cmdRank[0]];
         uint cmdTopScore = $topCmd.currentScore;
 
 
@@ -32,7 +34,7 @@ contract Tally {
         vars.cmdConds = new bool[]($topCmd.actions.length);
         vars.cmdCondSum;
         for (uint i; i < $topCmd.actions.length; i++) {
-            StorageLib.Action storage $action = $topCmd.actions[i];
+            StorageScheme.Action storage $action = $topCmd.actions[i];
             uint quorumOverride = $configOverride.overrides[SelectorLib.selector($action.func)].quorumScore;
             if (quorumOverride > 0) {
                 vars.cmdConds[i] = cmdTopScore >= quorumOverride; // Special quorum
@@ -110,8 +112,8 @@ contract Tally {
     }
 
     modifier onlyOncePerInterval(uint pid) {
-        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $.proposals[pid];
+        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageScheme.Proposal storage $p = $.proposals[pid];
         require($.config.tallyInterval > 0, "Set tally interval at config.");
         require(!$p.tallied[block.timestamp / $.config.tallyInterval], "This interval is already tallied.");
         _;

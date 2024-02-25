@@ -8,6 +8,8 @@ import { Vote } from "~/textDAO/functions/Vote.sol";
 import { Execute } from "~/textDAO/functions/Execute.sol";
 import { Tally } from "~/textDAO/functions/Tally.sol";
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
+import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
 import { SaveTextProtected } from "~/textDAO/functions/protected/SaveTextProtected.sol";
 import { MemberJoinProtected } from "~/textDAO/functions/protected/MemberJoinProtected.sol";
 
@@ -33,16 +35,16 @@ contract Test2 is UCSTestBase {
         metadataURIs[0] = bytes32(uint256(1));
         metadataURIs[1] = bytes32(uint256(2));
 
-        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $.proposals[pid];
+        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageScheme.Proposal storage $p = $.proposals[pid];
 
-        StorageLib.Text storage $text = StorageLib.$Texts().texts[textId];
+        StorageScheme.Text storage $text = StorageLib.$Texts().texts[textId];
 
         $p.cmds.push(); // Note: initialize for storage array
-        StorageLib.Command storage $cmd = $p.cmds[0];
+        StorageScheme.Command storage $cmd = $p.cmds[0];
         $cmd.id = 0;
         $cmd.actions.push(); // Note: initialize for storage array
-        StorageLib.Action storage $action = $cmd.actions[0];
+        StorageScheme.Action storage $action = $cmd.actions[0];
 
         $action.func = "saveText(uint256,uint256,bytes32[])";
         $action.abiParams = abi.encode(pid, textId, metadataURIs);
@@ -64,25 +66,25 @@ contract Test2 is UCSTestBase {
     function test_execute_successWithJoin() public {
         uint pid = 0;
 
-        StorageLib.Member[] memory candidates = new StorageLib.Member[](2);
-        StorageLib.Member memory member1;
+        StorageScheme.Member[] memory candidates = new StorageScheme.Member[](2);
+        StorageScheme.Member memory member1;
         member1.id = 0;
         member1.addr = address(1);
         candidates[0] = member1;
-        StorageLib.Member memory member2;
+        StorageScheme.Member memory member2;
         member2.id = 1;
         member2.addr = address(2);
         candidates[1] = member2;
 
-        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $.proposals[pid];
-        StorageLib.MemberJoinProtectedStorage storage $m = StorageLib.$Members();
+        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageScheme.Proposal storage $p = $.proposals[pid];
+        StorageScheme.MemberJoinProtectedStorage storage $m = StorageLib.$Members();
 
         $p.cmds.push(); // Note: initialize for storage array
-        StorageLib.Command storage $cmd = $p.cmds[0];
+        StorageScheme.Command storage $cmd = $p.cmds[0];
         $cmd.id = 0;
         $cmd.actions.push(); // Note: initialize for storage array
-        StorageLib.Action storage $action = $cmd.actions[0];
+        StorageScheme.Action storage $action = $cmd.actions[0];
 
         $action.func = "memberJoin(uint256,(uint256,address,bytes32)[])";
         $action.abiParams = abi.encode(pid, candidates);

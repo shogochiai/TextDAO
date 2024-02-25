@@ -2,14 +2,16 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
+import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Propose {
-    function propose(StorageLib.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
-        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $.proposals[proposalId];
-        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
-        StorageLib.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
+    function propose(StorageScheme.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
+        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
+        StorageScheme.Proposal storage $p = $.proposals[proposalId];
+        StorageScheme.VRFStorage storage $vrf = StorageLib.$VRF();
+        StorageScheme.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
 
         if ($.config.repsNum < $member.nextMemberId) {
             /*
@@ -52,11 +54,11 @@ contract Propose {
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWordsReturned) public returns (bool) {
-        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
-        StorageLib.Request storage $r = $vrf.requests[requestId];
-        StorageLib.ProposeStorage storage $prop = StorageLib.$Proposals();
-        StorageLib.Proposal storage $p = $prop.proposals[$r.proposalId];
-        StorageLib.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
+        StorageScheme.VRFStorage storage $vrf = StorageLib.$VRF();
+        StorageScheme.Request storage $r = $vrf.requests[requestId];
+        StorageScheme.ProposeStorage storage $prop = StorageLib.$Proposals();
+        StorageScheme.Proposal storage $p = $prop.proposals[$r.proposalId];
+        StorageScheme.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
 
 
         uint256[] memory randomWords = randomWordsReturned;
@@ -69,7 +71,7 @@ contract Propose {
     }
 
     modifier onlyMember() {
-        StorageLib.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
+        StorageScheme.MemberJoinProtectedStorage storage $member = StorageLib.$Members();
 
         bool result;
 

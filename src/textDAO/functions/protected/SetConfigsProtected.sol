@@ -3,19 +3,21 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
+import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
 import { ProtectionBase } from "~/_predicates/ProtectionBase.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract SetConfigsProtected is ProtectionBase {
-    function setProposalsConfig(uint pid, StorageLib.ProposalsConfig memory config) public protected(pid) returns (bool) {
-        StorageLib.ProposeStorage storage $ = StorageLib.$Proposals();
+    function setProposalsConfig(uint pid, StorageScheme.ProposalsConfig memory config) public protected(pid) returns (bool) {
+        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
         $.config.expiryDuration = config.expiryDuration;
         $.config.repsNum = config.repsNum;
         $.config.quorumScore = config.quorumScore;
     }
 
-    function setVRFConfig(uint pid, StorageLib.VRFConfig memory config) public protected(pid) returns (bool) {
-        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
+    function setVRFConfig(uint pid, StorageScheme.VRFConfig memory config) public protected(pid) returns (bool) {
+        StorageScheme.VRFStorage storage $vrf = StorageLib.$VRF();
         $vrf.config.vrfCoordinator = config.vrfCoordinator;
         $vrf.config.keyHash = config.keyHash;
         $vrf.config.callbackGasLimit = config.callbackGasLimit;
@@ -25,7 +27,7 @@ contract SetConfigsProtected is ProtectionBase {
     }
 
     function createAndFundVRFSubscription(uint pid, uint96 amount) public protected(pid) returns (bool) {
-        StorageLib.VRFStorage storage $vrf = StorageLib.$VRF();
+        StorageScheme.VRFStorage storage $vrf = StorageLib.$VRF();
 
         // Create a new subscription
         $vrf.subscriptionId = VRFCoordinatorV2Interface($vrf.config.vrfCoordinator).createSubscription();

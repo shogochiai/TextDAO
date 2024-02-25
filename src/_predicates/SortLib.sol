@@ -2,13 +2,15 @@
 pragma solidity ^0.8.23;
 
 import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
+import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
+import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
 
 /**
  * SortLib v0.1.0
  */
 library SortLib {    
 
-    function rankHeaders(StorageLib.Header[] memory _headers, uint nextHeaderTallyFrom) internal pure returns (uint[] memory) {
+    function rankHeaders(StorageScheme.Header[] memory _headers, uint nextHeaderTallyFrom) internal pure returns (uint[] memory) {
         uint headerLength = _headers.length;
         if(nextHeaderTallyFrom >= headerLength) return new uint[](0); // Return empty if out of bounds
         
@@ -34,7 +36,7 @@ library SortLib {
         return indices;
     }
 
-    function rankCmds(StorageLib.Command[] memory _cmds, uint nextCmdTallyFrom) internal pure returns (uint[] memory) {
+    function rankCmds(StorageScheme.Command[] memory _cmds, uint nextCmdTallyFrom) internal pure returns (uint[] memory) {
         uint cmdsLength = _cmds.length;
         if(nextCmdTallyFrom >= cmdsLength) return new uint[](0); // Return empty if out of bounds
         
