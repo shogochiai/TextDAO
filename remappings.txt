@@ -1,3 +1,4 @@
 @chainlink/=lib/chainlink/contracts/src/v0.8/
 ~/=src/
 @ucs-ops/=lib/ucs-ops/
+@ucs-std/=lib/ucs-std/
