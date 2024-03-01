@@ -7,4 +7,4 @@
 	url = https://github.com/smartcontractkit/chainlink
 [submodule "lib/ucs-ops"]
 	path = lib/ucs-ops
-	url = https://github.com/ecdysisxyz/ucs-ops
+	url = https://github.com/shogochiai/ucs-ops
