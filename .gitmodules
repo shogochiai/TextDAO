@@ -8,3 +8,6 @@
 [submodule "lib/ucs-ops"]
 	path = lib/ucs-ops
 	url = https://github.com/shogochiai/ucs-ops
+[submodule "lib/ucs-std"]
+	path = lib/ucs-std
+	url = https://github.com/shogochiai/ucs-std
