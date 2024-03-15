@@ -1,5 +1,3 @@
-// const { ASTReader, SolcAstReader } = require('solc-typed-ast');
-
 // Example function to read an AST from a JSON file
 async function readStructFromABI(filePath:any) {
     const data = await JSON.parse(require("fs").readFileSync(filePath));
@@ -18,19 +16,27 @@ function processStructs(ast:any) {
         console.log(`struct ${struct.name} ${struct.members.length > 0 ? "{" : ""}`);
 
         struct.members.forEach((member:any) => {
-            if (!!member.typeDescriptions) {
-                if (!!member.typeDescriptions.typeString) {
-                    // Process each member, extract type information, etc.
-                    console.log(`    ${member.typeDescriptions.typeString} ${member.name};`);
-                }
+            if (member.typeName.keyType) {
+                console.log(
+                "    mapping(" +
+                    member.typeName.keyType.typeDescriptions.typeString
+                    + " => " +
+                    member.typeName.valueType.typeDescriptions.typeString
+                + `) ${member.name};`
+                );
             } else {
-                console.log(`    ${member.name};`);
+                console.log(`    ${member.typeDescriptions.typeString} ${member.name};`);
             }
         });
         if (struct.members.length > 0) {
             console.log("}");
             console.log("");
         }
+
+        // TODO: Calc slots with https://hackmd.io/@kIid5I1TQM2sYFp03p5Mjw/BJb7LXxAa
+
+
+        // TODO: Extract all slots' data with https://dedaub.com/blog/bulk-storage-extraction
     });
 }
 

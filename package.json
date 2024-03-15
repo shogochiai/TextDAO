@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "solc-typed-ast": "^18.1.2"
+  }
+}
