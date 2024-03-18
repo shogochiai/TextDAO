@@ -1,5 +1,5 @@
 import { keccak256 } from 'js-sha3';
-import BN from 'bn.js';
+import * as BN from 'bn.js';
 
 // Convert a hex string to a BN object for arithmetic operations.
 function hexToBN(hexString: string): BN {
