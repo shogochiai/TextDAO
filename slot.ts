@@ -18,7 +18,7 @@ function calculateMappingSlot(key: number, baseSlot: string): string {
 const psBaseSlot = '0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400';
 
 // Additional slot calculations as per the list provided
-const calculateSlots = (): { [key: string]: string } => {
+export const calculateSlots = (): { [key: string]: string } => {
   let slots: { [key: string]: string } = {};
   slots['psFirstProposal'] = calculateMappingSlot(0, psBaseSlot);
   slots['psNextProposalId'] = `0x${hexToBN(psBaseSlot).add(new BN(1)).toString(16)}`;
@@ -66,14 +66,3 @@ const calculateSlots = (): { [key: string]: string } => {
 
   return slots;
 };
-
-
-const slots = calculateSlots();
-console.log(slots);
-
-
-/*
----
-
-In TypeScript, do that for all slot listed.
-*/
