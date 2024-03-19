@@ -20,7 +20,13 @@ function extractSlots(structDefinitions: StructDefinition[]): { [key: string]: s
     }
 
     for (const member of members) {
-        slots[member.name] = member.calculateSlotId();
+        if (member.isMapping || member.isArray) {
+            for(var i = 0; i < 10; i++) {
+                slots[`${member.name}[${i}]`] = member.calculateSlotId(i);
+            }
+        } else {
+            slots[`${member.name}`] = member.calculateSlotId();
+        }
     }
 
 

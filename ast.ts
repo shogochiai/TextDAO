@@ -108,13 +108,19 @@ export class StructMember {
             // If the parent's slotId is not calculated yet, calculate it first
             const parentSlotId = this.parent.slotId ? this.parent.slotId : this.parent.calculateSlotId();
     
-            if (!!key && (this.isMapping || this.isArray)) {
-                if (this.valueType === null) {
-                    throw new Error('Mapping value type is null');
+            if (this.isMapping || this.isArray) {
+                if (key >= 0) {
+                    if (this.valueType === null) {
+                        throw new Error('Mapping value type is null');
+                    }
+                    // Special rule for mappings and arrays
+                    const mappingSlot = calculateMappingSlot(key, parentSlotId + this.index);
+                    return mappingSlot;
+                } else {
+                    const slotId = parentSlotId + this.index;
+                    this.slotId = slotId; // Cache the calculated slotId
+                    return slotId;
                 }
-                // Special rule for mappings and arrays
-                const mappingSlot = calculateMappingSlot(key, parentSlotId);
-                return this.valueType.calculateSlotId();
             } else {
                 // Calculate slot ID based on parent's slot ID and member index
                 const slotId = parentSlotId + this.index;
@@ -264,6 +270,7 @@ function dig(cursorDefinition: StructDefinition, structMap: { [key: string]: Str
     cursorDefinition.members.forEach(member => {
         // make member name from type info
         let tempKey;
+        let memberSlotId;
         if (member.isMapping) {
             tempKey = member.valueType.type;
         } else if (member.isArray) {
@@ -276,6 +283,7 @@ function dig(cursorDefinition: StructDefinition, structMap: { [key: string]: Str
         // get corresponding definition and fill info
         if (tempKey in structMap) {
             childDefinition = structMap[tempKey];
+            childDefinition.slotId = member.calculateSlotId(); // mapping and array are also just a member with index
             childDefinition.parent = cursorDefinition;
             structDefinitionsWithRef = dig(childDefinition, structMap, structDefinitionsWithRef);
             structDefinitionsWithRef.push(childDefinition);
