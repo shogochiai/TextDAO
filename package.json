@@ -5,6 +5,7 @@
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
     "bn.js": "^5.2.1",
-    "js-sha3": "^0.9.3"
+    "js-sha3": "^0.9.3",
+    "node-fetch-polyfill": "^2.0.6"
   }
 }
