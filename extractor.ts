@@ -1,7 +1,7 @@
 import { ethCallWithCodeOverride } from './ethCall';
 
-const CONTRACT_ADDRESS = "0x5f5b80361460135780355481526020016001565b365ff3";
-const CONTRACT_CODE = '0x5f5b80361460135780355481526020016001565b365ff3'; // Optimized contract code from the blog post
+const CONTRACT_ADDRESS = "<your target contract>";
+const CONTRACT_CODE = '0x605b80361461135780355481526120016101565b3660f3'; // Optimized contract code from dedaub.com/blog/bulk-storage-extraction
 
 export async function extractStorage(slots: { [key: string]: string }): Promise<{ [key: string]: string }> {
     const batchSize = 15_000; // Maximum number of slots to fetch in a single batch
