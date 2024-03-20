@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 
-// import { console2 } from "forge-std/console2.sol";
+import { console2 } from "forge-std/console2.sol";
 import { MCDevKit } from "@devkit/MCDevKit.sol";
 import { MCScript } from "@devkit/MCScript.sol";
 
@@ -25,8 +25,7 @@ contract Deployment is MCScript {
 
 
         address voteAddr = address(new Vote());
-        // address textdao = 
-        mc.use("Clone", Clone.clone.selector, address(new Clone()))
+        address textdao = mc.use("Clone", Clone.clone.selector, address(new Clone()))
                             .use("Propose", Propose.propose.selector, address(new Propose()))
                             .use("Fork", Fork.fork.selector, address(new Fork()))
                             .use("Vote", Vote.voteHeaders.selector, voteAddr)
@@ -42,7 +41,7 @@ contract Deployment is MCScript {
                             // .deploy("TextDAO", abi.encodeCall(SetConfigsProtected.setProposalsConfig, (0, Schema.ProposalsConfig())))
                             .toProxyAddress();
 
-        // console2.logAddress(textdao);
+        console2.logAddress(textdao);
 
     }
 

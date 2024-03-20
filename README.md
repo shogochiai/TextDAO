@@ -5,6 +5,9 @@
 - mc: 257d4f5
 - solidity: 0.8.24
 
+# Notice
+- `forge <subcommand> --via-ir` is required due to deep stack of Deployment.s.sol for now. Thank you for your patience.
+
 ## Overview
 - A DAO with ERC-7546 UCS, it means DAO plugin architecture.
 - RCV voting for text diff review.
