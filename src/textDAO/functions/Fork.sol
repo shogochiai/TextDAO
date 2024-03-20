@@ -3,7 +3,6 @@ pragma solidity ^0.8.23;
 
 import { Storage } from "~/textDAO/storages/Storage.sol";
 import { Schema } from "~/textDAO/storages/Schema.sol";
-import { Constants } from "~/_utils/Constants.sol";
 
 contract Fork {
     function fork(uint pid, Schema.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {

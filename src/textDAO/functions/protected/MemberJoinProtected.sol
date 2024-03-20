@@ -3,7 +3,6 @@ pragma solidity ^0.8.23;
 
 import { Storage } from "~/textDAO/storages/Storage.sol";
 import { Schema } from "~/textDAO/storages/Schema.sol";
-import { Constants } from "~/_utils/Constants.sol";
 import { ProtectionBase } from "~/_utils/ProtectionBase.sol";
 
 contract MemberJoinProtected is ProtectionBase {

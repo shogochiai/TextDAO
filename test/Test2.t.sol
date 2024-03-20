@@ -9,7 +9,6 @@ import { Execute } from "~/textDAO/functions/Execute.sol";
 import { Tally } from "~/textDAO/functions/Tally.sol";
 import { Storage } from "~/textDAO/storages/Storage.sol";
 import { Schema } from "~/textDAO/storages/Schema.sol";
-import { Constants } from "~/_utils/Constants.sol";
 import { SaveTextProtected } from "~/textDAO/functions/protected/SaveTextProtected.sol";
 import { MemberJoinProtected } from "~/textDAO/functions/protected/MemberJoinProtected.sol";
 
