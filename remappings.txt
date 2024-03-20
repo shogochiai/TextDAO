@@ -1,4 +1,6 @@
-@chainlink/=lib/chainlink/contracts/src/v0.8/
 ~/=src/
-@ucs-ops/=lib/ucs-ops/
-@ucs-std/=lib/ucs-std/
+@chainlink/=lib/chainlink/contracts/src/v0.8/
+@openzeppelin/=lib/openzeppelin-contracts/
+@devkit/=lib/mc/devkit/
+@mc-std/=lib/mc/src/std/
+@mc-std/=lib/ucs-contracts/src/ops
