@@ -1,5 +1,10 @@
 # TextDAO
 
+# Version Sensitivity Info
+- foundry: 1a4960d 2024-03-20T00:19:54.542150000Z
+- mc: 257d4f5
+- solidity: 0.8.24
+
 ## Overview
 - A DAO with ERC-7546 UCS, it means DAO plugin architecture.
 - RCV voting for text diff review.

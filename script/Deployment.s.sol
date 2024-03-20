@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 
+// import { console2 } from "forge-std/console2.sol";
 import { MCDevKit } from "@devkit/MCDevKit.sol";
 import { MCScript } from "@devkit/MCScript.sol";
 
@@ -22,23 +23,26 @@ contract Deployment is MCScript {
 
         vm.deal(deployer, 100 ether);
 
-        address multisigAddr;
 
-
-
-        address yamato = mc.use("Clone", Clone.clone.selector, address(new Clone()))
-                            .use("Propose", Propose.deposit.selector, address(new Propose()))
+        address voteAddr = address(new Vote());
+        // address textdao = 
+        mc.use("Clone", Clone.clone.selector, address(new Clone()))
+                            .use("Propose", Propose.propose.selector, address(new Propose()))
                             .use("Fork", Fork.fork.selector, address(new Fork()))
-                            .use("Vote", Vote.vote.selector, address(new Vote()))
+                            .use("Vote", Vote.voteHeaders.selector, voteAddr)
+                            .use("Vote", Vote.voteCmds.selector, voteAddr)
                             .use("Tally", Tally.tally.selector, address(new Tally()))
                             .use("Execute", Execute.execute.selector, address(new Execute()))
                             .use("MemberJoinProtected", MemberJoinProtected.memberJoin.selector, address(new MemberJoinProtected()))
-                            .use("SetConfigsProtected", SetConfigsProtected.setConfigs.selector, address(new SetConfigsProtected()))
-                            .use("ConfigOverrideProtected", ConfigOverrideProtected.configOverride.selector, address(new ConfigOverrideProtected()))
-                            .use("SaveTextProtected", SaveTextProtected.saveTextProtected.selector, address(new SaveTextProtected()))
-                            .set(address(new TextDAOFacade())) // for Etherscan proxy read/write
-                            .deploy(abi.encodeCall(SetConfigsProtected.setConfigs, multisigAddr))
+                            .use("SetConfigsProtected", SetConfigsProtected.setProposalsConfig.selector, address(new SetConfigsProtected()))
+                            .use("ConfigOverrideProtected", ConfigOverrideProtected.overrideProposalsConfig.selector, address(new ConfigOverrideProtected()))
+                            .use("SaveTextProtected", SaveTextProtected.saveText.selector, address(new SaveTextProtected()))
+                            // .set(address(new TextDAOFacade())) // for Etherscan proxy read/write
+                            .deploy()
+                            // .deploy("TextDAO", abi.encodeCall(SetConfigsProtected.setProposalsConfig, (0, Schema.ProposalsConfig())))
                             .toProxyAddress();
+
+        // console2.logAddress(textdao);
 
     }
 

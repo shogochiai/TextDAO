@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 import { UCSTestBase } from "bundle/_utils/UCSTestBase.sol";
 import { SelectorLib } from "bundle/_utils/SelectorLib.sol";
