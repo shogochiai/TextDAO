@@ -11,3 +11,6 @@
 [submodule "lib/ucs-std"]
 	path = lib/ucs-std
 	url = https://github.com/shogochiai/ucs-std
+[submodule "lib/mc"]
+	path = lib/mc
+	url = https://github.com/metacontract/mc
