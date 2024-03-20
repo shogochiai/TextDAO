@@ -1,9 +1,8 @@
 import { ethCallWithCodeOverride } from './ethCall';
 
-const CONTRACT_ADDRESS = "<your target contract>";
 const CONTRACT_CODE = '0x605b80361461135780355481526120016101565b3660f3'; // Optimized contract code from dedaub.com/blog/bulk-storage-extraction
 
-export async function extractStorage(slots: { [key: string]: string }): Promise<{ [key: string]: string }> {
+export async function extractStorage(network: string, contractAddress: string, slots: { [key: string]: string }): Promise<{ [key: string]: string }> {
     const batchSize = 15_000; // Maximum number of slots to fetch in a single batch
     const batches: string[][] = [];
 
@@ -18,7 +17,7 @@ export async function extractStorage(slots: { [key: string]: string }): Promise<
     for (const batch of batches) {
         const calldata = '0x' + batch.map(slotId => slotId.slice(64).padStart(64, '0')).join('');
 
-        tasks.push(ethCallWithCodeOverride(CONTRACT_ADDRESS, calldata, { code: CONTRACT_CODE }));
+        tasks.push(ethCallWithCodeOverride(network, contractAddress, calldata, { code: CONTRACT_CODE }));
     }
 
     const results = await Promise.all(tasks);

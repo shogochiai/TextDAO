@@ -218,8 +218,8 @@ function calculateMappingSlot(key: number, baseSlot: string): string {
 }
 
 // Example function to read an AST from a JSON file
-export async function readStructFromABI(filePath: any) {
-    const data = await JSON.parse(require("fs").readFileSync(filePath));
+export async function readStructFromABIJson(jsonData: any) {
+    const data = await JSON.parse(jsonData);
     const _library: any = data.ast.nodes.filter((c: any) => c.nodeType === 'ContractDefinition');
     const _structs: any = _library[0].nodes.filter((c: any) => c.nodeType === 'StructDefinition');
 

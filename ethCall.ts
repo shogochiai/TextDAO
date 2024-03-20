@@ -1,4 +1,18 @@
 import fetchPolyfill from 'node-fetch-polyfill';
+import * as fs from 'fs';
+import * as path from 'path';
+
+interface Data {
+  name: string;
+}
+
+
+function getChainList(): { [key:string]: number } {
+    const filePath = path.join(__dirname, 'chainIds.json');
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(fileContent);
+}
+const chainList = getChainList();
 
 const globalThis: any = global;
 globalThis.fetch = fetchPolyfill;
@@ -6,9 +20,10 @@ globalThis.fetch = fetchPolyfill;
 const alchemyApiUrl = 'https://eth-mainnet.g.alchemy.com/v2/docs-demo';
 
 export async function ethCallWithCodeOverride(
-  contractAddress: string,
-  data: string,
-  stateOverride: { [key: string]: string } = {}
+    network: string,
+    contractAddress: string,
+    data: string,
+    stateOverride: { [key: string]: string } = {}
 ): Promise<string> {
   const payload = {
     jsonrpc: '2.0',
@@ -23,7 +38,7 @@ export async function ethCallWithCodeOverride(
         ...stateOverride,
       },
     ],
-    id: 1,
+    id: chainList[network],
   };
 
   const response = await fetch(alchemyApiUrl, {
