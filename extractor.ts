@@ -2,7 +2,7 @@ import { calculateSlots } from "./slot";
 import { StructDefinition, StructMember, BaseSlots, readStructFromABI } from "./ast";
 
 (async (_) => {
-    const structDefinitions = await readStructFromABI('out/StorageScheme.sol/StorageScheme.json');
+    const structDefinitions = await readStructFromABI('out/Schema.sol/Schema.json');
 
     const slots = extractSlots(structDefinitions);
 

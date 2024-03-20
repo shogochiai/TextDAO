@@ -2,9 +2,9 @@
 pragma solidity ^0.8.23;
 
 /**
- * StorageScheme v0.1.0
+ * Schema v0.1.0
  */
-library StorageScheme {    
+library Schema {    
     /*********************
      *  ProposeStorage
      ********************/

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
-import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
+import { Storage } from "~/textDAO/storages/Storage.sol";
+import { Schema } from "~/textDAO/storages/Schema.sol";
+import { Constants } from "~/_utils/Constants.sol";
 
 contract Fork {
-    function fork(uint pid, StorageScheme.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
+    function fork(uint pid, Schema.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
@@ -20,8 +20,8 @@ contract Fork {
     }
 
     modifier onlyReps(uint pid) {
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
 
         bool result;
         for (uint i; i <  $p.proposalMeta.reps.length; i++) {

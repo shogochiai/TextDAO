@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "~/_predicates/UCSTestBase.sol";
-import { SelectorLib } from "~/_predicates/SelectorLib.sol";
+import { UCSTestBase } from "~/_utils/UCSTestBase.sol";
+import { SelectorLib } from "~/_utils/SelectorLib.sol";
 import { Propose } from "~/textDAO/functions/Propose.sol";
 import { Fork } from "~/textDAO/functions/Fork.sol";
 import { Vote } from "~/textDAO/functions/Vote.sol";
 import { Execute } from "~/textDAO/functions/Execute.sol";
 import { Tally } from "~/textDAO/functions/Tally.sol";
-import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
-import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
+import { Storage } from "~/textDAO/storages/Storage.sol";
+import { Schema } from "~/textDAO/storages/Schema.sol";
+import { Constants } from "~/_utils/Constants.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Test1 is UCSTestBase {
@@ -26,10 +26,10 @@ contract Test1 is UCSTestBase {
 
 
     function test_propose() public {
-        StorageScheme.MemberJoinProtectedStorage storage $m = StorageLib.$Members();
-        StorageScheme.VRFStorage storage $vrf = StorageLib.$VRF();
+        Schema.MemberJoinProtectedStorage storage $m = Storage.$Members();
+        Schema.VRFStorage storage $vrf = Storage.$VRF();
 
-        StorageScheme.ProposalArg memory p;
+        Schema.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
 
         $vrf.config.vrfCoordinator = address(1);
@@ -45,7 +45,7 @@ contract Test1 is UCSTestBase {
         $m.members[0].addr = address(this);
 
         uint pid = Propose(address(this)).propose(p);
-        StorageScheme.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        Schema.Proposal storage $p = Storage.$Proposals().proposals[pid];
 
         assertEq(pid, 0);
         assertEq($p.proposalMeta.headerRank.length, 0);
@@ -55,12 +55,12 @@ contract Test1 is UCSTestBase {
 
     function test_fork() public {
         uint pid = 0;
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
 
-        StorageScheme.ProposalArg memory p;
+        Schema.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
-        p.cmd.actions = new StorageScheme.Action[](1);
+        p.cmd.actions = new Schema.Action[](1);
 
         $p.proposalMeta.reps.push(); // array init
         $p.proposalMeta.reps[0] = address(this); 
@@ -76,8 +76,8 @@ contract Test1 is UCSTestBase {
         uint fork1stId = 9;
         uint fork2ndId = 1;
         uint fork3rdId = 5;
-        StorageScheme.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        StorageScheme.Header[] storage $headers = $p.headers;
+        Schema.Proposal storage $p = Storage.$Proposals().proposals[pid];
+        Schema.Header[] storage $headers = $p.headers;
         for (uint i; i < 10; i++) {
             $headers.push();
         }
@@ -101,8 +101,8 @@ contract Test1 is UCSTestBase {
         uint fork1stId = 7;
         uint fork2ndId = 6;
         uint fork3rdId = 5;
-        StorageScheme.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
-        StorageScheme.Command[] storage $cmds = $p.cmds;
+        Schema.Proposal storage $p = Storage.$Proposals().proposals[pid];
+        Schema.Command[] storage $cmds = $p.cmds;
         for (uint i; i < 10; i++) {
             $cmds.push();
         }
@@ -124,21 +124,21 @@ contract Test1 is UCSTestBase {
 
     function test_tally_success() public {
         uint pid = 0;
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
 
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 1000;
         $.config.tallyInterval = 1000;
 
-        StorageScheme.Header[] storage $headers = $p.headers;
-        StorageScheme.Command[] storage $cmds = $p.cmds;
+        Schema.Header[] storage $headers = $p.headers;
+        Schema.Command[] storage $cmds = $p.cmds;
 
         for (uint i; i < 10; i++) {
             $headers.push();
             $cmds.push();
             $cmds[i].actions.push();
-            StorageScheme.Action storage $action = $cmds[i].actions[0];
+            Schema.Action storage $action = $cmds[i].actions[0];
             $action.func = "tally(uint256)";
         }
         $cmds.push();
@@ -166,22 +166,22 @@ contract Test1 is UCSTestBase {
 
     function test_tally_failCommandQuorumWithOverride() public {
         uint pid = 0;
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
-        StorageScheme.ConfigOverrideStorage storage $configOverride = StorageLib.$ConfigOverride();
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
+        Schema.ConfigOverrideStorage storage $configOverride = Storage.$ConfigOverride();
 
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 1000;
         $.config.tallyInterval = 1000;
 
-        StorageScheme.Header[] storage $headers = $p.headers;
-        StorageScheme.Command[] storage $cmds = $p.cmds;
+        Schema.Header[] storage $headers = $p.headers;
+        Schema.Command[] storage $cmds = $p.cmds;
 
         for (uint i; i < 10; i++) {
             $headers.push();
             $cmds.push();
             $cmds[i].actions.push();
-            StorageScheme.Action storage $action = $cmds[i].actions[0];
+            Schema.Action storage $action = $cmds[i].actions[0];
             $action.func = "tally(uint256)";
         }
         $cmds.push();
@@ -211,21 +211,21 @@ contract Test1 is UCSTestBase {
 
     function test_tally_failWithExpired() public {
         uint pid = 0;
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
 
         $p.proposalMeta.createdAt = 0;
         $.config.expiryDuration = 0;
         $.config.tallyInterval = 1000;
 
-        StorageScheme.Header[] storage $headers = $p.headers;
-        StorageScheme.Command[] storage $cmds = $p.cmds;
+        Schema.Header[] storage $headers = $p.headers;
+        Schema.Command[] storage $cmds = $p.cmds;
 
         for (uint i; i < 10; i++) {
             $headers.push();
             $cmds.push();
             $cmds[i].actions.push();
-            StorageScheme.Action storage $action = $cmds[i].actions[0];
+            Schema.Action storage $action = $cmds[i].actions[0];
             $action.func = "tally(uint256)";
         }
         $cmds.push();
@@ -247,7 +247,7 @@ contract Test1 is UCSTestBase {
 
     function test_execute_success() public {
         uint pid = 0;
-        StorageScheme.Proposal storage $p = StorageLib.$Proposals().proposals[pid];
+        Schema.Proposal storage $p = Storage.$Proposals().proposals[pid];
         $p.cmds.push();
         $p.proposalMeta.cmdRank = new uint[](3);
 

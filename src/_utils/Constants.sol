@@ -4,7 +4,7 @@ pragma solidity ^0.8.23;
 /**
  * StorageSlot v0.1.0
  */
-library StorageSlot {    
+library Constants {    
     // keccak256(abi.encode(uint256(keccak256("textDAO.PROPOSALS_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 public constant PROPOSALS_STORAGE_LOCATION =
         0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400;

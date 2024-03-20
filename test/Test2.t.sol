@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "~/_predicates/UCSTestBase.sol";
+import { UCSTestBase } from "~/_utils/UCSTestBase.sol";
 import { Propose } from "~/textDAO/functions/Propose.sol";
 import { Fork } from "~/textDAO/functions/Fork.sol";
 import { Vote } from "~/textDAO/functions/Vote.sol";
 import { Execute } from "~/textDAO/functions/Execute.sol";
 import { Tally } from "~/textDAO/functions/Tally.sol";
-import { StorageLib } from "~/textDAO/storages/StorageLib.sol";
-import { StorageScheme } from "~/textDAO/storages/StorageScheme.sol";
-import { StorageSlot } from "~/textDAO/storages/StorageSlot.sol";
+import { Storage } from "~/textDAO/storages/Storage.sol";
+import { Schema } from "~/textDAO/storages/Schema.sol";
+import { Constants } from "~/_utils/Constants.sol";
 import { SaveTextProtected } from "~/textDAO/functions/protected/SaveTextProtected.sol";
 import { MemberJoinProtected } from "~/textDAO/functions/protected/MemberJoinProtected.sol";
 
@@ -35,16 +35,16 @@ contract Test2 is UCSTestBase {
         metadataURIs[0] = bytes32(uint256(1));
         metadataURIs[1] = bytes32(uint256(2));
 
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
 
-        StorageScheme.Text storage $text = StorageLib.$Texts().texts[textId];
+        Schema.Text storage $text = Storage.$Texts().texts[textId];
 
         $p.cmds.push(); // Note: initialize for storage array
-        StorageScheme.Command storage $cmd = $p.cmds[0];
+        Schema.Command storage $cmd = $p.cmds[0];
         $cmd.id = 0;
         $cmd.actions.push(); // Note: initialize for storage array
-        StorageScheme.Action storage $action = $cmd.actions[0];
+        Schema.Action storage $action = $cmd.actions[0];
 
         $action.func = "saveText(uint256,uint256,bytes32[])";
         $action.abiParams = abi.encode(pid, textId, metadataURIs);
@@ -66,25 +66,25 @@ contract Test2 is UCSTestBase {
     function test_execute_successWithJoin() public {
         uint pid = 0;
 
-        StorageScheme.Member[] memory candidates = new StorageScheme.Member[](2);
-        StorageScheme.Member memory member1;
+        Schema.Member[] memory candidates = new Schema.Member[](2);
+        Schema.Member memory member1;
         member1.id = 0;
         member1.addr = address(1);
         candidates[0] = member1;
-        StorageScheme.Member memory member2;
+        Schema.Member memory member2;
         member2.id = 1;
         member2.addr = address(2);
         candidates[1] = member2;
 
-        StorageScheme.ProposeStorage storage $ = StorageLib.$Proposals();
-        StorageScheme.Proposal storage $p = $.proposals[pid];
-        StorageScheme.MemberJoinProtectedStorage storage $m = StorageLib.$Members();
+        Schema.ProposeStorage storage $ = Storage.$Proposals();
+        Schema.Proposal storage $p = $.proposals[pid];
+        Schema.MemberJoinProtectedStorage storage $m = Storage.$Members();
 
         $p.cmds.push(); // Note: initialize for storage array
-        StorageScheme.Command storage $cmd = $p.cmds[0];
+        Schema.Command storage $cmd = $p.cmds[0];
         $cmd.id = 0;
         $cmd.actions.push(); // Note: initialize for storage array
-        StorageScheme.Action storage $action = $cmd.actions[0];
+        Schema.Action storage $action = $cmd.actions[0];
 
         $action.func = "memberJoin(uint256,(uint256,address,bytes32)[])";
         $action.abiParams = abi.encode(pid, candidates);
