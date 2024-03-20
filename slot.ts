@@ -1,6 +1,6 @@
 import { keccak256 } from 'js-sha3';
 import * as BN from 'bn.js';
-import { StructDefinition, StructMember, BaseSlots, readStructFromABI } from "./ast";
+import { StructDefinition, StructMember } from "./ast";
 
 // Convert a hex string to a BN object for arithmetic operations.
 function hexToBN(hexString: string): BN {

@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { UCSTestBase } from "~/_utils/UCSTestBase.sol";
-import { Propose } from "~/textDAO/functions/Propose.sol";
-import { Fork } from "~/textDAO/functions/Fork.sol";
-import { Vote } from "~/textDAO/functions/Vote.sol";
-import { Execute } from "~/textDAO/functions/Execute.sol";
-import { Tally } from "~/textDAO/functions/Tally.sol";
-import { Storage } from "~/textDAO/storages/Storage.sol";
-import { Schema } from "~/textDAO/storages/Schema.sol";
-import { SaveTextProtected } from "~/textDAO/functions/protected/SaveTextProtected.sol";
-import { MemberJoinProtected } from "~/textDAO/functions/protected/MemberJoinProtected.sol";
+import { UCSTestBase } from "bundle/_utils/UCSTestBase.sol";
+import { Propose } from "bundle/textdao/functions/Propose.sol";
+import { Fork } from "bundle/textdao/functions/Fork.sol";
+import { Vote } from "bundle/textdao/functions/Vote.sol";
+import { Execute } from "bundle/textdao/functions/Execute.sol";
+import { Tally } from "bundle/textdao/functions/Tally.sol";
+import { Storage } from "bundle/textdao/storages/Storage.sol";
+import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { SaveTextProtected } from "bundle/textdao/functions/protected/SaveTextProtected.sol";
+import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJoinProtected.sol";
 
 contract Test2 is UCSTestBase {
 

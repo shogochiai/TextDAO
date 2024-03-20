@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { Storage } from "~/textDAO/storages/Storage.sol";
-import { Schema } from "~/textDAO/storages/Schema.sol";
+import { Storage } from "bundle/textdao/storages/Storage.sol";
+import { Schema } from "bundle/textdao/storages/Schema.sol";
 
 contract Vote {
     function voteHeaders(uint pid, uint[3] calldata headerIds) external returns (bool) {

@@ -1,6 +1,5 @@
-~/=src/
+bundle/=src/
 @chainlink/=lib/chainlink/contracts/src/v0.8/
 @openzeppelin/=lib/openzeppelin-contracts/
 @devkit/=lib/mc/devkit/
 @mc-std/=lib/mc/src/std/
-@mc-std/=lib/ucs-contracts/src/ops

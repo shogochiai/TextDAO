@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { Storage } from "~/textDAO/storages/Storage.sol";
-import { Schema } from "~/textDAO/storages/Schema.sol";
-import { SortLib } from "~/_utils/SortLib.sol";
-import { SelectorLib } from "~/_utils/SelectorLib.sol";
+import { Storage } from "bundle/textdao/storages/Storage.sol";
+import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { SortLib } from "bundle/_utils/SortLib.sol";
+import { SelectorLib } from "bundle/_utils/SelectorLib.sol";
 
 contract Tally {
     function tally(uint pid) external onlyOncePerInterval(pid) returns (bool) {
