@@ -25,24 +25,18 @@ contract Deployment is MCScript {
 
 
         address voteAddr = address(new Vote());
-        address textdao = mc.use("Clone", Clone.clone.selector, address(new Clone()))
-                            .use("Propose", Propose.propose.selector, address(new Propose()))
-                            .use("Fork", Fork.fork.selector, address(new Fork()))
-                            .use("Vote", Vote.voteHeaders.selector, voteAddr)
-                            .use("Vote", Vote.voteCmds.selector, voteAddr)
-                            .use("Tally", Tally.tally.selector, address(new Tally()))
-                            .use("Execute", Execute.execute.selector, address(new Execute()))
-                            .use("MemberJoinProtected", MemberJoinProtected.memberJoin.selector, address(new MemberJoinProtected()))
-                            .use("SetConfigsProtected", SetConfigsProtected.setProposalsConfig.selector, address(new SetConfigsProtected()))
-                            .use("ConfigOverrideProtected", ConfigOverrideProtected.overrideProposalsConfig.selector, address(new ConfigOverrideProtected()))
-                            .use("SaveTextProtected", SaveTextProtected.saveText.selector, address(new SaveTextProtected()))
-                            // .set(address(new TextDAOFacade())) // for Etherscan proxy read/write
-                            .deploy()
-                            // .deploy("TextDAO", abi.encodeCall(SetConfigsProtected.setProposalsConfig, (0, Schema.ProposalsConfig())))
-                            .toProxyAddress();
-
-        console2.logAddress(textdao);
-
+        mc.use("Clone", Clone.clone.selector, address(new Clone()));
+        mc.use("Propose", Propose.propose.selector, address(new Propose()));
+        mc.use("Fork", Fork.fork.selector, address(new Fork()));
+        mc.use("Vote", Vote.voteHeaders.selector, voteAddr);
+        mc.use("Vote", Vote.voteCmds.selector, voteAddr);
+        mc.use("Tally", Tally.tally.selector, address(new Tally()));
+        mc.use("Execute", Execute.execute.selector, address(new Execute()));
+        mc.use("MemberJoinProtected", MemberJoinProtected.memberJoin.selector, address(new MemberJoinProtected()));
+        mc.use("SetConfigsProtected", SetConfigsProtected.setProposalsConfig.selector, address(new SetConfigsProtected()));
+        mc.use("ConfigOverrideProtected", ConfigOverrideProtected.overrideProposalsConfig.selector, address(new ConfigOverrideProtected()));
+        mc.use("SaveTextProtected", SaveTextProtected.saveText.selector, address(new SaveTextProtected()));
+        // mc.set(address(new TextDAOFacade())); // for Etherscan proxy read/write
+        address textdao = mc.deploy().toProxyAddress();
     }
-
 }
