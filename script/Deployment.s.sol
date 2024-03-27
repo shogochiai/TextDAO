@@ -16,10 +16,10 @@ import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJo
 import { SetConfigsProtected } from "bundle/textdao/functions/protected/SetConfigsProtected.sol";
 import { ConfigOverrideProtected } from "bundle/textdao/functions/protected/ConfigOverrideProtected.sol";
 import { SaveTextProtected } from "bundle/textdao/functions/protected/SaveTextProtected.sol";
-
+import { TextDAOFacade } from "script/TextDAOFacade.sol";
 
 contract Deployment is MCScript {
-    function setUp() public startBroadcastWithDeployerPrivKey {
+    function run() public startBroadcastWithDeployerPrivKey {
 
         vm.deal(deployer, 100 ether);
 
@@ -36,7 +36,7 @@ contract Deployment is MCScript {
         mc.use("SetConfigsProtected", SetConfigsProtected.setProposalsConfig.selector, address(new SetConfigsProtected()));
         mc.use("ConfigOverrideProtected", ConfigOverrideProtected.overrideProposalsConfig.selector, address(new ConfigOverrideProtected()));
         mc.use("SaveTextProtected", SaveTextProtected.saveText.selector, address(new SaveTextProtected()));
-        // mc.set(address(new TextDAOFacade())); // for Etherscan proxy read/write
+        mc.set(address(new TextDAOFacade())); // for Etherscan proxy read/write
         address textdao = mc.deploy().toProxyAddress();
     }
 }

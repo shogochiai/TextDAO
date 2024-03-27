@@ -14,6 +14,12 @@
 - Any groupware would be acceptable for daily discourse.
 - But decision making over treasury and law must be on this DAO.
 
+## How to start
+- TDD with `forge test`
+- Run `anvil`
+- Prepare `.env`
+- `forge script script/Deployment.s.sol --rpc-url http://127.0.0.1:8545`
+
 ---
 # Architecture
 ## Functions
