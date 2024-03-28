@@ -85,15 +85,6 @@ library Schema {
         bytes32[] metadataURIs;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("textDAO.TEXTS_STORAGE_LOCATION")) - 1)) & ~bytes32(uint256(0xff));
-    bytes32 private constant TEXTS_STORAGE_LOCATION =
-        0x0a45678f7ac13226a0ead4e3b54db0ab263e1a30cc1ea3f19d7212aea5cd1d00;
-
-    function $Texts() internal pure returns (TextSaveProtectedStorage storage $) {
-        assembly { $.slot := TEXTS_STORAGE_LOCATION }
-    }
-
-
     /*********************
      *  MemberJoinProtected Storage
      ********************/

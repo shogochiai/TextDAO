@@ -8,6 +8,14 @@ export class BaseSlots {
         this.baseSlots = _baseSlots;
     }
 }
+const baseSlots = new BaseSlots({
+    ProposeStorage: "0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400",
+    TextSaveProtectedStorage: "0x0a45678f7ac13226a0ead4e3b54db0ab263e1a30cc1ea3f19d7212aea5cd1d00",
+    MemberJoinProtectedStorage: "0x2f8cab7d49dc616a0e8eb4e6f8b67d31c656445bf0c9ad5e38bc38d1128dcc00",
+    VRFStorage: "0x67f28ff67f7d7020f2b2ac7c9bd5f2a6dd9f19a9b15d92c4070c4572728ab000",
+    ConfigOverrideStorage: "0x531151f4103280746205c56419d2c949e0976d9ee39d3c364618181eba5ee500"
+});
+
 
 export class StructMember {
     name: string;
@@ -202,6 +210,7 @@ export class StructDefinition {
         }
     }
 
+
 }
 
 function calculateMappingSlot(key: number, baseSlot: string): string {
@@ -217,26 +226,7 @@ function calculateMappingSlot(key: number, baseSlot: string): string {
     return `0x${hash}`;
 }
 
-// Example function to read an AST from a JSON file
-export async function readStructFromABIJson(jsonData: any) {
-    const data = await JSON.parse(jsonData);
-    const _library: any = data.ast.nodes.filter((c: any) => c.nodeType === 'ContractDefinition');
-    const _structs: any = _library[0].nodes.filter((c: any) => c.nodeType === 'StructDefinition');
-
-    // Sort structs based on their parent-child relationships
-    const sortedStructs = sortStructsByParentChild(_structs);
-
-    return sortedStructs;
-}
-
-function sortStructsByParentChild(structs: any[]): StructDefinition[] {
-    const baseSlots = new BaseSlots({
-        ProposeStorage: "0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400",
-        TextSaveProtectedStorage: "0x0a45678f7ac13226a0ead4e3b54db0ab263e1a30cc1ea3f19d7212aea5cd1d00",
-        MemberJoinProtectedStorage: "0x2f8cab7d49dc616a0e8eb4e6f8b67d31c656445bf0c9ad5e38bc38d1128dcc00",
-        VRFStorage: "0x67f28ff67f7d7020f2b2ac7c9bd5f2a6dd9f19a9b15d92c4070c4572728ab000",
-        ConfigOverrideStorage: "0x531151f4103280746205c56419d2c949e0976d9ee39d3c364618181eba5ee500"
-    });
+export function sortStructsByParentChild(structs: any[]): StructDefinition[] {
 
     let rootStructDefinitions: StructDefinition[] = [];
     const structMap: { [key: string]: StructDefinition } = {};
@@ -260,6 +250,7 @@ function sortStructsByParentChild(structs: any[]): StructDefinition[] {
 
     return structDefinitionsWithRef;
 }
+
 
 // amend key
 // get members and copy to children

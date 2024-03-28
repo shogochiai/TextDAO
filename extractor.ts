@@ -21,7 +21,9 @@ export async function extractStorage(network: string, contractAddress: string, s
     }
 
     const results = await Promise.all(tasks);
-    console.log(results);
+    if (results[0] === undefined) {
+        throw new Error("slots didn't return anything.");
+    }
 
     let offset = 0;
     for (const batch of batches) {
