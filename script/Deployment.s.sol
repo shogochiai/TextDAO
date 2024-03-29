@@ -25,11 +25,12 @@ contract Deployment is MCScript {
 
 
         address voteAddr = address(new Vote());
+        mc.init("textdao");
         mc.use("Clone", Clone.clone.selector, address(new Clone()));
         mc.use("Propose", Propose.propose.selector, address(new Propose()));
         mc.use("Fork", Fork.fork.selector, address(new Fork()));
-        mc.use("Vote", Vote.voteHeaders.selector, voteAddr);
-        mc.use("Vote", Vote.voteCmds.selector, voteAddr);
+        mc.use("VoteHeaders", Vote.voteHeaders.selector, voteAddr);
+        mc.use("VoteCmds", Vote.voteCmds.selector, voteAddr);
         mc.use("Tally", Tally.tally.selector, address(new Tally()));
         mc.use("Execute", Execute.execute.selector, address(new Execute()));
         mc.use("MemberJoinProtected", MemberJoinProtected.memberJoin.selector, address(new MemberJoinProtected()));
@@ -38,5 +39,9 @@ contract Deployment is MCScript {
         mc.use("SaveTextProtected", SaveTextProtected.saveText.selector, address(new SaveTextProtected()));
         mc.set(address(new TextDAOFacade())); // for Etherscan proxy read/write
         address textdao = mc.deploy().toProxyAddress();
+
+        console2.logString(">>>>>>>>>>>>>>>>>>>>>");
+        console2.logAddress(textdao);
+        console2.logString("<<<<<<<<<<<<<<<<<<<<<");
     }
 }
