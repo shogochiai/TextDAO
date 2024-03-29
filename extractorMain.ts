@@ -3,6 +3,9 @@ import { calculateSlots } from "./slot";
 import { sortStructsByParentChild } from "./ast";
 import { extractStorage } from "./extractor";
 import { CompileFailedError, CompileResult, compileSol, ASTReader } from "solc-typed-ast";
+import * as dotenv from 'dotenv';
+dotenv.config();
+const TEXT_DAO_ADDR = process.env.TEXT_DAO_ADDR || '';
 
 interface InputData {
   network: string;
@@ -12,7 +15,7 @@ interface InputData {
 
 const INPUT_DATA: InputData = {
   network: "ethereum",
-  contractAddress: "<your target contract>",
+  contractAddress: TEXT_DAO_ADDR,
   schemaPath: "src/textdao/storages/Schema.sol"
 };
 

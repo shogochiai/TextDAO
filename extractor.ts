@@ -1,6 +1,6 @@
 import { ethCallWithCodeOverride } from './ethCall';
 
-const CONTRACT_CODE = '0x605b80361461135780355481526120016101565b3660f3'; // Optimized contract code from dedaub.com/blog/bulk-storage-extraction
+const CONTRACT_CODE = '0x5f5b80361460135780355481526020016001565b365ff3'; // Optimized contract code from dedaub.com/blog/bulk-storage-extraction
 
 export async function extractStorage(network: string, contractAddress: string, slots: { [key: string]: string }): Promise<{ [key: string]: string }> {
     const batchSize = 15_000; // Maximum number of slots to fetch in a single batch
@@ -8,35 +8,34 @@ export async function extractStorage(network: string, contractAddress: string, s
 
     // Split the slots into batches
     const slotIds = Object.values(slots);
-    for (let i = 0; i < slotIds.length; i += batchSize) {
-        batches.push(slotIds.slice(i, i + batchSize));
-    }
     const extractedSlots: { [key: string]: string } = {};
-    const tasks = [];
 
-    for (const batch of batches) {
-        const calldata = '0x' + batch.map(slotId => slotId.slice(64).padStart(64, '0')).join('');
-
-        tasks.push(ethCallWithCodeOverride(network, contractAddress, calldata, { code: CONTRACT_CODE }));
-    }
-
-    const results = await Promise.all(tasks);
-    if (results[0] === undefined) {
-        throw new Error("slots didn't return anything.");
-    }
-
-    let offset = 0;
-    for (const batch of batches) {
-        const result = results[offset];
-        for (let i = 0; i < batch.length; i++) {
-            const slotName = Object.keys(slots).find(key => slots[key] === batch[i]);
-            if (slotName) {
-                const slotValue = '0x' + result.slice(i * 64, (i + 1) * 64);
-                extractedSlots[slotName] = slotValue;
-            }
-        }
-        offset++;
-    }
+    const results:any = await ethCallWithCodeOverride(network, contractAddress, constructCalldata(slotIds), CONTRACT_CODE);
+    console.log(results);
 
     return extractedSlots;
 }
+
+
+function constructCalldata(slots: string[]): string {
+    let calldata = "0x";
+    for (const slot of slots) {
+      // Remove the "0x" prefix if present
+      let location = slot.replace(/^0x/, "");
+      location = location.slice(0, -4);
+  
+      // Ensure the length is 64 characters (32 bytes)
+      if (location.length < 64) {
+        location = location.padStart(64, "0");
+      } else if (location.length > 64) {
+        throw new Error(`Storage location ${slot} exceeds 32 bytes (${location.length/2} bytes)`);
+      }
+  
+      // Reverse the byte order for big-endian
+      location = location.match(/.{2}/g)!.reverse().join("");
+  
+      calldata += location;
+    }
+  
+    return calldata;
+  }

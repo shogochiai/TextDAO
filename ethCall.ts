@@ -17,14 +17,14 @@ const chainList = getChainList();
 const globalThis: any = global;
 globalThis.fetch = fetchPolyfill;
 
-const alchemyApiUrl = 'https://eth-mainnet.g.alchemy.com/v2/docs-demo';
+const apiUrl = 'http://127.0.0.1:8545';
 
 export async function ethCallWithCodeOverride(
     network: string,
     contractAddress: string,
     data: string,
-    stateOverride: { [key: string]: string } = {}
-): Promise<string> {
+    contractCode: string
+): Promise<any> {
   const payload = {
     jsonrpc: '2.0',
     method: 'eth_call',
@@ -35,13 +35,15 @@ export async function ethCallWithCodeOverride(
         gas: '0x0',
         gasPrice: '0x9184e72a000',
         value: '0x0',
-        ...stateOverride,
       },
+      'latest', // or any other block number or tag
+      // { code: contractCode } // stateOverride parameter
     ],
     id: chainList[network],
   };
 
-  const response = await fetch(alchemyApiUrl, {
+
+  const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -50,5 +52,6 @@ export async function ethCallWithCodeOverride(
   });
 
   const res = await response.json();
+  console.log(res);
   return res.result;
 }
