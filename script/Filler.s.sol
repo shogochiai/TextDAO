@@ -14,7 +14,7 @@ contract Filler {
         TextDAOFacade textdao = TextDAOFacade(textdaoAddr);
 
         address[] memory initialMembers = new address[](1);
-        initialMembers[0] = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; // Example initial member address
+        initialMembers[0] = address(this); // Example initial member address
         textdao.initialize(initialMembers);
 
         Schema.ProposalMeta memory proposalMeta = Schema.ProposalMeta({
@@ -27,9 +27,7 @@ contract Filler {
             nextRepId: 0,
             createdAt: block.timestamp
         });
-        console2.logString("----------1");
-        proposalMeta.reps[0] = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-        console2.logString("----------2");
+        proposalMeta.reps[0] = address(this);
         proposalMeta.nextRepId = 1;
         Schema.ProposalArg memory proposalArg = Schema.ProposalArg({
             header: Schema.Header({
