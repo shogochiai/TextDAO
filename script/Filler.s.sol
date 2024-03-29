@@ -27,7 +27,9 @@ contract Filler is Script {
             console2.log("Initialization failed but skipped.");
         }
 
-        vm.warp(block.timestamp + 3);
+
+        vm.warp(block.timestamp + 20);
+
 
         Schema.ProposalMeta memory proposalMeta = Schema.ProposalMeta({
             currentScore: 0,
@@ -55,7 +57,8 @@ contract Filler is Script {
             }),
             proposalMeta: proposalMeta
         });
-        uint proposalId = 1; // Assuming proposalId is known and set to 1 for demonstration
+
+        uint plannedProposalId = 0;
         Schema.Member[] memory candidates = new Schema.Member[](1); // Assuming there's one candidate for demonstration
         candidates[0] = Schema.Member({
             id: 123, // Example candidate ID
@@ -65,11 +68,14 @@ contract Filler is Script {
         
         proposalArg.cmd.actions[0] = Schema.Action({
             func: "memberJoin(uint256,address[])",
-            abiParams: abi.encode(proposalId, candidates)
+            abiParams: abi.encode(plannedProposalId, candidates)
         });
-        textdao.propose(proposalArg);
+        uint proposalId = textdao.propose(proposalArg);
+        require(plannedProposalId == proposalId, "Proposal IDs do not match");
 
-        vm.warp(block.timestamp + 3);
+
+        vm.warp(block.timestamp + 20);
+
 
         uint[3] memory cmdIds = [uint(0), uint(1), uint(2)]; // Example cmdIds, replace with actual command IDs
         textdao.voteCmds(proposalId, cmdIds);
