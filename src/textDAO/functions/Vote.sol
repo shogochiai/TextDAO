@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import { console2 } from "forge-std/console2.sol";
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
 
@@ -8,7 +9,9 @@ contract Vote {
     function voteHeaders(uint pid, uint[3] calldata headerIds) external returns (bool) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
-        
+
+        require($p.headers.length > 0, "No headers for this proposal.");
+
         if ($p.headers[0].id == headerIds[0]) {
             $p.headers[headerIds[0]].currentScore += 3;
         } else if ($p.headers[1].id == headerIds[0]) {
@@ -23,6 +26,8 @@ contract Vote {
     function voteCmds(uint pid, uint[3] calldata cmdIds) external returns (bool) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
+
+        require($p.cmds.length > 0, "No cmds for this proposal.");
 
         if ($p.cmds[0].id == cmdIds[0]) {
             $p.cmds[cmdIds[0]].currentScore += 3;

@@ -42,8 +42,12 @@ contract Deployment is MCScript {
         mc.set(address(new TextDAOFacade())); // for Etherscan proxy read/write
         address textdao = mc.deploy().toProxyAddress();
 
-        console2.logString(">>>>>>>>>>>>>>>>>>>>>");
-        console2.logAddress(textdao);
-        console2.logString("<<<<<<<<<<<<<<<<<<<<<");
+        bytes memory encodedData = abi.encodePacked("TEXT_DAO_ADDR=", vm.toString(address(textdao)));
+        vm.writeLine(
+            string(
+                abi.encodePacked(vm.projectRoot(), "/.env")
+            ),
+            string(encodedData)
+        );
     }
 }

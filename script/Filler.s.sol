@@ -3,19 +3,31 @@ pragma solidity ^0.8.24;
 
 
 import { console2 } from "forge-std/console2.sol";
+import { Script } from "forge-std/Script.sol";
 
 import { TextDAOFacade } from "script/TextDAOFacade.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
 import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJoinProtected.sol";
 
-contract Filler {
+contract Filler is Script {
+
     function run() public {
-        address textdaoAddr = 0x6C2d83262fF84cBaDb3e416D527403135D757892;
+        address textdaoAddr = vm.envOr("TEXT_DAO_ADDR", address(0));
         TextDAOFacade textdao = TextDAOFacade(textdaoAddr);
+
 
         address[] memory initialMembers = new address[](1);
         initialMembers[0] = address(this); // Example initial member address
-        textdao.initialize(initialMembers);
+        try textdao.initialize(initialMembers, Schema.ProposalsConfig({
+            expiryDuration: 2 minutes,
+            tallyInterval: 1 minutes,
+            repsNum: 1,
+            quorumScore: 3
+        })) {} catch {
+            console2.log("Initialization failed but skipped.");
+        }
+
+        vm.warp(block.timestamp + 3);
 
         Schema.ProposalMeta memory proposalMeta = Schema.ProposalMeta({
             currentScore: 0,
@@ -56,6 +68,8 @@ contract Filler {
             abiParams: abi.encode(proposalId, candidates)
         });
         textdao.propose(proposalArg);
+
+        vm.warp(block.timestamp + 3);
 
         uint[3] memory cmdIds = [uint(0), uint(1), uint(2)]; // Example cmdIds, replace with actual command IDs
         textdao.voteCmds(proposalId, cmdIds);

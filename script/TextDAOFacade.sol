@@ -5,7 +5,7 @@ import { Schema } from "bundle/textdao/storages/Schema.sol";
 
 contract TextDAOFacade {
     function clone(address _target) public {}
-    function initialize(address[] calldata initialMembers) public {}
+    function initialize(address[] calldata initialMembers, Schema.ProposalsConfig calldata pConfig) public {}
     function propose(Schema.ProposalArg calldata _p) public {}
     function fork(uint _proposalId) public {}
     function voteHeaders(uint _proposalId, uint[3] calldata _headerIds) public {}

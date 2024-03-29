@@ -5,9 +5,15 @@ import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
 
 contract Initialize {
-    function initialize(address[] calldata initialMembers) external onlyOnce returns (bool) {
+    function initialize(address[] calldata initialMembers, Schema.ProposalsConfig calldata pConfig) external onlyOnce returns (bool) {
         
         Schema.MemberJoinProtectedStorage storage $ = Storage.$Members();
+        Schema.ProposalsConfig storage $pConfig = Storage.$Proposals().config;
+        $pConfig.expiryDuration = pConfig.expiryDuration;
+        $pConfig.tallyInterval = pConfig.tallyInterval;
+        $pConfig.repsNum = pConfig.repsNum;
+        $pConfig.quorumScore = pConfig.quorumScore;
+
         uint currentMemberId = $.nextMemberId;
         for (uint i = 0; i < initialMembers.length; i++) {
             $.members[currentMemberId].id = currentMemberId;

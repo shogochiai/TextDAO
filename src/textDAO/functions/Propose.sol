@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import { console2 } from "forge-std/console2.sol";
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
@@ -15,7 +16,7 @@ contract Propose {
         if ($.config.repsNum < $member.nextMemberId) {
             /*
                 VRF Request to choose reps
-            */
+            */            
 
             require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetConfigsProtected::createAndFundSubscription first.");
             require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFProtected::setVRFConfig first.");
