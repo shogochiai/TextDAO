@@ -23,11 +23,13 @@ contract Filler {
             cmdRank: new uint[](0),
             nextHeaderTallyFrom: 0,
             nextCmdTallyFrom: 0,
-            reps: new address[](0),
+            reps: new address[](1),
             nextRepId: 0,
             createdAt: block.timestamp
         });
+        console2.logString("----------1");
         proposalMeta.reps[0] = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        console2.logString("----------2");
         proposalMeta.nextRepId = 1;
         Schema.ProposalArg memory proposalArg = Schema.ProposalArg({
             header: Schema.Header({
