@@ -19,6 +19,7 @@
 - Run `anvil`
 - Prepare `.env`
 - `forge script script/Deployment.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`
+- `forge script script/Filler.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`
 
 ---
 # Architecture

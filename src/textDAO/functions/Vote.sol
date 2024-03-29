@@ -9,16 +9,30 @@ contract Vote {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
         
-        $p.headers[headerIds[0]].currentScore += 3;
-        $p.headers[headerIds[1]].currentScore += 2;
-        $p.headers[headerIds[2]].currentScore += 1;
+        if ($p.headers[0].id == headerIds[0]) {
+            $p.headers[headerIds[0]].currentScore += 3;
+        } else if ($p.headers[1].id == headerIds[0]) {
+            $p.headers[headerIds[0]].currentScore += 3;
+            $p.headers[headerIds[1]].currentScore += 2;
+        } else {
+            $p.headers[headerIds[0]].currentScore += 3;
+            $p.headers[headerIds[1]].currentScore += 2;
+            $p.headers[headerIds[2]].currentScore += 1;
+        }
     }
     function voteCmds(uint pid, uint[3] calldata cmdIds) external returns (bool) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
 
-        $p.cmds[cmdIds[0]].currentScore += 3;
-        $p.cmds[cmdIds[1]].currentScore += 2;
-        $p.cmds[cmdIds[2]].currentScore += 1;
+        if ($p.cmds[0].id == cmdIds[0]) {
+            $p.cmds[cmdIds[0]].currentScore += 3;
+        } else if ($p.cmds[1].id == cmdIds[0]) {
+            $p.cmds[cmdIds[0]].currentScore += 3;
+            $p.cmds[cmdIds[1]].currentScore += 2;
+        } else {
+            $p.cmds[cmdIds[0]].currentScore += 3;
+            $p.cmds[cmdIds[1]].currentScore += 2;
+            $p.cmds[cmdIds[2]].currentScore += 1;
+        }
     }
 }

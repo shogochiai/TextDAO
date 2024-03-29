@@ -7,6 +7,7 @@ import { MCDevKit } from "@devkit/MCDevKit.sol";
 import { MCScript } from "@devkit/MCScript.sol";
 
 import { Clone } from "@mc-std/functions/Clone.sol";
+import { Initialize } from "bundle/textdao/functions/onlyonce/Initialize.sol";
 import { Propose } from "bundle/textdao/functions/Propose.sol";
 import { Fork } from "bundle/textdao/functions/Fork.sol";
 import { Vote } from "bundle/textdao/functions/Vote.sol";
@@ -27,6 +28,7 @@ contract Deployment is MCScript {
         address voteAddr = address(new Vote());
         mc.init("textdao");
         mc.use("Clone", Clone.clone.selector, address(new Clone()));
+        mc.use("Initialize", Initialize.initialize.selector, address(new Initialize()));
         mc.use("Propose", Propose.propose.selector, address(new Propose()));
         mc.use("Fork", Fork.fork.selector, address(new Fork()));
         mc.use("VoteHeaders", Vote.voteHeaders.selector, voteAddr);

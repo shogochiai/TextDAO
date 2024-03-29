@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import { Schema } from "bundle/textdao/storages/Schema.sol";
+
 contract TextDAOFacade {
-    function clone() public {}
-    function propose() public {}
-    function fork() public {}
-    function voteHeaders() public {}
-    function voteCmds() public {}
-    function tally() public {}
-    function execute() public {}
-    function memberJoin() public {}
-    function setProposalsConfig() public {}
-    function overrideProposalsConfig() public {}
-    function saveText() public {}
+    function clone(address _target) public {}
+    function initialize(address[] calldata initialMembers) public {}
+    function propose(Schema.ProposalArg calldata _p) public {}
+    function fork(uint _proposalId) public {}
+    function voteHeaders(uint _proposalId, uint[3] calldata _headerIds) public {}
+    function voteCmds(uint _proposalId, uint[3] calldata _cmdIds) public {}
+    function tally(uint _proposalId) public {}
+    function execute(uint _proposalId) public {}
+    function memberJoin(uint _proposalId, Schema.Member[] calldata _candidates) public {}
+    function setProposalsConfig(Schema.ProposalsConfig calldata _config) public {}
+    function overrideProposalsConfig(uint _proposalId, Schema.ProposalsConfig calldata _config) public {}
+    function saveText(uint _proposalId, string calldata _text) public {}
 }

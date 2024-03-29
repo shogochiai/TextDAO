@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import { Storage } from "bundle/textdao/storages/Storage.sol";
+import { Schema } from "bundle/textdao/storages/Schema.sol";
+
+contract Initialize {
+    function initialize(address[] calldata initialMembers) external onlyOnce returns (bool) {
+        
+        Schema.MemberJoinProtectedStorage storage $ = Storage.$Members();
+        uint currentMemberId = $.nextMemberId;
+        for (uint i = 0; i < initialMembers.length; i++) {
+            $.members[currentMemberId].id = currentMemberId;
+            $.members[currentMemberId].addr = initialMembers[i];
+            $.members[currentMemberId].metadataURI = ""; 
+            currentMemberId++;
+        }
+        $.nextMemberId = currentMemberId;
+        return true;
+    }
+    modifier onlyOnce() {
+        Schema.MemberJoinProtectedStorage storage $ = Storage.$Members();
+        require($.nextMemberId == 0, "Initialize: already initialized");
+        _;
+    }
+
+}
