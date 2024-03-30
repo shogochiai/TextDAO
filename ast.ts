@@ -122,7 +122,8 @@ export class StructMember {
                         throw new Error('Mapping value type is null');
                     }
                     // Special rule for mappings and arrays
-                    const mappingSlot = calculateMappingSlot(key, parentSlotId + this.index);
+                    const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16);
+                    const mappingSlot = calculateMappingSlot(key, slotIdHex);
                     return mappingSlot;
                 } else {
                     const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16);
@@ -144,13 +145,31 @@ export class StructMember {
             throw new Error('Unable to calculate slot ID for this member');
         }
     }
+    getTypeAndName(){
+        if (this.parent) {
+            if (this.isMapping) {
+                return `mapping(${this.keyType} => ${this.valueType.type}) ${this.name}`;
+            } else {
+                return `${this.type} ${this.name}`;
+            }
+        } else if (this.parent === null) {
+            return `${this.type} root`;
+        } else {
+            throw new Error('Unable to getTypeAndName slot ID for this member');
+        }
+    }
     getEDFS():string{
-        let nameHierarchy = this.name;
-        let currentParent = this.parent;
+        let nameHierarchy = this.getTypeAndName();
+        let currentParent : StructMember | StructDefinition = this.parent;
 
         while (currentParent !== null) {
-            nameHierarchy = currentParent.name + "." + nameHierarchy;
-            currentParent = currentParent.parent;
+            if (currentParent instanceof StructMember) {
+                nameHierarchy = currentParent.getTypeAndName() + " > " + nameHierarchy;
+                currentParent = currentParent.parent;    
+            } else {
+                nameHierarchy = `${currentParent.name} root` + " > " + nameHierarchy;
+                currentParent = null;
+            }
         }
 
         return nameHierarchy;
@@ -222,7 +241,6 @@ export class StructDefinition {
         }
     }
 
-
 }
 
 function calculateMappingSlot(key: number, baseSlot: string): string {
@@ -260,7 +278,8 @@ export function sortStructsByParentChild(structs: any[]): StructDefinition[] {
         structDefinitionsWithRef = dig(cursorDefinition, structMap, structDefinitionsWithRef);
     });
 
-    return structDefinitionsWithRef;
+    rootStructDefinitions.push(...structDefinitionsWithRef);
+    return rootStructDefinitions;
 }
 
 
