@@ -278,8 +278,8 @@ export function sortStructsByParentChild(structs: any[]): StructDefinition[] {
         structDefinitionsWithRef = dig(cursorDefinition, structMap, structDefinitionsWithRef);
     });
 
-    rootStructDefinitions.push(...structDefinitionsWithRef);
-    return rootStructDefinitions;
+    // structDefinitionsWithRef.push(...rootStructDefinitions);
+    return structDefinitionsWithRef;
 }
 
 
@@ -289,8 +289,7 @@ export function sortStructsByParentChild(structs: any[]): StructDefinition[] {
 // go to children digging
 function dig(cursorDefinition: StructDefinition, structMap: { [key: string]: StructDefinition }, structDefinitionsWithRef: StructDefinition[]): StructDefinition[] {
     let childDefinition:StructDefinition | null;
-    cursorDefinition.members.forEach(member => {
-        // make member name from type info
+    cursorDefinition.members.forEach(member => {    
         let tempKey;
         let memberSlotId;
         if (member.isMapping) {
@@ -305,10 +304,23 @@ function dig(cursorDefinition: StructDefinition, structMap: { [key: string]: Str
         // get corresponding definition and fill info
         if (tempKey in structMap) {
             childDefinition = structMap[tempKey];
+            childDefinition.parent = cursorDefinition;    
+
+            cursorDefinition = structMap[cursorDefinition.name];
+
+            // console.log(
+            //     `${cursorDefinition.name}: ${!!cursorDefinition.parent ? cursorDefinition.parent.name : ""} => ${childDefinition.name}: ${!!childDefinition.parent ? childDefinition.parent.name : ""}`
+            // );
+
+            // if root
+            if (!cursorDefinition.parent) {
+                structDefinitionsWithRef.push(cursorDefinition);
+            }
             childDefinition.slotId = member.calculateSlotId(); // mapping and array are also just a member with index
-            childDefinition.parent = cursorDefinition;
-            structDefinitionsWithRef = dig(childDefinition, structMap, structDefinitionsWithRef);
             structDefinitionsWithRef.push(childDefinition);
+            structDefinitionsWithRef = dig(childDefinition, structMap, structDefinitionsWithRef);
+        } else {
+            // Primitive types are not struct. Don't need to check structMap.
         }
     });
 
