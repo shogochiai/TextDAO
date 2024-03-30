@@ -1,14 +1,24 @@
 import { ethCallWithCodeOverride } from './ethCall';
+import { SlotsAndEDFS } from './slot';
 
 const CONTRACT_CODE = '0x5f5b80361460135780355481526020016001565b365ff3'; // Optimized contract code from dedaub.com/blog/bulk-storage-extraction
 
-export async function extractStorage(network: string, contractAddress: string, slots: { [key: string]: string }): Promise<{ [key: string]: string }> {
+export interface SlotKV {
+    EDFS: string; // Entity-Document-Field Specifier
+    slotId: string;
+    value: string;
+  }
+  
+
+export async function extractStorage(network: string, contractAddress: string, slotsAndEDFS: SlotsAndEDFS): Promise<{ [key: string]: SlotKV }> {
+    const slots = slotsAndEDFS.slots;
+    const EDFS = slotsAndEDFS.EDFS;
     const batchSize = 15_000; // Maximum number of slots to fetch in a single batch
     const batches: string[][] = [];
 
     // Split the slots into batches
     const slotIds = Object.values(slots);
-    const extractedSlots: { [key: string]: string } = {};
+    const extractedSlots: { [key: string]: SlotKV } = {};
 
     const results:any = await ethCallWithCodeOverride(network, contractAddress, constructCalldata(slotIds), CONTRACT_CODE);
 
@@ -18,8 +28,11 @@ export async function extractStorage(network: string, contractAddress: string, s
         resultArray.push(resultString);
     }
     for (let i = 0; i < slotIds.length; i++) {
-        console.log(slotIds[i].slice(0, 7), (slotIds[i].length-2)/2);
-        extractedSlots[slotIds[i]] = resultArray[i];
+        extractedSlots[EDFS[i]] = {
+            EDFS: EDFS[i],
+            slotId: slotIds[i],
+            value: resultArray[i]
+        };
     }
 
     return extractedSlots;

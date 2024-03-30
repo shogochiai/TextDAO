@@ -18,9 +18,15 @@ function calculateMappingSlot(key: number, baseSlot: string): string {
 // Constants
 const psBaseSlot = '0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400';
 
-export function calculateSlots(structDefinitions: StructDefinition[]): { [key: string]: string } {
+export interface SlotsAndEDFS {
+    slots: { [key: string]: string };
+    EDFS: string[];
+}
+
+export function calculateSlots(structDefinitions: StructDefinition[]): SlotsAndEDFS {
       const slots: { [key: string]: string } = {};
       const members: StructMember[] = [];
+      const EDFS: string[] = [];
   
       for (const structDefinition of structDefinitions) {
           members.push(...collectMembers(structDefinition));
@@ -29,15 +35,16 @@ export function calculateSlots(structDefinitions: StructDefinition[]): { [key: s
       for (const member of members) {
           if (member.isMapping || member.isArray) {
               for(var i = 0; i < 10; i++) {
+                  EDFS.push(`${member.name}[${i}]`);
                   slots[`${member.name}[${i}]`] = member.calculateSlotId(i);
               }
           } else {
-              slots[`${member.name}`] = member.calculateSlotId();
+            EDFS.push(`${member.name}`);
+            slots[`${member.name}`] = member.calculateSlotId();
           }
       }
-  
-  
-      return slots;
+        
+      return <SlotsAndEDFS>{ slots, EDFS };
   }
   
   function collectMembers(structDefinition: StructDefinition | StructMember): StructMember[] {

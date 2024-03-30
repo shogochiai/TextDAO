@@ -1,7 +1,7 @@
 import * as fs from 'fs';
-import { calculateSlots } from "./slot";
+import { calculateSlots, SlotsAndEDFS } from "./slot";
 import { sortStructsByParentChild } from "./ast";
-import { extractStorage } from "./extractor";
+import { extractStorage, SlotKV } from "./extractor";
 import { CompileFailedError, CompileResult, compileSol, ASTReader } from "solc-typed-ast";
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -25,11 +25,11 @@ const INPUT_DATA: InputData = {
 })();
 
 
-async function getStorage(inputData: InputData): Promise<{ [key: string]: string }> {
+async function getStorage(inputData: InputData): Promise<{ [key: string]: SlotKV }> {
   const result:CompileResult = await compileSol(inputData.schemaPath, "auto");
   const reader = new ASTReader();
   const sourceUnits = reader.read(result.data);  
-  const slots = calculateSlots(sortStructsByParentChild(sourceUnits[0].vContracts[0].raw.nodes));
-  const storage = await extractStorage(inputData.network, inputData.contractAddress, slots);
+  const slotsAndEDFS:SlotsAndEDFS = calculateSlots(sortStructsByParentChild(sourceUnits[0].vContracts[0].raw.nodes));
+  const storage: { [key: string]: SlotKV } = await extractStorage(inputData.network, inputData.contractAddress, slotsAndEDFS);
   return storage;
 }
