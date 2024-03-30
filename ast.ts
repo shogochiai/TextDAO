@@ -143,7 +143,19 @@ export class StructMember {
         } else {
             throw new Error('Unable to calculate slot ID for this member');
         }
-    }}
+    }
+    getEDFS():string{
+        let nameHierarchy = this.name;
+        let currentParent = this.parent;
+
+        while (currentParent !== null) {
+            nameHierarchy = currentParent.name + "." + nameHierarchy;
+            currentParent = currentParent.parent;
+        }
+
+        return nameHierarchy;
+    }
+}
 
 export class StructDefinition {
     name: string;

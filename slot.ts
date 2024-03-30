@@ -35,11 +35,11 @@ export function calculateSlots(structDefinitions: StructDefinition[]): SlotsAndE
       for (const member of members) {
           if (member.isMapping || member.isArray) {
               for(var i = 0; i < 10; i++) {
-                  EDFS.push(`${member.name}[${i}]`);
-                  slots[`${member.name}[${i}]`] = member.calculateSlotId(i);
+                  EDFS.push(`${member.getEDFS()}[${i}]`);
+                  slots[`${member.getEDFS()}[${i}]`] = member.calculateSlotId(i);
               }
           } else {
-            EDFS.push(`${member.name}`);
+            EDFS.push(`${member.getEDFS()}`);
             slots[`${member.name}`] = member.calculateSlotId();
           }
       }
