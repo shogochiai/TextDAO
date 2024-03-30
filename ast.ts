@@ -125,15 +125,15 @@ export class StructMember {
                     const mappingSlot = calculateMappingSlot(key, parentSlotId + this.index);
                     return mappingSlot;
                 } else {
-                    const slotId = parentSlotId + this.index;
-                    this.slotId = slotId; // Cache the calculated slotId
-                    return slotId;
+                    const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16);
+                    this.slotId = slotIdHex; // Cache the calculated slotId
+                    return slotIdHex;
                 }
             } else {
                 // Calculate slot ID based on parent's slot ID and member index
-                const slotId = parentSlotId + this.index;
-                this.slotId = slotId; // Cache the calculated slotId
-                return slotId;
+                const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16);
+                this.slotId = slotIdHex; // Cache the calculated slotId
+                return slotIdHex;
             }
         } else if (this.parent === null) {
             // This is the root StructDefinition

@@ -18,6 +18,7 @@ export async function extractStorage(network: string, contractAddress: string, s
         resultArray.push(resultString);
     }
     for (let i = 0; i < slotIds.length; i++) {
+        console.log(slotIds[i].slice(0, 7), (slotIds[i].length-2)/2);
         extractedSlots[slotIds[i]] = resultArray[i];
     }
 
@@ -30,7 +31,6 @@ function constructCalldata(slots: string[]): string {
     for (const slot of slots) {
       // Remove the "0x" prefix if present
       let location = slot.replace(/^0x/, "");
-      location = location.slice(0, -4);
   
       // Ensure the length is 64 characters (32 bytes)
       if (location.length < 64) {
