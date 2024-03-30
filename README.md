@@ -16,7 +16,7 @@
 
 ## How to start
 - TDD with `forge test`
-- Run `anvil`
+- Run `anvil --chain-id 1`
 - Prepare `.env`
 - `forge script script/Deployment.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`
 - `forge script script/Filler.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`

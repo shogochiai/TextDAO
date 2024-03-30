@@ -11,7 +11,15 @@ export async function extractStorage(network: string, contractAddress: string, s
     const extractedSlots: { [key: string]: string } = {};
 
     const results:any = await ethCallWithCodeOverride(network, contractAddress, constructCalldata(slotIds), CONTRACT_CODE);
-    console.log(results);
+
+    const resultArray: string[] = [];
+    for (const result of results) {
+        const resultString = result.toString(16).padStart(64, '0');
+        resultArray.push(resultString);
+    }
+    for (let i = 0; i < slotIds.length; i++) {
+        extractedSlots[slotIds[i]] = resultArray[i];
+    }
 
     return extractedSlots;
 }

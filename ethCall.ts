@@ -9,8 +9,10 @@ interface Data {
 
 function getChainList(): { [key:string]: number } {
     const filePath = path.join(__dirname, 'chainIds.json');
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(fileContent);
+    const fileContent = fs.readFileSync(filePath, 'utf-8')
+    const idToNetwork = JSON.parse(fileContent);
+    const networkToId = Object.fromEntries(Object.entries(idToNetwork).map(([k, v]) => [v, k]));
+    return networkToId;
 }
 const chainList = getChainList();
 
@@ -25,23 +27,27 @@ export async function ethCallWithCodeOverride(
     data: string,
     contractCode: string
 ): Promise<any> {
-  const payload = {
+  let overrides = {};
+  overrides[`${contractAddress}`] = { code: contractCode };
+
+  const gasPrice = '0x45c77'; // got by gasEstimation 
+
+  let payload:any = {
     jsonrpc: '2.0',
     method: 'eth_call',
     params: [
       {
         to: contractAddress,
         data,
-        gas: '0x0',
-        gasPrice: '0x9184e72a000',
+        gas: '0x4C4B40', // 5,000,000 gas (less than block gas limit)
+        gasPrice,
         value: '0x0',
       },
-      'latest', // or any other block number or tag
-      // { code: contractCode } // stateOverride parameter
+      'latest' // or any other block number or tag
     ],
     id: chainList[network],
   };
-
+  payload.params.push(overrides);
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -51,7 +57,7 @@ export async function ethCallWithCodeOverride(
     body: JSON.stringify(payload),
   });
 
-  const res = await response.json();
-  console.log(res);
-  return res.result;
+  const responseBody:any = await response.text();
+
+  return JSON.parse(responseBody).result;
 }
