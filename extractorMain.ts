@@ -21,7 +21,7 @@ const INPUT_DATA: InputData = {
 
 (async () => {
   const storage = await getStorage(INPUT_DATA);
-  console.log(storage);
+  // console.log(Object.keys(storage).join("\n"));
 })();
 
 
@@ -30,6 +30,7 @@ async function getStorage(inputData: InputData): Promise<{ [key: string]: SlotKV
   const reader = new ASTReader();
   const sourceUnits = reader.read(result.data);  
   const slotsAndEDFS:SlotsAndEDFS = calculateSlots(sortStructsByParentChild(sourceUnits[0].vContracts[0].raw.nodes));
+
   const storage: { [key: string]: SlotKV } = await extractStorage(inputData.network, inputData.contractAddress, slotsAndEDFS);
   return storage;
 }

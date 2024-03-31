@@ -24,46 +24,28 @@ export interface SlotsAndEDFS {
 }
 
 export function calculateSlots(structDefinitions: StructDefinition[]): SlotsAndEDFS {
-      const slots: { [key: string]: string } = {};
-      const members: StructMember[] = [];
-      const EDFS: string[] = [];
-  
-      for (const structDefinition of structDefinitions) {
-          members.push(...collectMembers(structDefinition));
-      }
-  
-      for (const member of members) {
-          if (member.isMapping || member.isArray) {
-              for(var i = 0; i < 10; i++) {
-                  EDFS.push(`${member.getEDFS()}[${i}]`);
-                  slots[`${member.getEDFS()}[${i}]`] = member.calculateSlotId(i);
-              }
-          } else {
+    const slots: { [key: string]: string } = {};
+    let members: StructMember[] = [];
+    const EDFS: string[] = [];
+
+    for (const structDefinition of structDefinitions) {
+        members.push(...structDefinition.members);
+    }
+
+    // Note: Temporary remove malformed member's parent definition
+    members = members.filter(member => !!member.parent.parent);
+
+    for (const member of members) {
+        if (member.isMapping || member.isArray) {
+            for(var i = 0; i < 10; i++) {
+                EDFS.push(`${member.getEDFS()}[${i}]`);
+                slots[`${member.getEDFS()}[${i}]`] = member.calculateSlotId(i);
+            }
+        } else {
             EDFS.push(`${member.getEDFS()}`);
             slots[`${member.name}`] = member.calculateSlotId();
-          }
-      }
-        
-      return <SlotsAndEDFS>{ slots, EDFS };
-  }
-  
-  function collectMembers(structDefinition: StructDefinition | StructMember): StructMember[] {
-      const members: StructMember[] = [];
-      let targets: StructMember[];
-  
-      if ((<any>structDefinition).children) {
-          targets = (<any>structDefinition).children;
-      } else {
-          targets = (<any>structDefinition).members;
-      }
-  
-      for (const member of targets) {
-          members.push(<StructMember>member);
-  
-          if ((<StructMember>member).children) {
-              members.push(...collectMembers(<StructMember>member));
-          }
-      }
-  
-      return members;
-  }
+        }
+    }
+
+    return <SlotsAndEDFS>{ slots, EDFS };
+}

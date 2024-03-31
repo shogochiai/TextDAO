@@ -20,14 +20,13 @@ const baseSlots = new BaseSlots({
 export class StructMember {
     name: string;
     type: string;
-    index: number;
+    index: number; // as struct member
     isMapping: boolean;
     isArray: boolean;
     keyType: string | null;
     valueType: StructMember | null;
     slotId: string | null;
     parent: StructDefinition | null;
-    children: StructMember[] | null;
 
     constructor(name: string, type: string, index: number, parent: StructDefinition | null) {
         this.name = name;
@@ -39,7 +38,6 @@ export class StructMember {
         this.valueType = null;
         this.slotId = null;
         this.parent = parent;
-        this.children = null;
     }
 
     static fromASTNode(node: any, index:number, parent: StructDefinition | null): StructMember {
@@ -111,22 +109,21 @@ export class StructMember {
 
     }
 
-    calculateSlotId(key?:number | null): string {
+    calculateSlotId(mappingKey?:number | null): string {
         if (this.parent) {
             // If the parent's slotId is not calculated yet, calculate it first
             const parentSlotId = this.parent.slotId ? this.parent.slotId : this.parent.calculateSlotId();
     
             if (this.isMapping || this.isArray) {
-                if (key >= 0) {
+                if (mappingKey >= 0) {
                     if (this.valueType === null) {
                         throw new Error('Mapping value type is null');
                     }
-                    // Special rule for mappings and arrays
-                    const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16);
-                    const mappingSlot = calculateMappingSlot(key, slotIdHex);
+                    const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16); // mapping base slot as a member
+                    const mappingSlot = calculateMappingSlot(mappingKey, slotIdHex);
                     return mappingSlot;
                 } else {
-                    const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16);
+                    const slotIdHex = "0x" + (parseInt(parentSlotId, 16) + this.index).toString(16); // slot for a member
                     this.slotId = slotIdHex; // Cache the calculated slotId
                     return slotIdHex;
                 }
@@ -164,11 +161,12 @@ export class StructMember {
 
         while (currentParent !== null) {
             if (currentParent instanceof StructMember) {
-                nameHierarchy = currentParent.getTypeAndName() + " > " + nameHierarchy;
+                nameHierarchy = currentParent.getTypeAndName() + " >>> " + nameHierarchy;
                 currentParent = currentParent.parent;    
             } else {
-                nameHierarchy = `${currentParent.name} root` + " > " + nameHierarchy;
-                currentParent = null;
+                // TODO: dictDefinitionToMember will solve finding member name here
+                nameHierarchy = `${currentParent.name} _` + " >>> " + nameHierarchy;
+                currentParent = currentParent.parent;
             }
         }
 
@@ -206,11 +204,6 @@ export class StructDefinition {
     setParentForMembers() {
         this.members.forEach(member => {
             member.parent = this;
-            if (member.children) {
-                member.children.forEach(child => {
-                    child.parent = this;
-                });
-            }
         });
     }
 
@@ -243,15 +236,24 @@ export class StructDefinition {
 
 }
 
-function calculateMappingSlot(key: number, baseSlot: string): string {
-    if (key === null) {
+/*
+/// mapping hash in ERC-7201 style
+struct Data {　// baseSlot
+    uint a;
+    uint b;
+    mapping(uint=>uint) elements;// index 2 ==> keccak256(abi.encode(mappingKey, baseSlot+2))
+}
+Data data;
+*/
+function calculateMappingSlot(mappingKey: number, mappingSlotIdAsMember: string): string {
+    if (mappingKey === null) {
         throw new Error('key is null');
     }
-    if (baseSlot === null) {
+    if (mappingSlotIdAsMember === null) {
         throw new Error('baseSlot is null');
     }
-    const keyHex = new BN(key).toString(16);
-    const encoded = `0x${keyHex}${baseSlot.slice(2)}`; // Simulate abi.encodePacked
+    const mappingKeyHex = new BN(mappingKey).toString(16);
+    const encoded = `0x${mappingKeyHex}${mappingSlotIdAsMember.slice(2)}`; // Simulate abi.encodePacked
     const hash = keccak256(encoded);
     return `0x${hash}`;
 }
@@ -280,49 +282,126 @@ export function sortStructsByParentChild(structs: any[]): StructDefinition[] {
 
     // structDefinitionsWithRef.push(...rootStructDefinitions);
     return structDefinitionsWithRef;
+
+
+    // // Set ref information for all Struct Definitions
+    // // Starting from root
+    // let structDefinitionsWithRef: StructDefinition[] = [];
+    // rootStructDefinitions.map(cursorDefinition => {
+    //     structDefinitionsWithRef = dig(cursorDefinition, structMap, structDefinitionsWithRef);
+    // });
+
+    // // structDefinitionsWithRef.push(...rootStructDefinitions);
+    // return structDefinitionsWithRef;
 }
 
 
 // amend key
-// get members and copy to children
 // fill parent
-// go to children digging
+// go to member digging
 function dig(cursorDefinition: StructDefinition, structMap: { [key: string]: StructDefinition }, structDefinitionsWithRef: StructDefinition[]): StructDefinition[] {
     let childDefinition:StructDefinition | null;
+
     cursorDefinition.members.forEach(member => {    
         let tempKey;
-        let memberSlotId;
         if (member.isMapping) {
             tempKey = member.valueType.type;
         } else if (member.isArray) {
             tempKey = member.type.split("[]").length > 1 ? member.type.split("[]")[0] : member.type;
         } else {
             tempKey = member.type.split(" ").length > 1 ? member.type.split(" ")[1] : member.type;
-            tempKey = tempKey.split(".").length > 1 ? tempKey.split(".")[1] : tempKey;    
+            tempKey = tempKey.split(".").length > 1 ? tempKey.split(".")[1] : tempKey;
         }
 
+        // mapping member must be expanded to 10 items and all those must have each slotId
+
+        // Only for struct-related members
         // get corresponding definition and fill info
         if (tempKey in structMap) {
+
             childDefinition = structMap[tempKey];
-            childDefinition.parent = cursorDefinition;    
+            // cursorDefinition = structMap[extractClassName(cursorDefinition.name)];
 
-            cursorDefinition = structMap[cursorDefinition.name];
+            if (member.isMapping) {
+                // mapping element struct as a member
+                for (let mappingKey = 0; mappingKey< 10; mappingKey++) {
+                    let nthChildDefinition = deepCopy(childDefinition);
+                    nthChildDefinition.name = `${nthChildDefinition.name}[${mappingKey}]`;
+                    member.parent = cursorDefinition;
 
-            // console.log(
-            //     `${cursorDefinition.name}: ${!!cursorDefinition.parent ? cursorDefinition.parent.name : ""} => ${childDefinition.name}: ${!!childDefinition.parent ? childDefinition.parent.name : ""}`
-            // );
+                    nthChildDefinition.parent = cursorDefinition;
 
+                    const slotIdHex = "0x" + (parseInt(nthChildDefinition.parent.slotId, 16)).toString(16);
+                    const mappingMemberSlot = calculateMappingSlot(mappingKey, slotIdHex);
+
+                    nthChildDefinition.slotId = mappingMemberSlot;
+                    structDefinitionsWithRef.push(nthChildDefinition);
+                    structDefinitionsWithRef = dig(nthChildDefinition, structMap, structDefinitionsWithRef);
+                }
+            } else if (member.isArray) {
+                // struct array
+                for (let arrayIndex = 0; arrayIndex< 10; arrayIndex++) {
+                    let nthChildDefinition = deepCopy(childDefinition);
+                    nthChildDefinition.name = `${nthChildDefinition.name}[${arrayIndex}]`;
+                    member.parent = cursorDefinition;
+                    nthChildDefinition.parent = cursorDefinition;
+                    const slotIdHex = "0x" + (parseInt(nthChildDefinition.parent.slotId, 16)).toString(16);
+                    const mappingMemberSlot = calculateMappingSlot(arrayIndex, slotIdHex);
+
+                    nthChildDefinition.slotId = mappingMemberSlot;
+                    structDefinitionsWithRef.push(nthChildDefinition);
+                    structDefinitionsWithRef = dig(nthChildDefinition, structMap, structDefinitionsWithRef);
+                }
+            } else {
+                // naive struct as a member
+                member.parent = cursorDefinition;
+                childDefinition.parent = cursorDefinition;
+                childDefinition.slotId = member.calculateSlotId();
+                structDefinitionsWithRef.push(childDefinition);
+                structDefinitionsWithRef = dig(childDefinition, structMap, structDefinitionsWithRef);    
+            }
             // if root
             if (!cursorDefinition.parent) {
-                structDefinitionsWithRef.push(cursorDefinition);
+                if (!structDefinitionsWithRef.some(item => item.name === cursorDefinition.name)) {
+                    structDefinitionsWithRef.push(cursorDefinition);
+                }
             }
-            childDefinition.slotId = member.calculateSlotId(); // mapping and array are also just a member with index
-            structDefinitionsWithRef.push(childDefinition);
-            structDefinitionsWithRef = dig(childDefinition, structMap, structDefinitionsWithRef);
+
         } else {
-            // Primitive types are not struct. Don't need to check structMap.
+            // 
         }
     });
-
     return structDefinitionsWithRef;
 }
+function deepCopy<T>(obj: T, cache?: WeakMap<any, any>): T {
+    if (!cache) {
+      cache = new WeakMap();
+    }
+  
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
+  
+    // Check if the object has already been copied
+    if (cache.has(obj)) {
+      return cache.get(obj) as T;
+    }
+  
+    let copy: any;
+  
+    if (obj instanceof Array) {
+      copy = [];
+      cache.set(obj, copy);
+      copy = obj.map(item => deepCopy(item, cache));
+    } else {
+      copy = {};
+      cache.set(obj, copy);
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          copy[key] = deepCopy((obj as { [key: string]: any })[key], cache);
+        }
+      }
+    }
+  
+    return copy as T;
+  }
