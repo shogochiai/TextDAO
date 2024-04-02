@@ -8,8 +8,9 @@ import {
 import * as dotenv from "dotenv";
 import { keccak256 } from 'js-sha3';
 import * as BN from 'bn.js';
+import { extractStorage, SlotKV } from "./extractor";
 
-dotenv.config();
+dotenv.config({ path: '../.env' });
 const TEXT_DAO_ADDR = process.env.TEXT_DAO_ADDR || "";
 
 interface InputData {
@@ -404,10 +405,12 @@ function regexpStruct(str: string): string[] {
   }
 }
 
-function logResult() {
+const loggerFlag: boolean = false;
+function logResult(): { [key: string]: SlotKV } {
   const uniqueAObjects = new Map();
   const uniqueBObjects = new Map();
   const uniqueCObjects = new Map();
+  const edfsToSlotKV: { [key: string]: SlotKV } = {};
 
   global.ResultStructs.forEach((a) => {
     const aKey = a.name;
@@ -421,7 +424,12 @@ function logResult() {
     }
 
     if (a.slot) {
-      console.log(`${a.name}: ${a.slot}`);
+      if (loggerFlag) console.log(`${a.name}: ${a.slot}`);
+      edfsToSlotKV[aKey] = {
+        EDFS: aKey,
+        slotId: a.slot,
+        value: "", // Set the value property to an empty string or any appropriate default value
+      };
     }
 
     a.members.forEach((b) => {
@@ -430,11 +438,21 @@ function logResult() {
         const existingB = uniqueBObjects.get(bKey);
         if (isMoreContentful(b, existingB)) {
           uniqueBObjects.set(bKey, b);
-          console.log(`${bKey}: ${b.slot}`);
+          if (loggerFlag) console.log(`${bKey}: ${b.slot}`);
+          edfsToSlotKV[bKey] = {
+            EDFS: bKey,
+            slotId: b.slot,
+            value: "", // Set the value property to an empty string or any appropriate default value
+          };
         }
       } else {
         uniqueBObjects.set(bKey, b);
-        console.log(`${bKey}: ${b.slot}`);
+        if (loggerFlag) console.log(`${bKey}: ${b.slot}`);
+        edfsToSlotKV[bKey] = {
+          EDFS: bKey,
+          slotId: b.slot,
+          value: "", // Set the value property to an empty string or any appropriate default value
+        };
       }
 
       if (b.iter) {
@@ -444,16 +462,28 @@ function logResult() {
             const existingC = uniqueCObjects.get(cKey);
             if (isMoreContentful(c, existingC)) {
               uniqueCObjects.set(cKey, c);
+              edfsToSlotKV[cKey] = {
+                EDFS: cKey,
+                slotId: c.slot,
+                value: "", // Set the value property to an empty string or any appropriate default value
+              };
             }
           } else {
             uniqueCObjects.set(cKey, c);
+            edfsToSlotKV[cKey] = {
+              EDFS: cKey,
+              slotId: c.slot,
+              value: "", // Set the value property to an empty string or any appropriate default value
+            };
           }
 
-          console.log(`${cKey}: ${c.slot}`);
+          if (loggerFlag) console.log(`${cKey}: ${c.slot}`);
         });
       }
     });
   });
+
+  return edfsToSlotKV;
 }
 
 function isMoreContentful(obj1, obj2) {
@@ -463,31 +493,34 @@ function isMoreContentful(obj1, obj2) {
 }
 
 function simplifyObject(obj) {
-  const simplified = {};
+    const simplified = {};
+  
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const value = obj[key];
+  
+        if (key === 'belongsTo' || key === 'parent') {
+          // Exclude circular reference properties
+          continue;
+        }
+   
+        if (Array.isArray(value)) {
+          simplified[key] = value.map(simplifyObject);
+        } else if (typeof value === 'object' && value !== null) {
+          simplified[key] = simplifyObject(value);
+        } else {
+          simplified[key] = value;
+         }
+       }
+     }
+  
+    return simplified;
+   }
 
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      const value = obj[key];
-
-      if (key === 'belongsTo' || key === 'parent') {
-        // Exclude circular reference properties
-        continue;
-      }
-
-      if (Array.isArray(value)) {
-        simplified[key] = value.map(simplifyObject);
-      } else if (typeof value === 'object' && value !== null) {
-        simplified[key] = simplifyObject(value);
-      } else {
-        simplified[key] = value;
-      }
-    }
-  }
-
-  return simplified;
-}
 
 (async () => {
   await execute(INPUT_DATA);
-  logResult();
+  const slotKVs: { [key: string]: SlotKV } = logResult();
+  const filledSlotKVs:{ [key: string]: SlotKV } = await extractStorage(INPUT_DATA.network, INPUT_DATA.contractAddress, slotKVs);
+  console.log(filledSlotKVs);
 })().catch(e=>{ console.error(e) });
