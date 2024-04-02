@@ -111,7 +111,7 @@ class Member {
     return slotIdHex;
   }
 
-  next(mappingKey?: string | null): StructDefinition | null {
+  next(): StructDefinition | null {
     if (this.typeKind === TypeKind.NaiveStruct) {
       for (const struct of global.ResultStructs) {
         if (struct.name === this.valueType) {
@@ -135,11 +135,6 @@ class Member {
           global.ResultStructs.push(newStruct);
           return newStruct;
         }
-      }
-    } else if (this.typeKind === TypeKind.Array || this.typeKind === TypeKind.Mapping) {
-      if (this.iter) {
-        const item = this.iter.items[mappingKey];
-        return item.next();
       }
     }
     return null;
@@ -212,6 +207,33 @@ class Member {
 
     return member;
   }
+
+  getEDFS(): string {
+    let nameHierarchy = this.getTypeAndName();
+    let currentParent: Member | StructDefinition = this.belongsTo;
+
+    while (currentParent !== null) {
+      if (currentParent instanceof Member) {
+        nameHierarchy = currentParent.getTypeAndName() + " >>> " + nameHierarchy;
+        currentParent = currentParent.belongsTo;
+      } else {
+        // TODO: dictDefinitionToMember will solve finding member name here
+        if (currentParent.parent){
+          // nameHierarchy = `${currentParent.parent.valueType} ${currentParent.parent.name}` + " >>> " + nameHierarchy;
+          currentParent = currentParent.parent;  
+        } else {
+          nameHierarchy = `${currentParent.name} _` + " >>> " + nameHierarchy;
+          currentParent = null;  
+        }
+      }
+    }
+
+    return nameHierarchy;
+  }
+
+  getTypeAndName(): string {
+    return `${this.valueType} ${this.name}`;
+  }
 }
 
 class IteratorMeta {
@@ -248,7 +270,7 @@ class IteratorItem extends Member {
   next(): StructDefinition | null {
     if (this.typeKind === TypeKind.NaiveStruct) {
       for (const struct of global.ResultStructs) {
-        if (struct.name === this.valueType) {
+        if (struct.name === this.valueType && struct.parent.mappingKey === this.mappingKey) {
           return struct;
         }
       }
@@ -272,6 +294,33 @@ class IteratorItem extends Member {
       }
     }
     return null;
+  }
+
+  getEDFS(): string {
+    let nameHierarchy = this.getTypeAndName();
+    let currentParent: Member | StructDefinition = this.belongsTo;
+
+    while (currentParent !== null) {
+      if (currentParent instanceof Member) {
+        nameHierarchy = currentParent.getTypeAndName() + " >>> " + nameHierarchy;
+        currentParent = currentParent.belongsTo;
+      } else {
+        // TODO: dictDefinitionToMember will solve finding member name here
+        if (currentParent.parent){
+          nameHierarchy = `${currentParent.parent.valueType} ${currentParent.parent.name}` + " >>> " + nameHierarchy;
+          currentParent = currentParent.parent;  
+        } else {
+          nameHierarchy = `${currentParent.name} _` + " >>> " + nameHierarchy;
+          currentParent = null;  
+        }
+      }
+    }
+
+    return nameHierarchy;
+  }
+
+  getTypeAndName(): string {
+    return `${this.valueType} ${this.name}`;
   }
 
 
@@ -357,5 +406,17 @@ function regexpStruct(str: string): string[] {
 
 (async () => {
   await execute(INPUT_DATA);
-  console.log(global.ResultStructs);
+  global.ResultStructs.forEach(a=>{
+    if (a.slot) {
+      console.log(`${a.name}: ${a.slot}`);
+    }
+    a.members.map(b=>{
+      if (b.iter) {
+        b.iter.items.map(c=>{
+          console.log(`${c.getEDFS()}: ${c.slot}`);
+        })
+      }
+      console.log(`${b.getEDFS()}: ${b.slot}`);
+    });
+  })
 })().catch(e=>{ console.error(e) });
