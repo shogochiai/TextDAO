@@ -404,19 +404,90 @@ function regexpStruct(str: string): string[] {
   }
 }
 
-(async () => {
-  await execute(INPUT_DATA);
-  global.ResultStructs.forEach(a=>{
+function logResult() {
+  const uniqueAObjects = new Map();
+  const uniqueBObjects = new Map();
+  const uniqueCObjects = new Map();
+
+  global.ResultStructs.forEach((a) => {
+    const aKey = a.name;
+    if (uniqueAObjects.has(aKey)) {
+      const existingA = uniqueAObjects.get(aKey);
+      if (isMoreContentful(a, existingA)) {
+        uniqueAObjects.set(aKey, a);
+      }
+    } else {
+      uniqueAObjects.set(aKey, a);
+    }
+
     if (a.slot) {
       console.log(`${a.name}: ${a.slot}`);
     }
-    a.members.map(b=>{
-      if (b.iter) {
-        b.iter.items.map(c=>{
-          console.log(`${c.getEDFS()}: ${c.slot}`);
-        })
+
+    a.members.forEach((b) => {
+      const bKey = b.getEDFS();
+      if (uniqueBObjects.has(bKey)) {
+        const existingB = uniqueBObjects.get(bKey);
+        if (isMoreContentful(b, existingB)) {
+          uniqueBObjects.set(bKey, b);
+          console.log(`${bKey}: ${b.slot}`);
+        }
+      } else {
+        uniqueBObjects.set(bKey, b);
+        console.log(`${bKey}: ${b.slot}`);
       }
-      console.log(`${b.getEDFS()}: ${b.slot}`);
+
+      if (b.iter) {
+        b.iter.items.forEach((c) => {
+          const cKey = c.getEDFS();
+          if (uniqueCObjects.has(cKey)) {
+            const existingC = uniqueCObjects.get(cKey);
+            if (isMoreContentful(c, existingC)) {
+              uniqueCObjects.set(cKey, c);
+            }
+          } else {
+            uniqueCObjects.set(cKey, c);
+          }
+
+          console.log(`${cKey}: ${c.slot}`);
+        });
+      }
     });
-  })
+  });
+}
+
+function isMoreContentful(obj1, obj2) {
+  const simplified1 = simplifyObject(obj1);
+  const simplified2 = simplifyObject(obj2);
+  return JSON.stringify(simplified1).length > JSON.stringify(simplified2).length;
+}
+
+function simplifyObject(obj) {
+  const simplified = {};
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key];
+
+      if (key === 'belongsTo' || key === 'parent') {
+        // Exclude circular reference properties
+        continue;
+      }
+
+      if (Array.isArray(value)) {
+        simplified[key] = value.map(simplifyObject);
+      } else if (typeof value === 'object' && value !== null) {
+        simplified[key] = simplifyObject(value);
+      } else {
+        simplified[key] = value;
+      }
+    }
+  }
+
+  return simplified;
+}
+
+(async () => {
+  await execute(INPUT_DATA);
+  logResult();
 })().catch(e=>{ console.error(e) });
