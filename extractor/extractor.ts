@@ -32,8 +32,8 @@ export async function extractStorage(
     batches.push(slots.slice(i, i + batchSize));
   }
 
-  const extractedSlots: { [key: string]: SlotKV } = {};
 
+  const extractedSlots: { [key: string]: SlotKV } = {};
   for (const batch of batches) {
       const _calldata = constructCalldata(batch);
       if (_calldata.length > 379010 /* We knew this number from experiments */) {
@@ -56,19 +56,48 @@ export async function extractStorage(
         const slotId = batch[i];
 
         // TODO: squashing DO happens because intermediate-unused node must be squashed.
-        const matchedSlotKV_EDFS: string = Object.keys(slotKVs).find(
-          (keyEDFS) => {
-            return slotKVs[keyEDFS].slotId === slotId;
-          }            
-        );
+        const matchedSlotKVs = {}; 
+        Object.keys(slotKVs)
+          .filter(slotKVKey=> slotKVs[slotKVKey].slotId === slotId )
+          .map(slotKVKey=>{
+            matchedSlotKVs[slotKVKey] = {};
+            const edfsPath = slotKVKey.split(" >>> ");
+            const lastNode = edfsPath[edfsPath.length - 1];
+            const isIteratorItem: boolean = lastNode.includes("[");
+            const isNonIteratorStruct:boolean = regexpStruct(lastNode)[0].charAt(0) === regexpStruct(lastNode)[0].charAt(0).toUpperCase();
+            if (isIteratorItem) {
+              matchedSlotKVs[slotKVKey]["1st"] = slotKVKey;
+            } else if (isNonIteratorStruct) {
+              matchedSlotKVs[slotKVKey]["2nd"] = slotKVKey;
+            } else {
+              matchedSlotKVs[slotKVKey]["other"] = slotKVKey;
+            }
+            return slotKVKey;
+          })
+          .map(slotKVKey=>{
+            if (matchedSlotKVs[slotKVKey]["1st"]) {
+              extractedSlots[matchedSlotKVs[slotKVKey]["1st"]] = {
+                EDFS: matchedSlotKVs[slotKVKey]["1st"],
+                slotId,
+                value: resultArray[i],
+              };
+            } else if (matchedSlotKVs[slotKVKey]["2nd"]) {
+              extractedSlots[matchedSlotKVs[slotKVKey]["2nd"]] = {
+                EDFS: matchedSlotKVs[slotKVKey]["2nd"],
+                slotId,
+                value: resultArray[i],
+              };
+            } else if (matchedSlotKVs[slotKVKey]["other"]) {
+              extractedSlots[matchedSlotKVs[slotKVKey]["other"]] = {
+                EDFS: matchedSlotKVs[slotKVKey]["other"],
+                slotId,
+                value: resultArray[i],
+              };
+            } else {
+              throw new Error("No slot match.");
+            }
+          })
 
-        if (matchedSlotKV_EDFS) {
-          extractedSlots[matchedSlotKV_EDFS] = {
-            EDFS: matchedSlotKV_EDFS,
-            slotId,
-            value: resultArray[i],
-          };
-        }
       }
       if (batch !== batches[batches.length - 1]) {
         await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds before the next call
@@ -102,4 +131,14 @@ function constructCalldata(slots: string[]): string {
   }
 
   return calldata;
+}
+
+export function regexpStruct(str: string): string[] {
+  if (!str) throw new Error("Empty input to regexpStruct");
+  let matched = str.match(/^struct\s+\w+\.(\w+)/)?.slice(1, 3);
+  if (matched) {
+    return matched;
+  } else {
+    return [str];
+  }
 }

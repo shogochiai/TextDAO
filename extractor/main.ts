@@ -12,7 +12,7 @@ import * as fs from 'fs';
 import * as dotenv from "dotenv";
 import { keccak256 } from 'js-sha3';
 import * as BN from 'bn.js';
-import { extractStorage, SlotKV } from "./extractor";
+import { extractStorage, SlotKV, regexpStruct } from "./extractor";
 import * as path from 'path';
 const rootPath: string = path.resolve(__dirname + "/..");
 dotenv.config({ path: `${rootPath}/.env` });
@@ -447,15 +447,6 @@ function calculateMappingSlot(mappingKey: number, mappingSlotIdAsMember: string)
   return `0x${hash}`;
 }
 
-function regexpStruct(str: string): string[] {
-  if (!str) throw new Error("Empty input to regexpStruct");
-  let matched = str.match(/^struct\s+\w+\.(\w+)/)?.slice(1, 3);
-  if (matched) {
-    return matched;
-  } else {
-    return [str];
-  }
-}
 
 const loggerFlag: boolean = false;
 const loggerCond1: string = "proposals[2";
@@ -577,8 +568,7 @@ function simplifyObject(obj) {
   const slotKVs: { [key: string]: SlotKV } = logResult();
 
   const extractedSlots:{ [key: string]: SlotKV } = await extractStorage(INPUT_DATA.network, INPUT_DATA.contractAddress, slotKVs);
-
-  // Object.keys(extractedSlots).map(a=>{
-  //   console.log(`${extractedSlots[a].EDFS}: ${extractedSlots[a].EDFS.split("[").length - 1}`);    
-  // })
+  Object.keys(extractedSlots).map(a=>{
+    console.log(`${extractedSlots[a].EDFS}: ${extractedSlots[a].EDFS.split("[").length - 1} - ${extractedSlots[a].slotId} = ${extractedSlots[a].value}`);    
+  })
 })().catch(e=>{ console.error(e) });
