@@ -4,25 +4,36 @@ import {
   CompileResult,
   compileSol,
   ASTReader,
+  PathOptions,
+  VariableDeclaration,
+  assert
 } from "solc-typed-ast";
+import * as fs from 'fs';
 import * as dotenv from "dotenv";
 import { keccak256 } from 'js-sha3';
 import * as BN from 'bn.js';
 import { extractStorage, SlotKV } from "./extractor";
+import * as path from 'path';
+const rootPath: string = path.resolve(__dirname + "/..");
+dotenv.config({ path: `${rootPath}/.env` });
 
-dotenv.config({ path: '../.env' });
+
+
+
 const TEXT_DAO_ADDR = process.env.TEXT_DAO_ADDR || "";
 
 interface InputData {
   network: string;
   contractAddress: string;
   schemaPath: string;
+  storagePath: string;
 }
 
 const INPUT_DATA: InputData = {
   network: "ethereum",
   contractAddress: TEXT_DAO_ADDR,
-  schemaPath: "../src/textdao/storages/Schema.sol",
+  schemaPath: `${rootPath}/src/textdao/storages/Schema.sol`,
+  storagePath: `${rootPath}/src/_utils/Constants.sol`,
 };
 
 
@@ -95,30 +106,28 @@ class Member {
 
   calculateSlot(): string {
     let parentSlotId = this.belongsTo.slot;
-    if (this.belongsTo instanceof StructDefinition && parentSlotId === null) {
-      // member-structDef->member reference
+    
+    if (this.belongsTo instanceof StructDefinition && this.belongsTo.parent instanceof IteratorItem) {
+      // If the effective-prev is an IteratorItem (array element), use its slot ID directly
+      parentSlotId = this.belongsTo.parent.slot;
+    } else if (this.belongsTo instanceof StructDefinition && parentSlotId === null) {
       let parentMember:Member = this.belongsTo.prev();
       if (parentMember === null) {
         throw new Error(`No prev() with the parent ${this.belongsTo.name}`);
       }
-  
       parentSlotId = parentMember.slot;
     }
+    
     if (parentSlotId === null) {
       throw new Error('Parent slot ID is null');
     }
-
+    
     const slotIdHex = "0x" + new BN(parentSlotId.slice(2), 16).add(new BN(this.structIndex)).toString(16);
     return slotIdHex;
   }
 
   next(): StructDefinition | null {
     if (this.typeKind === TypeKind.NaiveStruct) {
-      for (const struct of global.ResultStructs) {
-        if (struct.name === this.valueType) {
-          return struct;
-        }
-      }
 
       for (const node of global.AstNode) {
         if (node.nodeType === 'StructDefinition' && node.name === this.valueType) {
@@ -195,7 +204,7 @@ class Member {
       } else {
         iterTypeKind = TypeKind.Primitive;
       }
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 2; i++) {
         let newItem = new IteratorItem(`${member.name}[${i}]`, iterTypeKind, valueTypeStr, index, "", member, `${i}`);
         newItem.slot = newItem.calculateSlot();
         items.push(newItem);
@@ -218,9 +227,8 @@ class Member {
         nameHierarchy = currentParent.getTypeAndName() + " >>> " + nameHierarchy;
         currentParent = currentParent.belongsTo;
       } else {
-        // TODO: dictDefinitionToMember will solve finding member name here
         if (currentParent.parent){
-          // nameHierarchy = `${currentParent.parent.valueType} ${currentParent.parent.name}` + " >>> " + nameHierarchy;
+          // SkipStructDefinition with parent
           currentParent = currentParent.parent;  
         } else {
           nameHierarchy = `${currentParent.name} _` + " >>> " + nameHierarchy;
@@ -254,6 +262,7 @@ class IteratorItem extends Member {
     super(name, typeKind, valueType, structIndex, slot, belongsTo, null);
   }
 
+  // Bug: prop[0].slotId and prop[1].slotId are conflicting.
   calculateSlot(): string {
     const parentSlotId = this.belongsTo.slot;
     if (parentSlotId === null || this.mappingKey === null) {
@@ -267,28 +276,44 @@ class IteratorItem extends Member {
   // 1. Create new StructDefinition on-the-fly with AstNode global variable and register that StructDefinition to StructDefinitionDictionary global variable.
   // 2. Calculate all members's slotId and all iterItems' slotId on-the-fly and memo-nize it to corresponding members' or items' slotId field.
   // 3. Return the newly createdStructDefinition
-  // TODO: Implement creation of new StructDefinition based on the valueType
   next(): StructDefinition | null {
     if (this.typeKind === TypeKind.NaiveStruct) {
-      for (const struct of global.ResultStructs) {
-        if (struct.name === this.valueType && struct.parent.mappingKey === this.mappingKey) {
-          return struct;
-        }
-      }
-
       for (const node of global.AstNode) {
         if (node.nodeType === 'StructDefinition' && node.name === this.valueType) {
           const newStruct = new StructDefinition(node.name, null);
           newStruct.parent = this;
-          newStruct.members = node.members.map((member: any, index: number) => Member.fromASTNode(member, index, newStruct));
+  
+          // Get the parent IteratorItem's mappingKey
+          let parentMappingKey = null;
+          if (this.belongsTo instanceof IteratorItem) {
+            parentMappingKey = this.belongsTo.mappingKey;
+          }
+  
+          newStruct.members = node.members.map((member: any, index: number) => {
+            const newMember = Member.fromASTNode(member, index, newStruct);
+  
+            // If the parent has a mappingKey, update the member's name to include it
+            if (parentMappingKey !== null) {
+              newMember.name = newMember.name.replace(/\[\d+\]/, `[${parentMappingKey}]`);
+            }
+  
+            return newMember;
+          });
+  
           newStruct.members.forEach((member) => {
             member.slot = member.calculateSlot();
             if (member.iter) {
               member.iter.items.forEach((item) => {
                 item.slot = item.calculateSlot();
+  
+                // If the parent has a mappingKey, update the item's name to include it
+                if (parentMappingKey !== null) {
+                  item.name = item.name.replace(/\[\d+\]/, `[${parentMappingKey}]`);
+                }
               });
             }
           });
+  
           global.ResultStructs.push(newStruct);
           return newStruct;
         }
@@ -302,20 +327,25 @@ class IteratorItem extends Member {
     let currentParent: Member | StructDefinition = this.belongsTo;
 
     while (currentParent !== null) {
-      if (currentParent instanceof Member) {
+      if (currentParent instanceof IteratorItem) {
+        nameHierarchy = currentParent.getTypeAndName() + " >>> " + nameHierarchy;
+        currentParent = (<Member>currentParent.belongsTo);
+      } else if (currentParent instanceof Member) {
         nameHierarchy = currentParent.getTypeAndName() + " >>> " + nameHierarchy;
         currentParent = currentParent.belongsTo;
-      } else {
-        // TODO: dictDefinitionToMember will solve finding member name here
+      } else if (currentParent instanceof StructDefinition) {
         if (currentParent.parent){
-          nameHierarchy = `${currentParent.parent.valueType} ${currentParent.parent.name}` + " >>> " + nameHierarchy;
-          currentParent = currentParent.parent;  
+          let structAsMember = currentParent.parent;
+          // skip adding StructDefinition data to hierarchy
+          currentParent = currentParent.parent; // member
         } else {
           nameHierarchy = `${currentParent.name} _` + " >>> " + nameHierarchy;
           currentParent = null;  
         }
+      } else {
       }
     }
+    // console.log(nameHierarchy);
 
     return nameHierarchy;
   }
@@ -330,34 +360,56 @@ class IteratorItem extends Member {
 
 
 async function execute(inputData: InputData): Promise<void> {
+  let remappingStrs = fs.readFileSync(`${rootPath}/remappings.txt`).toString().split("\n");
   const result: CompileResult = await compileSol(inputData.schemaPath, "auto");
+  const baseSlotResult: CompileResult = await compileSol(inputData.storagePath, "auto", <PathOptions>{ remapping: remappingStrs });
+  
   const reader = new ASTReader();
   const sourceUnits = reader.read(result.data);
+
+  const baseSlotReader = new ASTReader();
+  const baseSlotSourceUnits = baseSlotReader.read(baseSlotResult.data);
+  
+  let baaeSlotObjects = baseSlotSourceUnits[0].children[1].children;
+  let baseSlots = baaeSlotObjects.map(obj=>{
+    if (obj instanceof VariableDeclaration) {
+      return obj.raw.value.value;
+    }
+  });
+  baseSlots = baseSlots.filter(slot => slot);
+  // console.log(baseSlots);
+
   global.AstNode = sourceUnits[0].vContracts[0].raw.nodes;
   global.ResultStructs = [];
   
-  const RootStructs: StructDefinition[] = [
-    new StructDefinition(
-      "ProposeStorage",
-      "0xf1a4d8eab6724b783b75a5c8d6b4a5edac1afaa52adaa7d3c57201451ce8c400"
-    ),
-    new StructDefinition(
-      "TextSaveProtectedStorage",
-      "0x0a45678f7ac13226a0ead4e3b54db0ab263e1a30cc1ea3f19d7212aea5cd1d00"
-    ),
-    new StructDefinition(
-      "MemberJoinProtectedStorage",
-      "0x2f8cab7d49dc616a0e8eb4e6f8b67d31c656445bf0c9ad5e38bc38d1128dcc00"
-    ),
-    new StructDefinition(
-      "VRFStorage",
-      "0x67f28ff67f7d7020f2b2ac7c9bd5f2a6dd9f19a9b15d92c4070c4572728ab000"
-    ),
-    new StructDefinition(
-      "ConfigOverrideStorage",
-      "0x531151f4103280746205c56419d2c949e0976d9ee39d3c364618181eba5ee500"
-    ),
-  ];
+  // TODO: Check order and correspondence of definitions
+  const RootStructs: StructDefinition[] = [];
+  for (const node of global.AstNode) {
+    if (node.nodeType === 'StructDefinition' && node.documentation && node.documentation.text.includes("@custom:storage-location erc7201:")) {
+      const struct = new StructDefinition(node.name, baseSlots.shift() || null);
+      RootStructs.push(struct);
+    } else if (node.nodeType === 'StructDefinition' && node.documentation && node.documentation.text.includes("@custom:indexer-dsl erc7546:")) {
+      /*
+        [Natspec]
+          @custom:indexer-dsl erc7546:method(EDFS, anotherMethodOutput)
+        [Methods]
+          setIteration(ProposeStorage.proposals, ProposeStorage.nextProposalId)
+          setIteration(ProposeStorage.proposals[i].headers, ProposeStorage.proposals[i].headers.length)
+          setUintKey(ConfigOverrideStorage.overrides, ConfigOverrideStorage.bytes4SigList)
+        [Notes]
+          A dynamic iterable without no setIteration causes runtime error in indexer.
+          An UintKey-less address or bytes mappings cause runtime error in indexer.
+      */
+
+    }
+  }
+
+  for (const node of global.AstNode) {
+    if (node.nodeType === 'StructDefinition' && node.documentation && node.documentation.text.includes("@custom:indexer-dsl erc7546:iteratorLength=")) {
+      // get DSL and set meta const
+    }
+  }
+
 
   RootStructs.forEach((rootStruct) => {
     global.ResultStructs.push(rootStruct);
@@ -406,6 +458,8 @@ function regexpStruct(str: string): string[] {
 }
 
 const loggerFlag: boolean = false;
+const loggerCond1: string = "proposals[2";
+const loggerCond2: string = "tagIds[";
 function logResult(): { [key: string]: SlotKV } {
   const uniqueAObjects = new Map();
   const uniqueBObjects = new Map();
@@ -424,7 +478,7 @@ function logResult(): { [key: string]: SlotKV } {
     }
 
     if (a.slot) {
-      if (loggerFlag) console.log(`${a.name}: ${a.slot}`);
+      if (loggerFlag && a.name.includes(loggerCond1) && a.name.includes(loggerCond2)) console.log(`${a.name}: ${a.slot}`);
       edfsToSlotKV[aKey] = {
         EDFS: aKey,
         slotId: a.slot,
@@ -447,7 +501,7 @@ function logResult(): { [key: string]: SlotKV } {
         }
       } else {
         uniqueBObjects.set(bKey, b);
-        if (loggerFlag) console.log(`${bKey}: ${b.slot}`);
+        if (loggerFlag && bKey.includes(loggerCond1) && bKey.includes(loggerCond2)) console.log(`${bKey}: ${b.slot}`);
         edfsToSlotKV[bKey] = {
           EDFS: bKey,
           slotId: b.slot,
@@ -477,7 +531,7 @@ function logResult(): { [key: string]: SlotKV } {
             };
           }
 
-          if (loggerFlag) console.log(`${cKey}: ${c.slot}`);
+          if (loggerFlag && cKey.includes(loggerCond1) && cKey.includes(loggerCond2)) console.log(`${cKey}: ${c.slot}`);
         });
       }
     });
@@ -521,6 +575,10 @@ function simplifyObject(obj) {
 (async () => {
   await execute(INPUT_DATA);
   const slotKVs: { [key: string]: SlotKV } = logResult();
-  const filledSlotKVs:{ [key: string]: SlotKV } = await extractStorage(INPUT_DATA.network, INPUT_DATA.contractAddress, slotKVs);
-  console.log(filledSlotKVs);
+
+  const extractedSlots:{ [key: string]: SlotKV } = await extractStorage(INPUT_DATA.network, INPUT_DATA.contractAddress, slotKVs);
+
+  // Object.keys(extractedSlots).map(a=>{
+  //   console.log(`${extractedSlots[a].EDFS}: ${extractedSlots[a].EDFS.split("[").length - 1}`);    
+  // })
 })().catch(e=>{ console.error(e) });

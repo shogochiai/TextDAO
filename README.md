@@ -22,8 +22,7 @@
 - `forge script script/Filler.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`
 
 ### extractor
-- `cd extractor`
-- `npx ts-node main.ts`
+- `npx ts-node extractor/main.ts`
 
 ---
 # Architecture

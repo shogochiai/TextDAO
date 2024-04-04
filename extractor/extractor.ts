@@ -1,3 +1,4 @@
+import { assert } from "solc-typed-ast";
 import { ethCallWithCodeOverride } from "./ethCall";
 
 const CONTRACT_CODE = "0x5f5b80361460135780355481526020016001565b365ff3"; // Optimized contract code from dedaub.com/blog/bulk-storage-extraction
@@ -18,10 +19,13 @@ export async function extractStorage(
   contractAddress: string,
   slotKVs: { [key: string]: SlotKV }
 ): Promise<{ [key: string]: SlotKV }> {
+  // console.log(Object.values(slotKVs).map((slotKV) => slotKV.EDFS));
   const slots = Object.values(slotKVs).map((slotKV) => slotKV.slotId);
   const EDFS = Object.keys(slotKVs);
-  const batchSize = 15_000; // Maximum number of slots to fetch in a single batch
+  const batchSize = 5000; // Maximum number of slots to fetch in a single batch
   const batches: string[][] = [];
+
+  assert(slots.length == EDFS.length, "same length");
 
   // Split the slots into batches
   for (let i = 0; i < slots.length; i += batchSize) {
@@ -31,29 +35,44 @@ export async function extractStorage(
   const extractedSlots: { [key: string]: SlotKV } = {};
 
   for (const batch of batches) {
-    const results: any = await ethCallWithCodeOverride(
-      network,
-      contractAddress,
-      constructCalldata(batch),
-      CONTRACT_CODE
-    );
+      const _calldata = constructCalldata(batch);
+      if (_calldata.length > 379010 /* We knew this number from experiments */) {
+        throw new Error("Too large.");
+      }
 
-    const resultArray: string[] = results.toString(16).padStart(64, "0")
-
-    for (let i = 0; i < batch.length; i++) {
-      const slotId = batch[i];
-      const EDFS = Object.keys(slotKVs).find(
-        (key) => slotKVs[key].slotId === slotId
+      const results: any = await ethCallWithCodeOverride(
+        network,
+        contractAddress,
+        _calldata,
+        CONTRACT_CODE
       );
 
-      if (EDFS) {
-        extractedSlots[EDFS] = {
-          EDFS,
-          slotId,
-          value: resultArray[i],
-        };
+      const resultStr: string = results.toString(16).padStart(64, "0")
+      const resultArray = resultStr.slice(2).match(/.{64}/g);
+
+      assert(batch.length == resultArray.length, `batch.length:${batch.length} resultArray.length:${resultArray.length}`);
+
+      for (let i = 0; i < batch.length; i++) {
+        const slotId = batch[i];
+
+        // TODO: squashing DO happens because intermediate-unused node must be squashed.
+        const matchedSlotKV_EDFS: string = Object.keys(slotKVs).find(
+          (keyEDFS) => {
+            return slotKVs[keyEDFS].slotId === slotId;
+          }            
+        );
+
+        if (matchedSlotKV_EDFS) {
+          extractedSlots[matchedSlotKV_EDFS] = {
+            EDFS: matchedSlotKV_EDFS,
+            slotId,
+            value: resultArray[i],
+          };
+        }
       }
-    }
+      if (batch !== batches[batches.length - 1]) {
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds before the next call
+      }
   }
 
   return extractedSlots;
