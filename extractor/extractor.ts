@@ -55,7 +55,6 @@ export async function extractStorage(
       for (let i = 0; i < batch.length; i++) {
         const slotId = batch[i];
 
-        // TODO: squashing DO happens because intermediate-unused node must be squashed.
         const matchedSlotKVs = {}; 
         Object.keys(slotKVs)
           .filter(slotKVKey=> slotKVs[slotKVKey].slotId === slotId )

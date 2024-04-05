@@ -20,11 +20,6 @@ library Schema {
         uint repsNum;
         uint quorumScore;
     }
-    struct ProposalArg {
-        Header header;
-        Command cmd;
-        ProposalMeta proposalMeta;
-    }
     struct Proposal {
         Header[] headers;
         Command[] cmds;
@@ -36,10 +31,6 @@ library Schema {
         uint currentScore;
         bytes32 metadataURI;
         uint[] tagIds;
-    }
-    struct Tag {
-        uint id;
-        bytes32 metadataURI;
     }
     struct Command {
         uint id;
@@ -60,17 +51,6 @@ library Schema {
         uint nextRepId;
         uint createdAt;
     }
-    struct ProposalVars {
-        uint[] headerRank;
-        uint[] cmdRank;
-        bool[] cmdConds;
-        bool cmdCondSum;
-        Header[3] topHeaders;
-        Command[3] topCommands;
-        uint headerRank2;
-        uint cmdRank2;
-    }
-
 
     /*********************
      *  TextSaveProtected Storage
@@ -135,4 +115,35 @@ library Schema {
         uint quorumScore;
     }    
 
+
+    /*********************
+     *  Tag Storage
+     ********************/
+    /// @custom:storage-location erc7201:textDAO.TAG_STORAGE_LOCATION
+    struct TagStorage {
+        mapping(uint => Tag) tags;
+        uint nextId;
+    }
+    struct Tag {
+        uint id;
+        bytes32 metadataURI;
+    }
+
+
+    /*********************
+     *  TagRelation Storage
+     ********************/
+    /// @custom:storage-location erc7201:textDAO.TAG_RELATION_STORAGE_LOCATION
+    struct TagRelationStorage {
+        mapping(uint => TagRelation) relations;
+        uint nextId;
+    }
+    struct TagRelation {
+        uint id;
+        uint tagId;
+        uint taggedId;
+    }
+
 }
+
+

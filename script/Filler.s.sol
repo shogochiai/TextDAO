@@ -7,6 +7,7 @@ import { Script } from "forge-std/Script.sol";
 
 import { TextDAOFacade } from "script/TextDAOFacade.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Types } from "bundle/textdao/storages/Types.sol";
 import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJoinProtected.sol";
 
 contract Filler is Script {
@@ -43,7 +44,7 @@ contract Filler is Script {
         });
         proposalMeta.reps[0] = address(this);
         proposalMeta.nextRepId = 1;
-        Schema.ProposalArg memory proposalArg = Schema.ProposalArg({
+        Types.ProposalArg memory proposalArg = Types.ProposalArg({
             header: Schema.Header({
                 id: 0,
                 currentScore: 0,

@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Types } from "bundle/textdao/storages/Types.sol";
 import { SortLib } from "bundle/_utils/SortLib.sol";
 import { SelectorLib } from "bundle/_utils/SelectorLib.sol";
 
@@ -14,7 +15,7 @@ contract Tally {
         Schema.Command[] storage $cmds = $p.cmds;
         Schema.ConfigOverrideStorage storage $configOverride = Storage.$ConfigOverride();
 
-        Schema.ProposalVars memory vars;
+        Types.ProposalVars memory vars;
 
         require($p.proposalMeta.createdAt + $.config.expiryDuration > block.timestamp, "This proposal has been expired. You cannot run new tally to update ranks.");
 

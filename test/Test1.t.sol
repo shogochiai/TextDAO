@@ -10,6 +10,7 @@ import { Execute } from "bundle/textdao/functions/Execute.sol";
 import { Tally } from "bundle/textdao/functions/Tally.sol";
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Types } from "bundle/textdao/storages/Types.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Test1 is UCSTestBase {
@@ -28,7 +29,7 @@ contract Test1 is UCSTestBase {
         Schema.MemberJoinProtectedStorage storage $m = Storage.$Members();
         Schema.VRFStorage storage $vrf = Storage.$VRF();
 
-        Schema.ProposalArg memory p;
+        Types.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
 
         $vrf.config.vrfCoordinator = address(1);
@@ -57,7 +58,7 @@ contract Test1 is UCSTestBase {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
 
-        Schema.ProposalArg memory p;
+        Types.ProposalArg memory p;
         p.header.metadataURI = "Qc.....xh";
         p.cmd.actions = new Schema.Action[](1);
 

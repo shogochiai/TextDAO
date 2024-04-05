@@ -2,11 +2,12 @@
 pragma solidity ^0.8.24;
 
 import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Types } from "bundle/textdao/storages/Types.sol";
 
 contract TextDAOFacade {
     function clone(address _target) public {}
     function initialize(address[] calldata initialMembers, Schema.ProposalsConfig calldata pConfig) public {}
-    function propose(Schema.ProposalArg calldata _p) public returns (uint) {}
+    function propose(Types.ProposalArg calldata _p) public returns (uint) {}
     function fork(uint _proposalId) public {}
     function voteHeaders(uint _proposalId, uint[3] calldata _headerIds) public {}
     function voteCmds(uint _proposalId, uint[3] calldata _cmdIds) public {}

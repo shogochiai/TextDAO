@@ -1,0 +1,104 @@
+
+vars:
+  $p: ProposeStorage.proposals[i]
+  $h: $p.headers[i]
+  $c: $p.cmds[i]
+
+# [format]
+# EDFS:
+#   from: uint
+#   to: uint
+
+constraints:
+  ProposeStorage.proposals:
+    from: 0
+    to: ProposeStorage.nextProposalId # proposals is mapping(uint=>any) and nextProposalId is uint
+  $p.headers:
+    from: 0
+    to: length($p.headers) # scan all headers[] and use each length for iteration count
+  $p.cmds:
+    from: 0
+    to: length($p.cmds)
+  $p.tallied:
+    from: updatedAt($p.tallied[i]) / ProposeStorage.config.tallyInterval  # Although Schema.sol doesn't have updateAt member, the indexer backend automatically maintain updated time of each the most primitive EDFS.
+    to: block.timestamp / ProposeStorage.config.tallyInterval # current time. This member is immutable and so no full-scan of the mapping.
+  $p.headers[i].tagIds:
+    from: 0
+    to: length($h.tagIds[i])
+  $c.actions:
+    from: 0
+    to: length($c.actions[i])
+  $p.proposalMeta.headerRank:
+    from: 0
+    to: length($p.proposalMeta.headerRank[i])  
+  $p.proposalMeta.cmdRank:
+    from: 0
+    to: length($p.proposalMeta.cmdRank[i])  
+  $p.proposalMeta.reps:
+    from: 0
+    to: length($p.proposalMeta.reps[i])  
+  TextSaveProtectedStorage.texts:
+    from: 0
+    to: length(TextSaveProtectedStorage.nextTextId)  
+  MemberJoinProtectedStorage.members:
+    from: 0
+    to: length(MemberJoinProtectedStorage.nextMemberId)
+  VRFStorage.requests:
+    from: 0
+    to: VRFStorage.nextId
+  ConfigOverrideStorage.overrides:
+    from: head(mc.functions)
+    to: tail(mc.functions) # overrides is mapping(bytes4=>any) and mc.functions is bytes4[] which is reserved by metacontract/mc
+  TagStorage.tags:
+    from: 0
+    to: TagStorage.nextId
+  TagRelationStorage.relations:
+    from: 0
+    to: TagRelationStorage.nextId
+
+relations:
+  - from: $p.proposalMeta.reps
+    to: MemberJoinProtectedStorage.members # primary key has index
+    type: one-to-many
+
+  - from: $p.proposalMeta.headerRank
+    to: $p.headers # unlike normal RDB relation, nested graph has relation to other
+    type: one-to-many
+
+  - from: $p.proposalMeta.cmdRank
+    to: $p.cmds
+    type: one-to-many
+
+  - from: TagStorage.tags
+    to: $p.headers
+    type: many-to-many
+    through: TagRelation.relations # TagRelation will have index
+
+ipfs:
+  - ref: TextSaveProtectedStorage.texts[i].metadataURIs[i]
+    as: TextMetadata
+  - ref: MemberJoinProtectedStorage.members[i].metadataURI
+    as: MemberMetadata
+  - ref: TagStorage.tags[i].metadataURI
+    as: TagMetadata
+
+fulltext:
+  TextMetadata:
+    title:
+      lang:
+        - en
+        - ja
+    description:
+      lang:
+        - en
+        - ja
+  MemberMetadata:
+    name:
+      lang:
+        - en
+        - ja
+  TagMetadata:
+    name:
+      lang:
+        - en
+        - ja

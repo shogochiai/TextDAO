@@ -4,10 +4,11 @@ pragma solidity ^0.8.24;
 import { console2 } from "forge-std/console2.sol";
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Types } from "bundle/textdao/storages/Types.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Propose {
-    function propose(Schema.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
+    function propose(Types.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[proposalId];
         Schema.VRFStorage storage $vrf = Storage.$VRF();

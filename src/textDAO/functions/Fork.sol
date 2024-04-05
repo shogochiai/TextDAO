@@ -3,9 +3,10 @@ pragma solidity ^0.8.24;
 
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Types } from "bundle/textdao/storages/Types.sol";
 
 contract Fork {
-    function fork(uint pid, Schema.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
+    function fork(uint pid, Types.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
 

@@ -14,6 +14,7 @@ import { keccak256 } from 'js-sha3';
 import * as BN from 'bn.js';
 import { extractStorage, SlotKV, regexpStruct } from "./extractor";
 import * as path from 'path';
+import * as YAML from "yaml";
 const rootPath: string = path.resolve(__dirname + "/..");
 dotenv.config({ path: `${rootPath}/.env` });
 
@@ -382,34 +383,18 @@ async function execute(inputData: InputData): Promise<void> {
   global.AstNode = sourceUnits[0].vContracts[0].raw.nodes;
   global.ResultStructs = [];
   
+  const EmbeddedIndexerConfFile = fs.readFileSync(`${rootPath}/src/textdao/storages/embedded_indexer_conf.yaml`).toString();
+  const embeddedIndexerConf = YAML.parse(EmbeddedIndexerConfFile);
+  console.log(embeddedIndexerConf);
+
   // TODO: Check order and correspondence of definitions
   const RootStructs: StructDefinition[] = [];
   for (const node of global.AstNode) {
     if (node.nodeType === 'StructDefinition' && node.documentation && node.documentation.text.includes("@custom:storage-location erc7201:")) {
       const struct = new StructDefinition(node.name, baseSlots.shift() || null);
       RootStructs.push(struct);
-    } else if (node.nodeType === 'StructDefinition' && node.documentation && node.documentation.text.includes("@custom:indexer-dsl erc7546:")) {
-      /*
-        [Natspec]
-          @custom:indexer-dsl erc7546:method(EDFS, anotherMethodOutput)
-        [Methods]
-          setIteration(ProposeStorage.proposals, ProposeStorage.nextProposalId)
-          setIteration(ProposeStorage.proposals[i].headers, ProposeStorage.proposals[i].headers.length)
-          setUintKey(ConfigOverrideStorage.overrides, ConfigOverrideStorage.bytes4SigList)
-        [Notes]
-          A dynamic iterable without no setIteration causes runtime error in indexer.
-          An UintKey-less address or bytes mappings cause runtime error in indexer.
-      */
-
     }
   }
-
-  for (const node of global.AstNode) {
-    if (node.nodeType === 'StructDefinition' && node.documentation && node.documentation.text.includes("@custom:indexer-dsl erc7546:iteratorLength=")) {
-      // get DSL and set meta const
-    }
-  }
-
 
   RootStructs.forEach((rootStruct) => {
     global.ResultStructs.push(rootStruct);
@@ -569,6 +554,8 @@ function simplifyObject(obj) {
 
   const extractedSlots:{ [key: string]: SlotKV } = await extractStorage(INPUT_DATA.network, INPUT_DATA.contractAddress, slotKVs);
   Object.keys(extractedSlots).map(a=>{
-    console.log(`${extractedSlots[a].EDFS}: ${extractedSlots[a].EDFS.split("[").length - 1} - ${extractedSlots[a].slotId} = ${extractedSlots[a].value}`);    
+    if (extractedSlots[a].value.slice(-2) !== "00") {
+      console.log(`${extractedSlots[a].EDFS}: ${extractedSlots[a].EDFS.split("[").length - 1} - ${extractedSlots[a].slotId} = ${extractedSlots[a].value}`);    
+    }
   })
 })().catch(e=>{ console.error(e) });
