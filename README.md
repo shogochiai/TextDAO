@@ -22,6 +22,10 @@
 - `forge script script/Filler.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`
 
 ### extractor
+- `solc --standard-json < extractor/solcSlotRequest.json > ~/Downloads/astnode.json &&  cat ~/Downloads/astnode.json | jq . 1> ~/Downloads/astnodeFormatted.json`
+- `forge script script/SlotTester.s.sol --rpc-url http://127.0.0.1:8545 --broadcast`
+- `cast storage --chain=1 --rpc-url http://127.0.0.1:8545 0x4826533B4897376654Bb4d4AD88B7faFD0C98528 1`
+- `cast storage --chain=1 --rpc-url http://127.0.0.1:8545 0x4826533B4897376654Bb4d4AD88B7faFD0C98528 0xeb29eb983a061a3feb4d4d7a2bced0182db2198396ce3beb0ace67382563d6e4` (ProposeStorage.proposals[0].tallied[0] for ERC-7201 dynamic base slot)
 - `npx ts-node extractor/main.ts`
 
 ---

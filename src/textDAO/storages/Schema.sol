@@ -110,6 +110,7 @@ library Schema {
     /// @custom:storage-location erc7201:textDAO.CONF_OVERRIDE_STORAGE_LOCATION
     struct ConfigOverrideStorage {
         mapping(bytes4 => ConfigOverride) overrides;
+        // bytes4[] overridesIndex;
     }
     struct ConfigOverride {
         uint quorumScore;

@@ -1,0 +1,30 @@
+{
+    "language": "Solidity",
+    "sources": {
+      "src/textDAO/storages/Schema.sol": {
+        "urls": ["src/textDAO/storages/Schema.sol"]
+      },
+      "src/_utils/Dummy.sol": {
+        "urls": ["src/_utils/Dummy.sol"]
+      }
+    },
+    "settings": {
+        "remappings": [
+            "bundle/=src/",
+            "@chainlink/=lib/chainlink/contracts/src/v0.8/",
+            "@openzeppelin/=lib/openzeppelin-contracts/",
+            "forge-std=lib/forge-std/src/",
+            "@devkit/=lib/mc/devkit/",
+            "@mc-std/=lib/mc/src/std/",
+            "@ucs-contracts/=lib/mc/lib/ucs-contracts/"
+
+        ],
+        "outputSelection": {
+        "*": {
+          "*": [
+            "storageLayout"
+          ]
+        }
+      }
+    }
+  }

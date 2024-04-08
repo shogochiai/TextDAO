@@ -4,45 +4,16 @@ vars:
   $h: $p.headers[i]
   $c: $p.cmds[i]
 
+
+# Mapping Scan Setting 
 # [format]
 # EDFS:
 #   from: uint
 #   to: uint
-
 constraints:
-  ProposeStorage.proposals:
-    from: 0
-    to: ProposeStorage.nextProposalId # proposals is mapping(uint=>any) and nextProposalId is uint
-  $p.headers:
-    from: 0
-    to: length($p.headers) # scan all headers[] and use each length for iteration count
-  $p.cmds:
-    from: 0
-    to: length($p.cmds)
   $p.tallied:
     from: updatedAt($p.tallied[i]) / ProposeStorage.config.tallyInterval  # Although Schema.sol doesn't have updateAt member, the indexer backend automatically maintain updated time of each the most primitive EDFS.
     to: block.timestamp / ProposeStorage.config.tallyInterval # current time. This member is immutable and so no full-scan of the mapping.
-  $p.headers[i].tagIds:
-    from: 0
-    to: length($h.tagIds[i])
-  $c.actions:
-    from: 0
-    to: length($c.actions[i])
-  $p.proposalMeta.headerRank:
-    from: 0
-    to: length($p.proposalMeta.headerRank[i])  
-  $p.proposalMeta.cmdRank:
-    from: 0
-    to: length($p.proposalMeta.cmdRank[i])  
-  $p.proposalMeta.reps:
-    from: 0
-    to: length($p.proposalMeta.reps[i])  
-  TextSaveProtectedStorage.texts:
-    from: 0
-    to: length(TextSaveProtectedStorage.nextTextId)  
-  MemberJoinProtectedStorage.members:
-    from: 0
-    to: length(MemberJoinProtectedStorage.nextMemberId)
   VRFStorage.requests:
     from: 0
     to: VRFStorage.nextId

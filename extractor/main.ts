@@ -15,6 +15,8 @@ import * as BN from 'bn.js';
 import { extractStorage, SlotKV, regexpStruct } from "./extractor";
 import * as path from 'path';
 import * as YAML from "yaml";
+import { ethers } from 'ethers';
+
 const rootPath: string = path.resolve(__dirname + "/..");
 dotenv.config({ path: `${rootPath}/.env` });
 
@@ -102,7 +104,8 @@ class Member {
     public structIndex: number,
     public slot: string,
     public belongsTo: Member | StructDefinition,
-    public iter: IteratorMeta | null
+    public iter: IteratorMeta | null,
+    public arrayLength?: number | null
   ) {}
 
   calculateSlot(): string {
@@ -124,6 +127,13 @@ class Member {
     }
     
     const slotIdHex = "0x" + new BN(parentSlotId.slice(2), 16).add(new BN(this.structIndex)).toString(16);
+
+    // TODO: This spec causes frequent RPC call and all architecture is to be async/await.
+    // if (this.typeKind === TypeKind.Array) {
+    //   const provider = new ethers.providers.JsonRpcProvider(INPUT_DATA.network);
+    //   const result = await provider.getStorageAt(INPUT_DATA.contractAddress, slotIdHex);
+    //   this.arrayLength = parseInt(result, 16);
+    // }
     return slotIdHex;
   }
 
@@ -381,6 +391,7 @@ async function execute(inputData: InputData): Promise<void> {
   // console.log(baseSlots);
 
   global.AstNode = sourceUnits[0].vContracts[0].raw.nodes;
+  fs.writeFileSync("/Users/bob/Downloads/astnode.json", JSON.stringify(sourceUnits[0].vContracts[0].raw));
   global.ResultStructs = [];
   
   const EmbeddedIndexerConfFile = fs.readFileSync(`${rootPath}/src/textdao/storages/embedded_indexer_conf.yaml`).toString();
