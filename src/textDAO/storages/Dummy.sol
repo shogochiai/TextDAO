@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import { Schema } from "../textdao/storages/Schema.sol";
+import { Schema } from "bundle/textdao/storages/Schema.sol";
 
 contract Dummy {
     Schema.ProposeStorage $;
