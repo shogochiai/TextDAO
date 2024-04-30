@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "@chainlink/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Constants } from "bundle/_utils/Constants.sol";
+import { Constants } from "bundle/textdao/storages/Constants.sol";
 
 /**
  * StorageLib v0.1.0

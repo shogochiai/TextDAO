@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import { Storage } from "bundle/textdao/storages/Storage.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Constants } from "bundle/_utils/Constants.sol";
 
 /**
  * SortLib v0.1.0
