@@ -5,10 +5,7 @@ pragma solidity ^0.8.24;
  * Schema v0.1.0
  */
 library Schema {    
-    /*********************
-     *  ProposeStorage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.PROPOSALS_STORAGE_LOCATION
+    /// @custom:storage-location erc7201:textDAO.ProposeStorage
     struct ProposeStorage {
         mapping(uint => Proposal) proposals;
         uint nextProposalId;
@@ -52,10 +49,10 @@ library Schema {
         uint createdAt;
     }
 
-    /*********************
-     *  TextSaveProtected Storage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.TEXTS_STORAGE_LOCATION
+
+
+
+    /// @custom:storage-location erc7201:textDAO.TextSaveProtectedStorage
     struct TextSaveProtectedStorage {
         mapping(uint => Text) texts;
         uint nextTextId;
@@ -65,10 +62,10 @@ library Schema {
         bytes32[] metadataURIs;
     }
 
-    /*********************
-     *  MemberJoinProtected Storage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.MEMBERS_STORAGE_LOCATION
+
+
+
+    /// @custom:storage-location erc7201:textDAO.MemberJoinProtectedStorage
     struct MemberJoinProtectedStorage {
         mapping(uint => Member) members;
         uint nextMemberId;
@@ -80,10 +77,7 @@ library Schema {
     }
 
 
-    /*********************
-     *  VRF Storage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.VRF_STORAGE_LOCATION
+    /// @custom:storage-location erc7201:textDAO.VRFStorage
     struct VRFStorage {
         mapping(uint => Request) requests;
         uint nextId;
@@ -104,10 +98,8 @@ library Schema {
     }
 
 
-    /*********************
-     *  ConfigOverride Storage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.CONF_OVERRIDE_STORAGE_LOCATION
+
+    /// @custom:storage-location erc7201:textDAO.ConfigOverrideStorage
     struct ConfigOverrideStorage {
         mapping(bytes4 => ConfigOverride) overrides;
         // bytes4[] overridesIndex;
@@ -117,10 +109,9 @@ library Schema {
     }    
 
 
-    /*********************
-     *  Tag Storage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.TAG_STORAGE_LOCATION
+
+
+    /// @custom:storage-location erc7201:textDAO.TagStorage
     struct TagStorage {
         mapping(uint => Tag) tags;
         uint nextId;
@@ -131,10 +122,9 @@ library Schema {
     }
 
 
-    /*********************
-     *  TagRelation Storage
-     ********************/
-    /// @custom:storage-location erc7201:textDAO.TAG_RELATION_STORAGE_LOCATION
+
+
+    /// @custom:storage-location erc7201:textDAO.TagRelationStorage
     struct TagRelationStorage {
         mapping(uint => TagRelation) relations;
         uint nextId;
