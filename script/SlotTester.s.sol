@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 
 import { MCScript } from "@devkit/MCScript.sol";
-import { Dummy } from "src/textdao/storages/Dummy.sol";
+import { Dummy } from "src/_utils/Dummy.sol";
 
 contract SlotTester is MCScript {
 
