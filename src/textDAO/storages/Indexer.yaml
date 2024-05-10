@@ -14,6 +14,12 @@ constraints:
   $p.tallied:
     from: updatedAt($p.tallied[i]) / ProposeStorage.config.tallyInterval  # Although Schema.sol doesn't have updateAt member, the indexer backend automatically maintain updated time of each the most primitive EDFS.
     to: block.timestamp / ProposeStorage.config.tallyInterval # current time. This member is immutable and so no full-scan of the mapping.
+  TextSaveProtectedStorage.texts:
+    from: 0
+    to: TextSaveProtectedStorage.nextTextId
+  MemberJoinProtectedStorage.members:
+    from: 0
+    to: MemberJoinProtectedStorage.nextMemberId
   VRFStorage.requests:
     from: 0
     to: VRFStorage.nextId
