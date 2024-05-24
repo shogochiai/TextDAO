@@ -20,7 +20,7 @@ import { SaveTextProtected } from "bundle/textdao/functions/protected/SaveTextPr
 import { TextDAOFacade } from "script/TextDAOFacade.sol";
 
 contract Deployment is MCScript {
-    function run() public startBroadcastWithDeployerPrivKey {
+    function run() public startBroadcastWith("DEPLOYER_PRIV_KEY") {
 
         vm.deal(deployer, 100 ether);
 
@@ -39,7 +39,7 @@ contract Deployment is MCScript {
         mc.use("SetConfigsProtected", SetConfigsProtected.setProposalsConfig.selector, address(new SetConfigsProtected()));
         mc.use("ConfigOverrideProtected", ConfigOverrideProtected.overrideProposalsConfig.selector, address(new ConfigOverrideProtected()));
         mc.use("SaveTextProtected", SaveTextProtected.saveText.selector, address(new SaveTextProtected()));
-        mc.set(address(new TextDAOFacade())); // for Etherscan proxy read/write
+        mc.useFacade(address(new TextDAOFacade())); // for Etherscan proxy read/write
         address textdao = mc.deploy().toProxyAddress();
 
         bytes memory encodedData = abi.encodePacked("TEXT_DAO_ADDR=", vm.toString(address(textdao)));
