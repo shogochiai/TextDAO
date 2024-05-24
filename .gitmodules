@@ -4,9 +4,6 @@
 [submodule "lib/chainlink"]
 	path = lib/chainlink
 	url = https://github.com/smartcontractkit/chainlink
-[submodule "lib/ucs-ops"]
-	path = lib/ucs-ops
-	url = https://github.com/shogochiai/ucs-ops
 [submodule "lib/ucs-std"]
 	path = lib/ucs-std
 	url = https://github.com/shogochiai/ucs-std
