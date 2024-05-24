@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 /**
- * Schema v0.1.0
+ * @title TextDAO Schema v0.1.0
  */
-library Schema {    
+library Schema {
     /// @custom:storage-location erc7201:textDAO.ProposeStorage
     struct ProposeStorage {
         mapping(uint => Proposal) proposals;
@@ -106,7 +106,7 @@ library Schema {
     }
     struct ConfigOverride {
         uint quorumScore;
-    }    
+    }
 
 
 

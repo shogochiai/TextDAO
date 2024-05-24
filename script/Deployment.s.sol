@@ -17,7 +17,7 @@ import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJo
 import { SetConfigsProtected } from "bundle/textdao/functions/protected/SetConfigsProtected.sol";
 import { ConfigOverrideProtected } from "bundle/textdao/functions/protected/ConfigOverrideProtected.sol";
 import { SaveTextProtected } from "bundle/textdao/functions/protected/SaveTextProtected.sol";
-import { TextDAOFacade } from "script/TextDAOFacade.sol";
+import { TextDAOFacade } from "bundle/textDAO/interfaces/TextDAOFacade.sol";
 
 contract Deployment is MCScript {
     function run() public startBroadcastWith("DEPLOYER_PRIV_KEY") {
