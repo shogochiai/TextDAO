@@ -1,0 +1,20 @@
+
+# event ProposedHeader(uint pid, uint headerId, uint currentScore, bytes32 metadataURI, uint[] tagIds);
+type ProposedHeader @entity(immutable: true) {
+  id: Bytes!
+  pid: BigInt!  # uint
+  headerId: BigInt!  # uint
+  currentScore: BigInt!  # uint
+  metadataURI: Bytes!  # bytes32
+  tagIds: [BigInt!]  # uint[]
+}
+
+# event ProposedAction(uint pid, uint cmdId, uint currentScore, string func, bytes abiParams);
+type ProposedAction @entity(immutable: true) {
+  id: Bytes!
+  pid: BigInt!  # uint
+  cmdId: BigInt!  # uint
+  currentScore: BigInt!  # uint
+  func: String!  # string
+  abiParams: Bytes!
+}
