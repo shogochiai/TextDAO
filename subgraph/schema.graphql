@@ -1,42 +1,39 @@
-
-# event ProposedHeader(uint pid, uint headerId, uint currentScore, bytes32 metadataURI, uint[] tagIds);
-# event ProposedAction(uint pid, uint cmdId, uint currentScore, string func, bytes abiParams);
-type Proposal @entity(immutable: true)  {
+type Proposal @entity {
     id: BigInt!
     headers: [Header!]! @derivedFrom(field: "proposal")
     cmds: [Command!]! @derivedFrom(field: "proposal")
     proposalMeta: ProposalMeta @derivedFrom(field: "propolal")
 }
-type Header @entity(immutable: true)  {
+type Header @entity {
     id: BigInt!
     proposal: Proposal!
     currentScore: BigInt!
     metadataURI: Bytes!
     tagIds: [BigInt!]!
 }
-type Command @entity(immutable: true)  {
+type Command @entity {
     id: BigInt!
     proposal: Proposal!
     actions: [Action!]! @derivedFrom(field: "command")
     currentScore: BigInt!
 }
-type Action @entity(immutable: true)  {
+type Action @entity {
     command: Command!
     func: String!
     abiParams: Bytes!
 }
-type ProposalMeta @entity(immutable: true)  {
+type ProposalMeta @entity {
     propolal: Proposal
     currentScore: BigInt!
     headerRank: [BigInt!]!
     cmdRank: [BigInt!]!
     nextHeaderTallyFrom: BigInt!
     nextCmdTallyFrom: BigInt!
-    reps: [Bytes!]!  # address[]
+    reps: [Bytes!]!
     nextRepId: BigInt!
     createdAt: BigInt!
 }
-type Text @entity(immutable: true)  {
+type Text @entity {
     id: BigInt!
     metadataURIs: [Bytes!]!
 }
