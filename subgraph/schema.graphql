@@ -5,6 +5,7 @@ type Proposal @entity(immutable: true)  {
     id: BigInt!
     headers: [Header!]! @derivedFrom(field: "proposal")
     cmds: [Command!]! @derivedFrom(field: "proposal")
+    proposalMeta: ProposalMeta @derivedFrom(field: "propolal")
 }
 type Header @entity(immutable: true)  {
     id: BigInt!
@@ -23,4 +24,15 @@ type Action @entity(immutable: true)  {
     command: Command!
     func: String!
     abiParams: Bytes!
+}
+type ProposalMeta @entity(immutable: true)  {
+    propolal: Proposal
+    currentScore: BigInt!
+    headerRank: [BigInt!]!
+    cmdRank: [BigInt!]!
+    nextHeaderTallyFrom: BigInt!
+    nextCmdTallyFrom: BigInt!
+    reps: [Bytes!]!  # address[]
+    nextRepId: BigInt!
+    createdAt: BigInt!
 }

@@ -48,7 +48,7 @@ contract Tally {
                 break;
             }
         }
-        
+
         if ($p.proposalMeta.headerRank.length == 0) {
             $p.proposalMeta.headerRank = new uint[](3);
         }
@@ -82,7 +82,7 @@ contract Tally {
             if(vars.headerRank2 < $p.headers.length){
                 vars.topHeaders[i] = $p.headers[vars.headerRank2];
             }
-            
+
             if(vars.cmdRank2 < $p.cmds.length){
                 vars.topCommands[i] = $p.cmds[vars.cmdRank2];
             }
