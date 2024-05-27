@@ -36,3 +36,7 @@ type ProposalMeta @entity(immutable: true)  {
     nextRepId: BigInt!
     createdAt: BigInt!
 }
+type Text @entity(immutable: true)  {
+    id: BigInt!
+    metadataURIs: [Bytes!]!
+}
