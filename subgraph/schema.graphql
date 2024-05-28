@@ -36,6 +36,7 @@ type ProposalMeta @entity {
 type Text @entity {
     id: BigInt!
     metadataURIs: [Bytes!]!
+    bodies: [String]!
 }
 type Member @entity {
     id: BigInt!
