@@ -2,7 +2,7 @@ type Proposal @entity {
     id: BigInt!
     headers: [Header!]! @derivedFrom(field: "proposal")
     cmds: [Command!]! @derivedFrom(field: "proposal")
-    proposalMeta: ProposalMeta @derivedFrom(field: "propolal")
+    proposalMeta: ProposalMeta @derivedFrom(field: "proposal")
 }
 type Header @entity {
     id: BigInt!
@@ -23,7 +23,7 @@ type Action @entity {
     abiParams: Bytes!
 }
 type ProposalMeta @entity {
-    propolal: Proposal
+    proposal: Proposal!
     currentScore: BigInt!
     headerRank: [BigInt!]!
     cmdRank: [BigInt!]!
