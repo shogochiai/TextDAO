@@ -37,3 +37,8 @@ type Text @entity {
     id: BigInt!
     metadataURIs: [Bytes!]!
 }
+type Member @entity {
+    id: BigInt!
+    addr: Bytes!
+    metadataURI: Bytes!
+}
