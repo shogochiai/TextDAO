@@ -5,7 +5,7 @@ pragma solidity ^0.8.24;
 import { console2 } from "forge-std/console2.sol";
 import { Script } from "forge-std/Script.sol";
 
-import { TextDAOFacade } from "script/TextDAOFacade.sol";
+import { TextDAOFacade } from "bundle/textDAO/interfaces/TextDAOFacade.sol";
 import { Schema } from "bundle/textdao/storages/Schema.sol";
 import { Types } from "bundle/textdao/storages/Types.sol";
 import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJoinProtected.sol";
@@ -66,7 +66,7 @@ contract Filler is Script {
             addr: 0x1234567890123456789012345678901234567890, // Example candidate address
             metadataURI: "exampleURI" // Example metadata URI
         });
-        
+
         proposalArg.cmd.actions[0] = Schema.Action({
             func: "memberJoin(uint256,address[])",
             abiParams: abi.encode(plannedProposalId, candidates)
@@ -80,6 +80,6 @@ contract Filler is Script {
 
         uint[3] memory cmdIds = [uint(0), uint(1), uint(2)]; // Example cmdIds, replace with actual command IDs
         textdao.voteCmds(proposalId, cmdIds);
-        
+
     }
 }

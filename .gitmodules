@@ -1,13 +1,9 @@
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
-	branch = v1.7.4
 [submodule "lib/chainlink"]
 	path = lib/chainlink
 	url = https://github.com/smartcontractkit/chainlink
-[submodule "lib/ucs-ops"]
-	path = lib/ucs-ops
-	url = https://github.com/shogochiai/ucs-ops
 [submodule "lib/ucs-std"]
 	path = lib/ucs-std
 	url = https://github.com/shogochiai/ucs-std

@@ -6,7 +6,7 @@ pragma solidity ^0.8.24;
  * keccak256(abi.encode(uint256(keccak256("<corresponded URL in the Schema.sol>")) - 1)) & ~bytes32(uint256(0xff));
  */
 
-library BaseSlots {    
+library BaseSlots {
     bytes32 public constant baseslot_ProposeStorage =
         0x9a70c69f78b954ec2ace8c62308c5ea2ed35f782ee583f10b56d88886fa99300;
     bytes32 public constant baseslot_TextSaveProtectedStorage =
@@ -16,5 +16,5 @@ library BaseSlots {
     bytes32 public constant baseslot_VRFStorage =
         0xe4fa6871814422bfe1d10a118a3483c970f3cc6a461f81c9d5701005cfdaf400;
     bytes32 public constant baseslot_ConfigOverrideStorage =
-        0x147a311fe1db87247fe76cc1e6db3134e5d52a59e0824f018dad572e05b14000;    
+        0x147a311fe1db87247fe76cc1e6db3134e5d52a59e0824f018dad572e05b14000;
 }

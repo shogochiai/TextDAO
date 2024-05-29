@@ -7,8 +7,8 @@ import { Dummy } from "src/_utils/Dummy.sol";
 
 contract SlotTester is MCScript {
 
-    function run() public startBroadcastWithDeployerPrivKey {       
-        address addr = address(new Dummy()); 
+    function run() public startBroadcastWith("DEPLOYER_PRIV_KEY") {
+        address addr = address(new Dummy());
         Dummy(addr).save();
     }
 }
