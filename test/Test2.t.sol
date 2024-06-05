@@ -2,15 +2,15 @@
 pragma solidity ^0.8.24;
 
 import { UCSTestBase } from "bundle/_utils/UCSTestBase.sol";
-import { Propose } from "bundle/textdao/functions/Propose.sol";
-import { Fork } from "bundle/textdao/functions/Fork.sol";
-import { Vote } from "bundle/textdao/functions/Vote.sol";
-import { Execute } from "bundle/textdao/functions/Execute.sol";
-import { Tally } from "bundle/textdao/functions/Tally.sol";
-import { Storage } from "bundle/textdao/storages/Storage.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { SaveTextProtected } from "bundle/textdao/functions/protected/SaveTextProtected.sol";
-import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJoinProtected.sol";
+import { Propose } from "bundle/textDAO/functions/Propose.sol";
+import { Fork } from "bundle/textDAO/functions/Fork.sol";
+import { Vote } from "bundle/textDAO/functions/Vote.sol";
+import { Execute } from "bundle/textDAO/functions/Execute.sol";
+import { Tally } from "bundle/textDAO/functions/Tally.sol";
+import { Storage } from "bundle/textDAO/storages/Storage.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { SaveTextProtected } from "bundle/textDAO/functions/protected/SaveTextProtected.sol";
+import { MemberJoinProtected } from "bundle/textDAO/functions/protected/MemberJoinProtected.sol";
 
 contract Test2 is UCSTestBase {
 
@@ -29,7 +29,7 @@ contract Test2 is UCSTestBase {
         uint pid = 0;
         uint textId = 0;
 
-        // Note: Array variable is only available as function args. 
+        // Note: Array variable is only available as function args.
         bytes32[] memory metadataURIs = new bytes32[](2);
         metadataURIs[0] = bytes32(uint256(1));
         metadataURIs[1] = bytes32(uint256(2));

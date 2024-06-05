@@ -3,14 +3,14 @@ pragma solidity ^0.8.24;
 
 import { UCSTestBase } from "bundle/_utils/UCSTestBase.sol";
 import { SelectorLib } from "bundle/_utils/SelectorLib.sol";
-import { Propose } from "bundle/textdao/functions/Propose.sol";
-import { Fork } from "bundle/textdao/functions/Fork.sol";
-import { Vote } from "bundle/textdao/functions/Vote.sol";
-import { Execute } from "bundle/textdao/functions/Execute.sol";
-import { Tally } from "bundle/textdao/functions/Tally.sol";
-import { Storage } from "bundle/textdao/storages/Storage.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Types } from "bundle/textdao/storages/Types.sol";
+import { Propose } from "bundle/textDAO/functions/Propose.sol";
+import { Fork } from "bundle/textDAO/functions/Fork.sol";
+import { Vote } from "bundle/textDAO/functions/Vote.sol";
+import { Execute } from "bundle/textDAO/functions/Execute.sol";
+import { Tally } from "bundle/textDAO/functions/Tally.sol";
+import { Storage } from "bundle/textDAO/storages/Storage.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { Types } from "bundle/textDAO/storages/Types.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Test1 is UCSTestBase {
@@ -63,7 +63,7 @@ contract Test1 is UCSTestBase {
         p.cmd.actions = new Schema.Action[](1);
 
         $p.proposalMeta.reps.push(); // array init
-        $p.proposalMeta.reps[0] = address(this); 
+        $p.proposalMeta.reps[0] = address(this);
 
         assertEq($p.headers.length, 0);
         assertEq($p.cmds.length, 0);

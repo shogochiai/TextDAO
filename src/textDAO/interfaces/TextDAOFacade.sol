@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Types } from "bundle/textdao/storages/Types.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { Types } from "bundle/textDAO/storages/Types.sol";
 
 contract TextDAOFacade {
     function clone(address _target) public {}

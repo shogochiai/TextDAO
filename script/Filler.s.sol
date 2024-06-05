@@ -6,9 +6,9 @@ import { console2 } from "forge-std/console2.sol";
 import { Script } from "forge-std/Script.sol";
 
 import { TextDAOFacade } from "bundle/textDAO/interfaces/TextDAOFacade.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Types } from "bundle/textdao/storages/Types.sol";
-import { MemberJoinProtected } from "bundle/textdao/functions/protected/MemberJoinProtected.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { Types } from "bundle/textDAO/storages/Types.sol";
+import { MemberJoinProtected } from "bundle/textDAO/functions/protected/MemberJoinProtected.sol";
 
 contract Filler is Script {
 

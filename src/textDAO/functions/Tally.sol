@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import { Storage } from "bundle/textdao/storages/Storage.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Types } from "bundle/textdao/storages/Types.sol";
+import { Storage } from "bundle/textDAO/storages/Storage.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { Types } from "bundle/textDAO/storages/Types.sol";
 import { SortLib } from "bundle/_utils/SortLib.sol";
 import { SelectorLib } from "bundle/_utils/SelectorLib.sol";
 
@@ -48,7 +48,7 @@ contract Tally {
                 break;
             }
         }
-        
+
         if ($p.proposalMeta.headerRank.length == 0) {
             $p.proposalMeta.headerRank = new uint[](3);
         }
@@ -82,7 +82,7 @@ contract Tally {
             if(vars.headerRank2 < $p.headers.length){
                 vars.topHeaders[i] = $p.headers[vars.headerRank2];
             }
-            
+
             if(vars.cmdRank2 < $p.cmds.length){
                 vars.topCommands[i] = $p.cmds[vars.cmdRank2];
             }

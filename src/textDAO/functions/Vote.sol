@@ -2,8 +2,8 @@
 pragma solidity ^0.8.24;
 
 import { console2 } from "forge-std/console2.sol";
-import { Storage } from "bundle/textdao/storages/Storage.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
+import { Storage } from "bundle/textDAO/storages/Storage.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
 
 contract Vote {
     function voteHeaders(uint pid, uint[3] calldata headerIds) external returns (bool) {

@@ -3,8 +3,8 @@ pragma solidity ^0.8.24;
 
 import "@chainlink/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { BaseSlots } from "bundle/textdao/storages/BaseSlots.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { BaseSlots } from "bundle/textDAO/storages/BaseSlots.sol";
 
 /**
  * StorageLib v0.1.0

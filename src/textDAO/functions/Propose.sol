@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 import { console2 } from "forge-std/console2.sol";
-import { Storage } from "bundle/textdao/storages/Storage.sol";
-import { Schema } from "bundle/textdao/storages/Schema.sol";
-import { Types } from "bundle/textdao/storages/Types.sol";
+import { Storage } from "bundle/textDAO/storages/Storage.sol";
+import { Schema } from "bundle/textDAO/storages/Schema.sol";
+import { Types } from "bundle/textDAO/storages/Types.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Propose {
@@ -17,7 +17,7 @@ contract Propose {
         if ($.config.repsNum < $member.nextMemberId) {
             /*
                 VRF Request to choose reps
-            */            
+            */
 
             require($vrf.subscriptionId > 0, "No Chainlink VRF subscription. Try SetConfigsProtected::createAndFundSubscription first.");
             require($vrf.config.vrfCoordinator != address(0), "No Chainlink VRF vrfCoordinator. Try SetVRFProtected::setVRFConfig first.");
@@ -49,7 +49,7 @@ contract Propose {
             $p.cmds.push(_p.cmd);
         }
         // Note: Shadow(sender, timestamp)
-        
+
         proposalId = $.nextProposalId;
         $.nextProposalId++;
     }
