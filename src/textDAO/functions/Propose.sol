@@ -48,6 +48,7 @@ contract Propose {
         if (_p.cmd.actions.length > 0) {
             $p.cmds.push(_p.cmd);
         }
+        $p.proposalMeta.createdAt = block.timestamp;
         // Note: Shadow(sender, timestamp)
 
         proposalId = $.nextProposalId;

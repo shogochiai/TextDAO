@@ -89,7 +89,7 @@ contract ProposeTest is MCTest {
         uint256 pid = Propose(address(this)).propose(p);
         (, bytes32[] memory writes) = vm.accesses(address(this));
 
-        assertEq(writes.length, 9);
+        assertEq(writes.length, 10);
 
         assertEq(_preState.vrfRequestId, 0);
         assertEq($vrf.requests[_preState.vrfRequestId].requestId, _requestId);
@@ -160,7 +160,7 @@ contract ProposeTest is MCTest {
         uint pid = Propose(address(this)).propose(p);
         (, bytes32[] memory writes) = vm.accesses(address(this));
 
-        assertEq(writes.length, 9);
+        assertEq(writes.length, 10);
 
         assertEq(_preState.vrfRequestId, 0);
         assertEq($vrf.requests[_preState.vrfRequestId].requestId, _requestId);
