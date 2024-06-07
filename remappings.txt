@@ -1,5 +1,6 @@
 bundle/=src/
+forge-std/=lib/mc/lib/forge-std/src/
 @chainlink/=lib/chainlink/contracts/src/v0.8/
-@openzeppelin/=lib/openzeppelin-contracts/
+@openzeppelin/=lib/mc/lib/ucs-contracts/lib/openzeppelin-contracts/
 @devkit/=lib/mc/devkit/
 @mc-std/=lib/mc/src/std/
