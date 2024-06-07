@@ -17,6 +17,11 @@ library Schema {
         uint repsNum;
         uint quorumScore;
     }
+    struct ProposalNoTallied {
+        Schema.Header[] headers;
+        Schema.Command[] cmds;
+        Schema.ProposalMeta proposalMeta;
+    }
     struct Proposal {
         Header[] headers;
         Command[] cmds;
@@ -49,9 +54,6 @@ library Schema {
         uint createdAt;
     }
 
-
-
-
     /// @custom:storage-location erc7201:textDAO.TextSaveProtectedStorage
     struct TextSaveProtectedStorage {
         mapping(uint => Text) texts;
@@ -61,9 +63,6 @@ library Schema {
         uint id;
         bytes32[] metadataURIs;
     }
-
-
-
 
     /// @custom:storage-location erc7201:textDAO.MemberJoinProtectedStorage
     struct MemberJoinProtectedStorage {
@@ -75,7 +74,6 @@ library Schema {
         address addr;
         bytes32 metadataURI;
     }
-
 
     /// @custom:storage-location erc7201:textDAO.VRFStorage
     struct VRFStorage {
@@ -97,8 +95,6 @@ library Schema {
         address LINKTOKEN;
     }
 
-
-
     /// @custom:storage-location erc7201:textDAO.ConfigOverrideStorage
     struct ConfigOverrideStorage {
         mapping(bytes4 => ConfigOverride) overrides;
@@ -107,9 +103,6 @@ library Schema {
     struct ConfigOverride {
         uint quorumScore;
     }
-
-
-
 
     /// @custom:storage-location erc7201:textDAO.TagStorage
     struct TagStorage {
@@ -121,9 +114,6 @@ library Schema {
         bytes32 metadataURI;
     }
 
-
-
-
     /// @custom:storage-location erc7201:textDAO.TagRelationStorage
     struct TagRelationStorage {
         mapping(uint => TagRelation) relations;
@@ -134,7 +124,6 @@ library Schema {
         uint tagId;
         uint taggedId;
     }
-
 }
 
 
