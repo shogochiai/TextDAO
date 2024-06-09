@@ -24,7 +24,7 @@ contract Fork {
         }
         if (_p.cmd.actions.length > 0) {
             for (uint i; i < _p.cmd.actions.length; i++) {
-                emit CommandProposed(pid, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
+                emit CommandForked(pid, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
             }
         }
         // Note: Shadow(sender, timestamp)
