@@ -47,22 +47,18 @@ contract Propose {
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
+            emit HeaderProposed(proposalId, _p.header.id, _p.header.currentScore, _p.header.metadataURI, _p.header.tagIds);
         }
         if (_p.cmd.actions.length > 0) {
             $p.cmds.push(_p.cmd);
+            for (uint i; i < _p.cmd.actions.length; i++) {
+                emit CommandProposed(proposalId, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
+            }
         }
         // Note: Shadow(sender, timestamp)
 
         proposalId = $.nextProposalId;
         $.nextProposalId++;
-        if (_p.header.metadataURI.length > 0) {
-            emit HeaderProposed(proposalId, _p.header.id, _p.header.currentScore, _p.header.metadataURI, _p.header.tagIds);
-        }
-        if (_p.cmd.actions.length > 0) {
-            for (uint i; i < _p.cmd.actions.length; i++) {
-                emit CommandProposed(proposalId, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
-            }
-        }
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWordsReturned) public returns (bool) {

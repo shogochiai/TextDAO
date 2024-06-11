@@ -15,14 +15,10 @@ contract Fork {
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
-        }
-        if (_p.cmd.actions.length > 0) {
-            $p.cmds.push(_p.cmd);
-        }
-        if (_p.header.metadataURI.length > 0) {
             emit HeaderForked(pid, _p.header.id, _p.header.currentScore, _p.header.metadataURI, _p.header.tagIds);
         }
         if (_p.cmd.actions.length > 0) {
+            $p.cmds.push(_p.cmd);
             for (uint i; i < _p.cmd.actions.length; i++) {
                 emit CommandForked(pid, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
             }
