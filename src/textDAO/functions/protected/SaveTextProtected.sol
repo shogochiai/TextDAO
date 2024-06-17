@@ -6,7 +6,7 @@ import { Schema } from "bundle/textdao/storages/Schema.sol";
 import { ProtectionBase } from "bundle/_utils/ProtectionBase.sol";
 
 contract SaveTextProtected is ProtectionBase {
-    event TextSaved(uint pid, uint textId, bytes32[] metadataURIs);
+    event TextSaved(uint pid, Schema.Text text);
 
     function saveText(uint pid, uint textId, bytes32[] memory metadataURIs) public protected(pid) returns (bool) {
         Schema.TextSaveProtectedStorage storage $ = Storage.$Texts();
@@ -14,6 +14,6 @@ contract SaveTextProtected is ProtectionBase {
         $text.id = $.nextTextId;
         $text.metadataURIs = metadataURIs;
         $.nextTextId++;
-        emit TextSaved(pid, $text.id, $text.metadataURIs);
+        emit TextSaved(pid, $text);
     }
 }

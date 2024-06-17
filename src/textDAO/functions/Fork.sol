@@ -6,8 +6,8 @@ import { Schema } from "bundle/textdao/storages/Schema.sol";
 import { Types } from "bundle/textdao/storages/Types.sol";
 
 contract Fork {
-    event HeaderForked(uint pid, uint headerId, uint currentScore, bytes32 metadataURI, uint[] tagIds);
-    event CommandForked(uint pid, uint cmdId, uint currentScore, string func, bytes abiParams);
+    event HeaderForked(uint pid, Schema.Header header);
+    event CommandForked(uint pid, Schema.Command cmd);
 
     function fork(uint pid, Types.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
@@ -15,13 +15,11 @@ contract Fork {
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
-            emit HeaderForked(pid, _p.header.id, _p.header.currentScore, _p.header.metadataURI, _p.header.tagIds);
+            emit HeaderForked(pid, _p.header);
         }
         if (_p.cmd.actions.length > 0) {
             $p.cmds.push(_p.cmd);
-            for (uint i; i < _p.cmd.actions.length; i++) {
-                emit CommandForked(pid, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
-            }
+            emit CommandForked(pid, _p.cmd);
         }
         // Note: Shadow(sender, timestamp)
     }

@@ -8,8 +8,8 @@ import { Types } from "bundle/textdao/storages/Types.sol";
 import "@chainlink/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 
 contract Propose {
-    event HeaderProposed(uint pid, uint headerId, uint currentScore, bytes32 metadataURI, uint[] tagIds);
-    event CommandProposed(uint pid, uint cmdId, uint currentScore, string func, bytes abiParams);
+    event HeaderProposed(uint pid, Schema.Header header);
+    event CommandProposed(uint pid, Schema.Command cmd);
 
     function propose(Types.ProposalArg calldata _p) external onlyMember returns (uint proposalId) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
@@ -47,13 +47,11 @@ contract Propose {
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
-            emit HeaderProposed(proposalId, _p.header.id, _p.header.currentScore, _p.header.metadataURI, _p.header.tagIds);
+            emit HeaderProposed(proposalId, _p.header);
         }
         if (_p.cmd.actions.length > 0) {
             $p.cmds.push(_p.cmd);
-            for (uint i; i < _p.cmd.actions.length; i++) {
-                emit CommandProposed(proposalId, _p.cmd.id, _p.cmd.currentScore, _p.cmd.actions[i].func, _p.cmd.actions[i].abiParams);
-            }
+            emit CommandProposed(proposalId, _p.cmd);
         }
         // Note: Shadow(sender, timestamp)
 
