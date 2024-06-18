@@ -8,6 +8,8 @@ import { SortLib } from "bundle/_utils/SortLib.sol";
 import { SelectorLib } from "bundle/_utils/SelectorLib.sol";
 
 contract Tally {
+    event ProposalTallied(uint pid, Schema.ProposalMeta proposalMeta);
+
     function tally(uint pid) external onlyOncePerInterval(pid) returns (bool) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
@@ -48,7 +50,7 @@ contract Tally {
                 break;
             }
         }
-        
+
         if ($p.proposalMeta.headerRank.length == 0) {
             $p.proposalMeta.headerRank = new uint[](3);
         }
@@ -82,7 +84,7 @@ contract Tally {
             if(vars.headerRank2 < $p.headers.length){
                 vars.topHeaders[i] = $p.headers[vars.headerRank2];
             }
-            
+
             if(vars.cmdRank2 < $p.cmds.length){
                 vars.topCommands[i] = $p.cmds[vars.cmdRank2];
             }
@@ -109,6 +111,7 @@ contract Tally {
         // interval flag
         require($.config.tallyInterval > 0, "Set tally interval at config.");
         $p.tallied[block.timestamp / $.config.tallyInterval] = true;
+        emit ProposalTallied(pid, $p.proposalMeta);
     }
 
     modifier onlyOncePerInterval(uint pid) {

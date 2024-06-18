@@ -6,15 +6,20 @@ import { Schema } from "bundle/textdao/storages/Schema.sol";
 import { Types } from "bundle/textdao/storages/Types.sol";
 
 contract Fork {
+    event HeaderForked(uint pid, Schema.Header header);
+    event CommandForked(uint pid, Schema.Command cmd);
+
     function fork(uint pid, Types.ProposalArg calldata _p) external onlyReps(pid) returns (uint forkId) {
         Schema.ProposeStorage storage $ = Storage.$Proposals();
         Schema.Proposal storage $p = $.proposals[pid];
 
         if (_p.header.metadataURI.length > 0) {
             $p.headers.push(_p.header);
+            emit HeaderForked(pid, _p.header);
         }
         if (_p.cmd.actions.length > 0) {
             $p.cmds.push(_p.cmd);
+            emit CommandForked(pid, _p.cmd);
         }
         // Note: Shadow(sender, timestamp)
     }

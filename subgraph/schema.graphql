@@ -1,0 +1,45 @@
+type Proposal @entity {
+    id: BigInt!
+    headers: [Header!]! @derivedFrom(field: "proposal")
+    cmds: [Command!]! @derivedFrom(field: "proposal")
+    proposalMeta: ProposalMeta @derivedFrom(field: "proposal")
+}
+type Header @entity {
+    id: BigInt!
+    proposal: Proposal!
+    currentScore: BigInt!
+    metadataURI: Bytes!
+    tagIds: [BigInt!]!
+}
+type Command @entity {
+    id: BigInt!
+    proposal: Proposal!
+    actions: [Action!]! @derivedFrom(field: "command")
+    currentScore: BigInt!
+}
+type Action @entity {
+    command: Command!
+    func: String!
+    abiParams: Bytes!
+}
+type ProposalMeta @entity {
+    proposal: Proposal!
+    currentScore: BigInt!
+    headerRank: [BigInt!]!
+    cmdRank: [BigInt!]!
+    nextHeaderTallyFrom: BigInt!
+    nextCmdTallyFrom: BigInt!
+    reps: [Bytes!]!
+    nextRepId: BigInt!
+    createdAt: BigInt!
+}
+type Text @entity {
+    id: BigInt!
+    metadataURIs: [Bytes!]!
+    bodies: [String]!
+}
+type Member @entity {
+    id: BigInt!
+    addr: Bytes!
+    metadataURI: Bytes!
+}
