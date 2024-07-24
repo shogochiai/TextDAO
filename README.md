@@ -1,4 +1,6 @@
-# TextDAO
+# TextDAO (Deprecated)
+
+- Moved to [ecdysisxyz/TextDAO](https://github.com/ecdysisxyz/TextDAO)
 
 # Version Sensitivity Info
 - foundry: 1a4960d 2024-03-20T00:19:54.542150000Z
